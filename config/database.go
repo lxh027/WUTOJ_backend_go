@@ -11,7 +11,7 @@ func GetDbConfig() map[string]string {
 	dbConfig["username"] 	= "root"
 	dbConfig["password"] 	= ""
 	dbConfig["charset"]		= "utf8"
-
+	dbConfig["parseTime"]	= "True"
 
 	return dbConfig
 }
