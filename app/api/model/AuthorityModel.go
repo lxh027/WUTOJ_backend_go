@@ -2,35 +2,24 @@ package model
 
 import (
 	"OnlineJudge/db_server"
-	"database/sql"
+	"github.com/jinzhu/gorm"
 	"log"
 )
 
-var db *sql.DB = db_server.MySqlDb
+var db *gorm.DB = db_server.MySqlDb
 
 type Authority struct {
-	ID int64 `json:"id"`
-	Name string `json:"name"`
-	Enabled int64 `json:"enabled"`
+	ID uint64		`json:"id"`
+	Name string		`json:"name"`
+	Enabled uint8	`json:"enabled"`
 }
 
 func (model *Authority) GetAllAuthority() (authorities []Authority, err error)  {
 	authorities = make([]Authority, 0)
 
-	rows, err := db.Query("SELECT * FROM `authority`")
+	db.Find(&authorities)
 
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-
-	for rows.Next() {
-		var auth Authority
-		err = rows.Scan(&auth.ID, &auth.Name, &auth.Enabled)
-		authorities = append(authorities, auth)
-	}
-
-	if err != nil {
+	if err = db.Error; err != nil {
 		log.Println(err.Error())
 		return
 	}
