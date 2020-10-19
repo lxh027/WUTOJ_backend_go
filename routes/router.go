@@ -6,6 +6,13 @@ import (
 )
 
 func Routes(router *gin.Engine)  {
-	router.GET("/", controller.Index)
-	router.GET("/test", controller.Test)
+
+	// api
+	api := router.Group("/api")
+	{
+		api.GET("/", controller.Index)
+		api.GET("/test", controller.Test)
+		api.POST("/register", controller.Register)
+	}
+
 }

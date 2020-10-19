@@ -1,12 +1,9 @@
 package model
 
 import (
-	"OnlineJudge/db_server"
-	"github.com/jinzhu/gorm"
 	"log"
 )
 
-var db *gorm.DB = db_server.MySqlDb
 
 type Authority struct {
 	ID uint64		`json:"id"`

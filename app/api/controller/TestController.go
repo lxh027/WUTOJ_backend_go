@@ -15,7 +15,7 @@ func Test(c *gin.Context)  {
 	var authModel = model.Authority{}
 	var authValidate = validate.AuthorityValidate
 
-	if res, err := authValidate.Validate(c, "ind"); !res {
+	if res, err := authValidate.Validate(c, "find"); !res {
 		log.Println(err.Error())
 		return
 	}

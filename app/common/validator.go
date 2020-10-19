@@ -21,6 +21,7 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 	}
 	httpData, err := validate.FromRequest(c.Request)
 	if err != nil {
+		log.Println(err.Error())
 		panic(err.Error())
 	}
 	// 创建验证器
