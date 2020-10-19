@@ -9,7 +9,6 @@ import (
 	"strconv"
 )
 
-
 func Test(c *gin.Context)  {
 
 	var authModel = model.Authority{}

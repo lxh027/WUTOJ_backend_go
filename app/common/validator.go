@@ -34,3 +34,4 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 		return false, errors.New(v.Errors.One())
 	}
 }
+

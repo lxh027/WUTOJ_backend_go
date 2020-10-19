@@ -4,7 +4,6 @@ import (
 	"OnlineJudge/app/common"
 )
 
-
 type Authority struct {
 	ID uint64		`json:"id"`
 	Name string		`json:"name"`
