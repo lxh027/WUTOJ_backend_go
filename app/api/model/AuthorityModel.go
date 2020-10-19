@@ -26,4 +26,14 @@ func (model *Authority) GetAllAuthority() (authorities []Authority, err error)  
 	return
 }
 
+func (model *Authority) GetAuthorityByID(id uint64) (authority Authority, err error)  {
+	db.Where("id = ?", id).First(&authority)
+
+	if err = db.Error; err != nil {
+		log.Println(err.Error())
+		return
+	}
+	return
+}
+
 
