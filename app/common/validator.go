@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/validate"
-	"log"
 )
 
 type Validator struct {
@@ -16,13 +15,11 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 	// 判断scene是否存在
 	if _, ok := validator.Scenes[scene]; !ok {
 		msg := errors.New("scene is not exists")
-		log.Println(msg.Error()) // all error messages
 		return false, msg
 	}
 	httpData, err := validate.FromRequest(c.Request)
 	if err != nil {
-		log.Println(err.Error())
-		panic(err.Error())
+		return false, err
 	}
 	// 创建验证器
 	v := httpData.Create()
@@ -34,7 +31,6 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 	if v.Validate() {
 		return true, errors.New("")
 	} else {
-		log.Println(v.Errors) // all error messages
 		return false, errors.New(v.Errors.One())
 	}
 }

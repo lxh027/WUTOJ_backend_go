@@ -2,7 +2,6 @@ package model
 
 import (
 	"OnlineJudge/app/common"
-	"log"
 )
 
 
@@ -15,10 +14,9 @@ type Authority struct {
 func (model *Authority) GetAllAuthority() common.ReturnType  {
 	authorities := make([]Authority, 0)
 
-	db.Find(&authorities)
+	err := db.Find(&authorities).Error
 
-	if err := db.Error; err != nil {
-		log.Println(err.Error())
+	if err != nil {
 		return common.ReturnType{Status: common.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
 	}
 	return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取成功", Data: authorities}
@@ -26,10 +24,9 @@ func (model *Authority) GetAllAuthority() common.ReturnType  {
 
 func (model *Authority) GetAuthorityByID(id uint64) common.ReturnType  {
 	authority := Authority{}
-	db.Where("id = ?", id).First(&authority)
+	err := db.Where("id = ?", id).First(&authority).Error
 
-	if err := db.Error; err != nil {
-		log.Println(err.Error())
+	if err != nil {
 		return common.ReturnType{Status: common.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
 	}
 	return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取成功", Data: authority}
