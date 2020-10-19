@@ -22,14 +22,9 @@ func Run(httpServer *gin.Engine)  {
 	//设置session中间件
 	httpServer.Use(sessions.Sessions(sessionConfig["name"].(string), sessionStore))
 
+	gin.DisableConsoleColor()
 	// 生成日志
-	var logFile *os.File
-	if file, err := os.Open(config.GetLogPath()); err != nil {
-		file, _ := os.Create(config.GetLogPath())
-		logFile = file
-	} else {
-		logFile = file
-	}
+	logFile, _:= os.Create(config.GetLogPath())
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
 	// 设置日志格式
 	httpServer.Use(gin.LoggerWithFormatter(config.GetLogFormat))

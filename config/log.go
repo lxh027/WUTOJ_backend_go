@@ -22,6 +22,6 @@ func GetLogFormat(param gin.LogFormatterParams) string {
 
 func GetLogPath() string  {
 	timeObj := time.Now()
-	datetime := timeObj.Format("2006-01-02")
+	datetime := timeObj.Format("2006-01-02-15-04-05")
 	return "log/OnlineJudge"+datetime+".log"
 }
