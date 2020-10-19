@@ -14,13 +14,13 @@ func Run(httpServer *gin.Engine)  {
 	serverConfig  := config.GetServerConfig()
 	sessionConfig := config.GetSessionConfig()
 	// 运行模式
-	gin.SetMode(serverConfig["mode"])
+	gin.SetMode(serverConfig["mode"].(string))
 	httpServer = gin.Default()
 
 	// 创建session存储引擎
-	sessionStore := cookie.NewStore([]byte(sessionConfig["key"]))
+	sessionStore := cookie.NewStore([]byte(sessionConfig["key"].(string)))
 	//设置session中间件
-	httpServer.Use(sessions.Sessions(sessionConfig["name"], sessionStore))
+	httpServer.Use(sessions.Sessions(sessionConfig["name"].(string), sessionStore))
 
 	// 生成日志
 	var logFile *os.File
@@ -38,7 +38,7 @@ func Run(httpServer *gin.Engine)  {
 	// 注册路由
 	routes.Routes(httpServer)
 
-	serverError := httpServer.Run(serverConfig["host"]+":"+serverConfig["port"])
+	serverError := httpServer.Run(serverConfig["host"].(string)+":"+serverConfig["port"].(string))
 
 	if serverError != nil {
 		panic("server error !" + serverError.Error())

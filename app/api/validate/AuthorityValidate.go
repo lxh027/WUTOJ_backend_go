@@ -10,7 +10,7 @@ func init()  {
 	}
 
 	scenes := map[string][]string {
-		"find": []string{"id"},
+		"find": {"id"},
 	}
 	AuthorityValidate.Rules = rules
 	AuthorityValidate.Scenes = scenes
