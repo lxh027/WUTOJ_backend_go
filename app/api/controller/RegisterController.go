@@ -21,16 +21,12 @@ func Register(c *gin.Context)  {
 	password, passwordCheck := c.PostForm("password"), c.PostForm("password_check")
 
 	if password != passwordCheck {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "两次密码输入不一致",
-		})
+		c.JSON(http.StatusOK, common.ApiReturn(common.CODE_ERROE, "两次密码输入不一致", ""))
 	}
 
 	var userJson model.User
 	if err := c.ShouldBind(&userJson); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status": err.Error(),
-		})
+		c.JSON(http.StatusOK, common.ApiReturn(common.CODE_ERROE, "数据绑定模型错误", err.Error()))
 		return
 	}
 
@@ -40,20 +36,12 @@ func Register(c *gin.Context)  {
 		userJson.Avatar = "../uploads/image/20200214/fc3d5f691e86c9f621621682c57de59b.jpg"
 	}
 
-	res, err := userModel.AddUser(userJson)
+	res := userModel.AddUser(userJson)
 
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
-	} else if !res {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "插入失败",
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "插入成功",
-		})
+	if res.Status != common.CODE_SUCCESS {
+		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
+	} else  {
+		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
 	}
 	return
 }

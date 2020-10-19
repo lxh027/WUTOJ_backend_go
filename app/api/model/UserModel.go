@@ -1,7 +1,7 @@
 package model
 
 import (
-	"errors"
+	"OnlineJudge/app/common"
 )
 
 type User struct {
@@ -27,13 +27,12 @@ func (User) TableName() string {
 }
 
 // 添加用户
-func (model *User) AddUser(data User)(bool, error)  {
+func (model *User) AddUser(data User)common.ReturnType  {
 	err := db.Create(&data).Error
 	if err != nil {
-		return false, err
+		return common.ReturnType{Status: common.CODE_ERROE, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return true, errors.New("创建成功")
+		return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "创建成功", Data: 1}
 	}
-
 }
 

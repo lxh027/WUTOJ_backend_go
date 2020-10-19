@@ -3,6 +3,7 @@ package controller
 import (
 	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/api/validate"
+	"OnlineJudge/app/common"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -19,16 +20,11 @@ func Test(c *gin.Context)  {
 		log.Println(err.Error())
 		return
 	}
-	id, err:= strconv.ParseUint(c.Query("id"), 10, 64)
-	auths, err := authModel.GetAuthorityByID(id)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "ERROR",
-		})
+	id, _:= strconv.ParseUint(c.Query("id"), 10, 64)
+	res := authModel.GetAuthorityByID(id)
+	if res.Status != common.CODE_SUCCESS{
+		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "OK",
-		"data": auths,
-	})
+	c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
 }
