@@ -15,7 +15,9 @@ func DoLogin(c *gin.Context) {
 	session := sessions.Default(c)
 
 	if session.Get("user_id") != nil {
-		c.JSON(http.StatusOK, common.ApiReturn(common.CODE_ERROE, "已登陆", session.Get("data")))
+		data := make(map[string]interface{}, 0)
+		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
+		c.JSON(http.StatusOK, common.ApiReturn(common.CODE_ERROE, "已登陆", data))
 		return
 	}
 
@@ -52,7 +54,7 @@ func DoLogin(c *gin.Context) {
 		session.Set("user_id", userInfo.UserID)
 		session.Set("nick", userInfo.Nick)
 		session.Set("identity", userInfo.Identity)
-		session.Set("data", jsonData)
+		session.Set("data", string(jsonData))
 		session.Save()
 		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, returnData))
 		return
