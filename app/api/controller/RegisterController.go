@@ -5,7 +5,6 @@ import (
 	"OnlineJudge/app/api/validate"
 	"OnlineJudge/app/common"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ func Register(c *gin.Context)  {
 	var userValidate = validate.UserValidate
 
 	if res, err := userValidate.Validate(c, "register"); !res {
-		log.Println(err.Error())
+		c.JSON(http.StatusOK, common.ApiReturn(common.CODE_ERROE, "输入信息不完整或有误", err.Error()))
 		return
 	}
 
@@ -38,10 +37,6 @@ func Register(c *gin.Context)  {
 
 	res := userModel.AddUser(userJson)
 
-	if res.Status != common.CODE_SUCCESS {
-		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
-	} else  {
-		c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
-	}
+	c.JSON(http.StatusOK, common.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

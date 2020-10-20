@@ -13,6 +13,9 @@ func Routes(router *gin.Engine)  {
 		api.GET("/", controller.Index)
 		api.GET("/test", controller.Test)
 		api.POST("/register", controller.Register)
+
+		api.POST("/do_login", controller.DoLogin)
+		api.POST("/do_logout", controller.DoLogout)
 	}
 
 }
