@@ -92,7 +92,7 @@ func (model *Contest) editContest(contestID int, data Contest) common.ReturnType
 func (model *Contest) getAllGroupContest(groupID int, page int) common.ReturnType {
 	config := config.GetWutOjConfig()
 	i := config["page_limit"]
-	var PageLimit int = i
+	var PageLimit int = i.(int)
 	var groupList []Group
 	err := db.Where("group_id = ?", groupID).Limit(page * PageLimit).Scan(&groupList).Error
 	if err != nil {

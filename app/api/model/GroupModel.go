@@ -5,12 +5,14 @@ type Group struct {
 	GroupName    int    `json:"group_name" form:"group_name"`
 	Avatar       string `json:"avatar" form:"avatar"`
 	JoinCode     int    `json:"join_code" form:"join_code"`
-	desc         string `json:"desc" form:"desc"`
+	Desc         string `json:"desc" form:"desc"`
 	GroupCreator int    `json:"group_creator" form:"group_creator"`
-	status       int    `json:"status" form:"status"`
+	Status       int    `json:"status" form:"status"`
 }
 
 func getAllGroup() {
+	//config := config2.GetWutOjConfig()
+	//PageLimit := config["page_limit"]
 
 }
 

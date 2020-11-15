@@ -7,11 +7,12 @@ import (
 )
 
 type Validator struct {
-	Rules map[string]string
-	Scenes map[string] []string
+	Rules   map[string]string
+	Scenes  map[string][]string
+	Message map[string]string
 }
 
-func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) {
+func (validator *Validator) Validate(c *gin.Context, scene string) (bool, error) {
 	// 判断scene是否存在
 	if _, ok := validator.Scenes[scene]; !ok {
 		msg := errors.New("scene is not exists")
@@ -34,4 +35,3 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 		return false, errors.New(v.Errors.One())
 	}
 }
-
