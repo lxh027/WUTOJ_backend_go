@@ -2,11 +2,11 @@ package common
 
 import (
 	"crypto/md5"
-	"encoding/hex"
+	"fmt"
 )
 
 func GetMd5(str string) string  {
-	h := md5.New()
-	h.Write([]byte(str))
-	return hex.EncodeToString(h.Sum(nil))
+	hash := md5.Sum([]byte(str))
+	hashBase64:= fmt.Sprintf("%x", hash)
+	return hashBase64
 }
