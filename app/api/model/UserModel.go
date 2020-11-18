@@ -19,7 +19,7 @@ type User struct {
 	Mail 		string 	`json:"mail" form:"mail"`
 	Status 		int 	`json:"status" form:"status"`
 	RoleGroup	string 	`json:"role_group" form:"role_group"`
-	AllProblem	interface{}	`json:"all_problem" form:"all_problem"`
+	//AllProblem	interface{}	`json:"all_problem" form:"all_problem"`
 }
 
 // 设定表名
@@ -31,7 +31,7 @@ func (User) TableName() string {
 func (model *User) AddUser(data User)common.ReturnType  {
 	user := User{}
 	// 判断昵称是否已存在
-	if err := db.Where("nick = ?", data.Nick).First(user).Error; err == nil {
+	if err := db.Where("nick = ?", data.Nick).First(&user).Error; err == nil {
 		return common.ReturnType{Status: common.CODE_ERROE, Msg: "昵称已存在",  Data: user}
 	}
 	// 创建记录
@@ -101,8 +101,10 @@ func (model *User) LoginCheck(data User)common.ReturnType  {
 		if res.Status != common.CODE_SUCCESS {
 			return res
 		} else {
-			user.AllProblem = res.Data
-			return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "登录验证成功", Data: user}
+			resp := make(map[string]interface{})
+			resp["userInfo"] = user
+			resp["allProblem"] = res.Data
+			return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "登录验证成功", Data: resp}
 		}
 	}
 }

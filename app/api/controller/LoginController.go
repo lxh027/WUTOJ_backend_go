@@ -42,13 +42,14 @@ func DoLogin(c *gin.Context) {
 
 
 	if res.Status == common.CODE_SUCCESS {
-		userInfo := res.Data.(model.User)
+		userInfo := res.Data.(map[string]interface{})["userInfo"].(model.User)
+		allProblem := res.Data.(map[string]interface{})["allProblem"].([]model.Submit)
 		returnData := map[string]interface{} {
 			"userId"	: userInfo.UserID,
 			"nick"		: userInfo.Nick,
 			"desc"		: userInfo.Desc,
 			"avatar"	: userInfo.Avatar,
-			"all_problem": userInfo.AllProblem,
+			"all_problem": allProblem,
 		}
 		jsonData, _ := json.Marshal(returnData)
 		session.Set("user_id", userInfo.UserID)
