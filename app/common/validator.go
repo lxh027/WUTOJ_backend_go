@@ -29,7 +29,7 @@ func (validator *Validator)Validate(c *gin.Context, scene string) (bool, error) 
 	}
 
 	if v.Validate() {
-		return true, errors.New("")
+		return true, nil
 	} else {
 		return false, errors.New(v.Errors.One())
 	}
