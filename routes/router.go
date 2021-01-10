@@ -11,7 +11,6 @@ func Routes(router *gin.Engine)  {
 	api := router.Group("/api")
 	{
 		api.GET("/", controller.Index)
-		api.GET("/test", controller.Test)
 		api.POST("/register", controller.Register)
 
 		api.POST("/do_login", controller.DoLogin)
