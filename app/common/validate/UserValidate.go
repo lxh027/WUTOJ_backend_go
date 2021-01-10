@@ -22,6 +22,7 @@ func init()  {
 		"mail"			: "required|email",
 		"check"			: "required",
 		"status"		: "required|int:-1,0",
+		"is_admin"		: "required|bool",
 	}
 
 	scenes := map[string][]string {
@@ -36,6 +37,7 @@ func init()  {
 		"forget"			: {"nick", "mail"},
 		"forget_password"	: {"nick", "password", "password_check", "check"},
 		"change_password"	: {"nick", "old_password", "password", "password_check"},
+		"set_admin"			: {"uid", "is_admin"},
 	}
 	UserValidate.Rules = rules
 	UserValidate.Scenes = scenes
