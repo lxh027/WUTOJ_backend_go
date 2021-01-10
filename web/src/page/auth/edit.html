@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>编辑用户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        .layui-iconpicker-body.layui-iconpicker-body-page .hide {display: none;}
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" id="title" lay-verify="required" lay-reqtext="标题不能为空" placeholder="请输入标题" value="" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label for="" class="layui-form-label">图标</label>
+        <div class="layui-input-block">
+            <input type="text" name="icon" id="icon" value="fa" lay-filter="iconPicker" class="hide">
+        </div>
+    </div>
+
+    <div class="layui-form-item" id="href-div" hidden>
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="href" id="href" placeholder="请输入地址" value="" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item" id="parent-div" hidden>
+        <label class="layui-form-label">上级权限</label>
+        <div class="layui-input-block">
+            <select name="parent" id="parent">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../../js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<script>
+    layui.use(['form', 'iconPickerFa'], function () {
+        var iconPickerFa = layui.iconPickerFa,
+            form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        let auths = [], aid = 0, authType = -1, iconVal = "";
+
+        $(document).ready(() => {
+            renderIconPicker()
+            aid = getQueryString("aid")
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("updateAuth") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            }).then( () => {
+                $.ajax({
+                    url: getPort()+'auth/getAuthByID',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "aid": aid
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            authType = data.data.type
+                            $("#icon").val(data.data.icon)
+                            $("#title").val(data.data.title)
+                            $("#href").val(data.data.href)
+                            iconVal = data.data.icon
+                            if (data.data.type != 0) {
+                                if (data.data.type == 1) {
+                                    $("#href-div").show()
+                                }
+                                $("#parent-div").show()
+                                $.ajax({
+                                    url: getPort()+'auth/getParentAuth',
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {
+                                        "parent": data.data.type-1
+                                    },
+                                    success: function (return_data) {
+                                        const auths = return_data.data
+                                        let ops = ""
+                                        auths.forEach((auth) => {
+                                            let op = "<option value="+auth.aid+">"+auth.title+"</option>"
+                                            console.log(op)
+                                            ops += op
+                                        })
+                                        $("#parent").html(ops)
+                                        $("#parent").val(data.data.parent)
+                                        form.render('select')
+                                    }
+                                })
+                            }
+                        } else {
+                            layer.msg("获取信息错误", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                    }
+                }).then(() => {
+                    iconPickerFa.checkIcon('iconPicker', $("#icon").val());
+                })
+            })
+
+        })
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var index = layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            }, function () {
+                let ajaxData = {
+                    "aid": aid,
+                    "title": $("#title").val(),
+                    "type" : authType
+                }
+                if (authType == 1) {
+                    ajaxData["parent"] = $("#parent").val()
+                    ajaxData["href"]  = $("#href").val()
+                } else if (authType == 2) {
+                    ajaxData["parent"] = $("#parent").val()
+                }
+                if ($("#icon").val() == iconVal) {
+                    ajaxData["icon"]  = iconVal
+                } else {
+                    ajaxData["icon"]  = "fa "+$("#icon").val()
+                }
+                $.ajax({
+                    url: getPort()+'auth/updateAuth',
+                    type: "post",
+                    dataType: "json",
+                    data: ajaxData,
+                    success: function (data) {
+                        layer.msg(data.msg)
+                        if (data.status == 0) {
+                            // 关闭弹出层
+                            layer.close(index);
+
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layui.table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                            parent.layer.close(iframeIndex);
+                        }
+                    }
+                })
+            });
+
+            return false;
+        });
+        function renderIconPicker() {
+            iconPickerFa.render({
+                // 选择器，推荐使用input
+                elem: '#icon',
+                // fa 图标接口
+                url: "../../../lib/font-awesome-4.7.0/less/variables.less",
+                // 是否开启搜索：true/false，默认true
+                search: true,
+                // 是否开启分页：true/false，默认true
+                page: true,
+                // 每页显示数量，默认12
+                limit: 12,
+                // 点击回调
+                click: function (data) {
+                    console.log(data);
+                },
+                // 渲染成功后的回调
+                success: function (d) {
+                    console.log(d);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

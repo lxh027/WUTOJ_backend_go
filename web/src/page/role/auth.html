@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>角色权限更改</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css"  media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+
+<div id="auth" class="demo-transfer" align="center"></div>
+
+
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['transfer', 'layer', 'util'], function(){
+        var $ = layui.jquery
+            ,transfer = layui.transfer
+            ,layer = layui.layer
+            ,util = layui.util;
+
+        let auths = [], rid = 0, authData = [];
+
+        $(document).ready(() => {
+            rid = getQueryString("rid")
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("authAssign") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            }).then(() => {
+                $.ajax({
+                    url: getPort()+'roleAuth/getRoleAuthsList',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "rid": rid
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            transfer.render({
+                                id : 'authTransfer',
+                                contentType: 'application/json',
+                                elem: '#auth',
+                                width: 500,
+                                data: data.data.allAuths,
+                                title: ['未拥有权限', '拥有权限'],
+                                value: data.data.values,
+                                //value: ["1", "3", "5", "7", "9", "11"],
+                                parseData: function(res){
+                                    return {
+                                        "value": res.aid, //数据值
+                                        "title": "type："+(res.type==0?"菜单":(res.type==1?"页面":"操作"))+"；title："+res.title, //数据标题
+                                        "disabled": res.disabled,  //是否禁用
+                                        "checked": res.checked, //是否选中
+                                    }
+                                },
+                                showSearch: true,
+                                onchange: function(obj, index){
+                                    var queryUrl = ['roleAuth/addRoleAuths', 'roleAuth/deleteRoleAuths'];
+                                    let aidArray = []
+                                    obj.forEach((data) => {
+                                        aidArray.push(data.value)
+                                    })
+                                    aidArray = JSON.stringify(aidArray)
+                                    console.log(aidArray)
+                                    $.ajax({
+                                        url: getPort()+queryUrl[index],
+                                        type: "post",
+                                        dataType: "json",
+                                        data: {
+                                            "rid": rid,
+                                            "aids": aidArray
+                                        },
+                                        success: function (return_data) {
+                                            layer.msg(return_data.msg)
+                                            reloadRoleData()
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            layer.msg("获取信息错误", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                    }
+                })
+                return false;
+            })
+        })
+
+        function reloadRoleData() {
+            $.ajax({
+                url: getPort()+'roleAuth/getRoleAuthsList',
+                type: "post",
+                dataType: "json",
+                data: {
+                    "rid": rid
+                },
+                success: function (data) {
+                    if (data.status == 0) {
+                        transfer.reload('roleTransfer', {
+                            width: 500,
+                            data: data.data.allAuths,
+                            title: ['未拥有权限', '拥有权限'],
+                            value: data.data.values,
+                            //value: ["1", "3", "5", "7", "9", "11"],
+                            parseData: function(res){
+                                return {
+                                    "value": res.aid, //数据值
+                                    "title": "type："+res.type==0?"菜单":(res.type==1?"页面":"操作")+"；title："+res.title, //数据标题
+                                    "disabled": res.disabled,  //是否禁用
+                                    "checked": res.checked, //是否选中
+                                }
+                            },
+                            showSearch: true,
+                            onchange: function(obj, index){
+                                var queryUrl = ['roleAuth/addRoleAuths', 'roleAuth/deleteRoleAuths'];
+                                let aidArray = []
+                                obj.forEach((data) => {
+                                    aidArray.push(data.value)
+                                })
+                                aidArray = JSON.stringify(aidArray)
+                                console.log(aidArray)
+                                $.ajax({
+                                    url: getPort()+queryUrl[index],
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {
+                                        "rid": rid,
+                                        "aids": aidArray
+                                    },
+                                    success: function (return_data) {
+                                        layer.msg(return_data.msg)
+                                        reloadRoleData()
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        layer.msg("获取信息错误", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            })
+        }
+    });
+</script>
+
+</body>
+</html>
