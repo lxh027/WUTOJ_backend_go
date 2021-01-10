@@ -1,6 +1,7 @@
 package model
 
 import (
+	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"time"
 )
@@ -30,8 +31,8 @@ func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 		Group("status").
 		Find(&submits).Error
 	if err != nil {
-		return helper.ReturnType{Status: helper.CODE_ERROE, Msg: "获取提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: common.CODE_ERROE, Msg: "获取提交记录失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: helper.CODE_SUCCESS, Msg: "获取提交记录成功", Data: submits}
+		return helper.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取提交记录成功", Data: submits}
 	}
 }
