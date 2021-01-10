@@ -18,18 +18,18 @@ func Register(c *gin.Context)  {
 		PasswordCheck string `json:"password_check" form:"password_check"`
 	}
 	if err := c.ShouldBind(&userJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CODE_ERROE, "数据绑定模型错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
 		return
 	}
 
 	userMap := helper.Struct2Map(userJson)
 	if  res, err := userValidate.ValidateMap(userMap, "register"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CODE_ERROE, "输入信息不完整或有误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "输入信息不完整或有误", err.Error()))
 		return
 	}
 
 	if userJson.Password != userJson.PasswordCheck {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CODE_ERROE, "两次密码输入不一致", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "两次密码输入不一致", ""))
 	}
 
 	userJson.Password = helper.GetMd5(userJson.Password)
