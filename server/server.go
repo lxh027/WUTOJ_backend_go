@@ -19,6 +19,10 @@ func Run(httpServer *gin.Engine)  {
 
 	// 创建session存储引擎
 	sessionStore := cookie.NewStore([]byte(sessionConfig["key"].(string)))
+	sessionStore.Options(sessions.Options{
+		MaxAge: sessionConfig["age"].(int),
+		Path: sessionConfig["path"].(string),
+	})
 	//设置session中间件
 	httpServer.Use(sessions.Sessions(sessionConfig["name"].(string), sessionStore))
 
