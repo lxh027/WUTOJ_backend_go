@@ -1,7 +1,7 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
+	"OnlineJudge/app/helper"
 	"time"
 )
 
@@ -23,15 +23,15 @@ func (Submit) TableName() string {
 	return "submit"
 }
 
-func (model *Submit) GetUserSubmits(userID uint)common.ReturnType  {
+func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 	submits := make([]Submit, 0)
 	err := db.Select([]string{"status", "count(*) as cnt"}).
 		Where("user_id = ?", userID).
 		Group("status").
 		Find(&submits).Error
 	if err != nil {
-		return common.ReturnType{Status: common.CODE_ERROE, Msg: "获取提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: helper.CODE_ERROE, Msg: "获取提交记录失败", Data: err.Error()}
 	} else {
-		return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取提交记录成功", Data: submits}
+		return helper.ReturnType{Status: helper.CODE_SUCCESS, Msg: "获取提交记录成功", Data: submits}
 	}
 }

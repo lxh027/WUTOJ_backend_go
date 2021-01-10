@@ -1,8 +1,10 @@
 package validate
 
-import "OnlineJudge/app/common"
+import (
+	"OnlineJudge/app/helper"
+)
 
-var UserValidate common.Validator
+var UserValidate helper.Validator
 
 func init()  {
 	rules := map[string]string {

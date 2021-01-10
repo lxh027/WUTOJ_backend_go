@@ -1,7 +1,7 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
+	"OnlineJudge/app/helper"
 )
 
 type Authority struct {
@@ -10,25 +10,25 @@ type Authority struct {
 	Enabled uint8	`json:"enabled"`
 }
 
-func (model *Authority) GetAllAuthority() common.ReturnType  {
+func (model *Authority) GetAllAuthority() helper.ReturnType {
 	authorities := make([]Authority, 0)
 
 	err := db.Find(&authorities).Error
 
 	if err != nil {
-		return common.ReturnType{Status: common.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: helper.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
 	}
-	return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取成功", Data: authorities}
+	return helper.ReturnType{Status: helper.CODE_SUCCESS, Msg: "获取成功", Data: authorities}
 }
 
-func (model *Authority) GetAuthorityByID(id uint64) common.ReturnType  {
+func (model *Authority) GetAuthorityByID(id uint64) helper.ReturnType {
 	authority := Authority{}
 	err := db.Where("id = ?", id).First(&authority).Error
 
 	if err != nil {
-		return common.ReturnType{Status: common.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: helper.CODE_ERROE, Msg: "获取失败", Data: err.Error()}
 	}
-	return common.ReturnType{Status: common.CODE_SUCCESS, Msg: "获取成功", Data: authority}
+	return helper.ReturnType{Status: helper.CODE_SUCCESS, Msg: "获取成功", Data: authority}
 }
 
 
