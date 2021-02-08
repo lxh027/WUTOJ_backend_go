@@ -3,6 +3,7 @@ package controller
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/panel/model"
+	"container/list"
 	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -43,43 +44,63 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 
 	if res := authModel.GetUserAllAuth(userID); res.Status == common.CodeSuccess {
 		auths := res.Data.([]model.Auth)
-		var authsLeft []model.Auth
+		authsLeft := map[int]model.Auth{}
 		var authName []string
 		var menu []menuItem
 
+		childMenu := map[int][]menuItem{}
+		hasChild := map[int]int{}
 		menuItemCount := 0
-		type2Pos := map[int]int{}
 
 		for _, auth := range auths {
 			if auth.Type == 2 {
 				authName = append(authName, auth.Title)
-			} else if auth.Type == 0 {
-				item := menuItem{
-					Title: auth.Title,
-					Target: auth.Target,
-					Icon: auth.Icon,
-					Href: auth.Href,
+			} else {
+				hasChild[auth.Aid] = 0
+				childMenu[auth.Aid] = make([]menuItem, 0)
+				authsLeft[auth.Aid] = auth
+				if auth.Type == 0 {
+					menuItemCount++
 				}
-				menu = append(menu, item)
-				type2Pos[auth.Aid] = menuItemCount
-				menuItemCount++
-			} else if auth.Type == 1 {
-				authsLeft = append(authsLeft, auth)
 			}
 		}
-		if menu != nil {
-			for _, auth := range authsLeft {
-				item := menuItem{
-					Title: auth.Title,
-					Target: auth.Target,
-					Icon: auth.Icon,
-					Href: auth.Href,
-				}
-				pos := type2Pos[auth.Parent]
-				menu[pos].Child = append(menu[pos].Child, item)
+
+		for _, auth := range authsLeft {
+			hasChild[auth.Parent]++
+		}
+		queue := list.New()
+		for _, auth := range authsLeft {
+			if hasChild[auth.Aid] == 0 {
+				queue.PushBack(auth)
 			}
-		} else {
-			menu = make([]menuItem, 0)
+		}
+
+		for queue.Len() > 0 {
+			auth := queue.Front().Value.(model.Auth)
+			queue.Remove(queue.Front())
+			item := menuItem{
+				Title: auth.Title,
+				Icon: auth.Icon,
+				Href: auth.Href,
+				Target: auth.Target,
+				Child: childMenu[auth.Aid],
+			}
+			childMenu[auth.Parent] = append(childMenu[auth.Parent], item)
+			hasChild[auth.Parent]--
+			if hasChild[auth.Parent] == 0 {
+				parentAuth := authsLeft[auth.Parent]
+				if parentAuth.Type == 0 {
+					menu = append(menu, menuItem{
+						Title: parentAuth.Title,
+						Icon: parentAuth.Icon,
+						Href: parentAuth.Href,
+						Target: parentAuth.Target,
+						Child: childMenu[parentAuth.Aid],
+					})
+				} else {
+					queue.PushBack(authsLeft[auth.Parent])
+				}
+			}
 		}
 
 		return menu, authName, nil
