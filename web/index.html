@@ -140,7 +140,7 @@
                         })
                     } else {
                         $("#admin_nick").text(return_data.data.nick)
-                        if (return_data.data.is_admin != 1) {
+                        if (return_data.data.identity != 1) {
                             $.ajax({
                                 url: getPort()+'user/logout',
                                 type: "post",
