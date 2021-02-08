@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"os"
+	"time"
 )
 
 func Run(httpServer *gin.Engine)  {
@@ -33,6 +34,13 @@ func Run(httpServer *gin.Engine)  {
 	// 设置日志格式
 	httpServer.Use(gin.LoggerWithFormatter(config.GetLogFormat))
 	httpServer.Use(gin.Recovery())
+
+	go func() {
+		for {
+			addTimer()
+			time.Sleep(10*time.Minute)
+		}
+	}()
 
 	// 注册路由
 	routes.Routes(httpServer)
