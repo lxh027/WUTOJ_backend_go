@@ -63,7 +63,8 @@ func addTimer() {
 			index++
 		}
 		if index != 0 {
-			addSql = addSql+" ac = VALUES(ac), wa = VALUES(wa), tle = VALUES(tle), mle = VALUES(mle), re = VALUES(re), se = VALUES(se), ce = VALUES(ce)"
+			addSql = addSql+"ON DUPLICATE KEY UPDATE ac = VALUES(ac), wa = VALUES(wa), tle = VALUES(tle), mle = VALUES(mle), re = VALUES(re), se = VALUES(se), ce = VALUES(ce)"
+			fmt.Println(addSql)
 			db.Exec(addSql)
 		}
 	}
