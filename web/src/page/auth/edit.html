@@ -106,13 +106,13 @@
                                     type: "post",
                                     dataType: "json",
                                     data: {
-                                        "parent": data.data.type-1
+                                        "type": data.data.type
                                     },
                                     success: function (return_data) {
                                         const auths = return_data.data
                                         let ops = ""
                                         auths.forEach((auth) => {
-                                            let op = "<option value="+auth.aid+">"+auth.title+"</option>"
+                                            let op = "<option value="+auth.aid+">"+auth.type+": "+auth.title+"</option>"
                                             console.log(op)
                                             ops += op
                                         })

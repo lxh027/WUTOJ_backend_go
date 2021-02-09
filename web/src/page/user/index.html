@@ -110,10 +110,10 @@
             }],
             cols: [[
                 {type: "checkbox", },
-                {field: 'uid' , title: 'ID', sort: true},
+                {field: 'user_id' , title: 'ID', sort: true},
                 {field: 'nick', title: '昵称', sort: true},
                 {field: 'mail', title: '邮箱', sort: true, minWidth:150,},
-                {field: 'is_admin', title: '身份', sort: true, templet: (d) => {if (d.is_admin == "0") return "<p style='color: green'>普通用户</p>"; else if (d.is_admin == "1") return "<p style='color: red'>管理员</p>";}},
+                {field: 'identity', title: '身份', sort: true, templet: (d) => {if (d.identity == "0") return "<p style='color: green'>普通用户</p>"; else if (d.identity == "1") return "<p style='color: red'>管理员</p>";}},
                 {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
@@ -158,7 +158,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: './edit.html?uid='+data.uid,
+                    content: './edit.html?user_id='+data.user_id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -171,7 +171,7 @@
                         type: "post",
                         dataType: "json",
                         data: {
-                            "uid": data.uid,
+                            "user_id": data.user_id,
                         },
                         success: function (data) {
                             table.reload('currentTableId', {
@@ -197,7 +197,7 @@
                         maxmin:true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: './role.html?uid='+data.uid,
+                        content: './role.html?user_id='+data.user_id,
                     });
                     $(window).on("resize", function () {
                         layer.full(index);
@@ -205,15 +205,15 @@
                 }
                 return false;
             } else if (obj.event === 'admin') {
-                const is_admin = 1-obj.data.is_admin
+                const is_admin = 1-obj.data.identity
                 layer.confirm('确认更改', function (index) {
                     $.ajax({
                         url: getPort()+'user/setAdmin',
                         type: "post",
                         dataType: "json",
                         data: {
-                            "uid": data.uid,
-                            "is_admin": is_admin
+                            "uid": data.user_id,
+                            "identity": is_admin
                         },
                         success: function (data) {
                             table.reload('currentTableId', {

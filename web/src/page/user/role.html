@@ -27,7 +27,7 @@
         let auths = [], uid = 0, roleData = [];
 
         $(document).ready(() => {
-            uid = getQueryString("uid")
+            uid = getQueryString("user_id")
             $.ajax({
                 url: getPort()+'user/getUserInfo',
                 type: "post",
@@ -48,7 +48,7 @@
                     type: "post",
                     dataType: "json",
                     data: {
-                        "uid": uid
+                        "user_id": uid
                     },
                     success: function (data) {
                         if (data.status == 0) {
@@ -83,7 +83,7 @@
                                         type: "post",
                                         dataType: "json",
                                         data: {
-                                            "uid": uid,
+                                            "user_id": uid,
                                             "rids": ridArray
                                         },
                                         success: function (return_data) {
@@ -110,7 +110,7 @@
                 type: "post",
                 dataType: "json",
                 data: {
-                    "uid": uid
+                    "user_id": uid
                 },
                 success: function (data) {
                     if (data.status == 0) {
@@ -142,7 +142,7 @@
                                     type: "post",
                                     dataType: "json",
                                     data: {
-                                        "uid": uid,
+                                        "user_id": uid,
                                         "rids": ridArray
                                     },
                                     success: function (return_data) {
