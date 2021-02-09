@@ -20,7 +20,7 @@ func AddUserRoles(c *gin.Context)  {
 	userRoleModel := model.UserRole{}
 
 	userRolesJson := struct {
-		Uid 	int 	`json:"uid" form:"uid"`
+		UserID 	int 	`json:"user_id" form:"user_id"`
 		Rids	string 	`json:"rids" form:"rids"`
 	}{}
 
@@ -39,7 +39,7 @@ func AddUserRoles(c *gin.Context)  {
 	_ = json.Unmarshal([]byte((userRolesJson.Rids)), &rids)
 	fmt.Println(rids)
 	for _, rid := range rids {
-		res := userRoleModel.AddUserRole(model.UserRole{Uid: userRolesJson.Uid, Rid: rid})
+		res := userRoleModel.AddUserRole(model.UserRole{UserID: userRolesJson.UserID, Rid: rid})
 		if res.Status != common.CodeSuccess {
 			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "编号为"+string(rune(rid))+"的角色添加失败", res.Data))
 			return
@@ -58,7 +58,7 @@ func DeleteUserRoles(c *gin.Context)  {
 	userRoleModel := model.UserRole{}
 
 	userRolesJson := struct {
-		Uid 	int 	`json:"uid" form:"uid"`
+		UserID 	int 	`json:"user_id" form:"user_id"`
 		Rids	string 	`json:"rids" form:"rids"`
 	}{}
 
@@ -77,7 +77,7 @@ func DeleteUserRoles(c *gin.Context)  {
 	_ = json.Unmarshal([]byte((userRolesJson.Rids)), &rids)
 	fmt.Println(rids)
 	for _, rid := range rids {
-		res := userRoleModel.DeleteUserRole(model.UserRole{Uid: userRolesJson.Uid, Rid: rid})
+		res := userRoleModel.DeleteUserRole(model.UserRole{UserID: userRolesJson.UserID, Rid: rid})
 		if res.Status != common.CodeSuccess {
 			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "编号为"+string(rune(rid))+"的权限删除失败", res.Data))
 			return
@@ -97,7 +97,7 @@ func GetUserRolesList(c *gin.Context) {
 	roleModel := model.Role{}
 
 	roleJson := struct {
-		Uid 	int 	`json:"uid" form:"uid"`
+		UserID 	int 	`json:"user_id" form:"user_id"`
 	}{}
 
 	if err := c.ShouldBind(&roleJson); err != nil {
@@ -113,7 +113,7 @@ func GetUserRolesList(c *gin.Context) {
 
 	allRoles := roleModel.GetRoleNoRules()
 
-	res := roleModel.GetUserRole(roleJson.Uid)
+	res := roleModel.GetUserRole(roleJson.UserID)
 	roles := res.Data.([]model.Role)
 	var val []int
 	for _, role := range roles {

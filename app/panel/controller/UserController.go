@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func UpdateUser(c *gin.Context)  {
@@ -27,12 +28,12 @@ func UpdateUser(c *gin.Context)  {
 	}
 
 	userMap := helper.Struct2Map(userJson)
-	if res, err:= userValidate.ValidateMap(userMap, "update"); !res {
+	if res, err:= userValidate.ValidateMap(userMap, "updateUser"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 
-	res := userModel.UpdateUser(userJson.Uid, userJson)
+	res := userModel.UpdateUser(userJson.UserID, userJson)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
@@ -60,10 +61,10 @@ func DeleteUsers(c *gin.Context) {
 		return
 	}
 
-	for _, uid := range userArrayJson.Users {
-		res := userModel.DeleteUser(uid)
+	for _, userID := range userArrayJson.Users {
+		res := userModel.DeleteUser(userID)
 		if res.Status != common.CodeSuccess {
-			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "uid为"+string(rune(uid))+"的用户删除失败", res.Data))
+			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "user_id为"+string(strconv.Itoa(userID))+"的用户删除失败", res.Data))
 			return
 		}
 	}
@@ -80,8 +81,8 @@ func SetUserAdmin(c *gin.Context)  {
 	userModel := model.User{}
 
 	userIDJson := struct {
-		Uid	int `json:"uid" form:"uid"`
-		IsAdmin int `json:"is_admin" form:"is_admin"`
+		UserID	int `json:"user_id" form:"user_id"`
+		Identity int `json:"identity" form:"identity"`
 	}{}
 
 	if err := c.ShouldBind(&userIDJson); err != nil {
@@ -95,7 +96,7 @@ func SetUserAdmin(c *gin.Context)  {
 		return
 	}
 
-	res := userModel.SetAdmin(userIDJson.Uid, userIDJson.IsAdmin)
+	res := userModel.SetAdmin(userIDJson.UserID, userIDJson.Identity)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
@@ -109,7 +110,7 @@ func DeleteUser(c *gin.Context)  {
 	userModel := model.User{}
 
 	userIDJson := struct {
-		Uid	int `json:"uid" form:"uid"`
+		UserID	int `json:"user_id" form:"user_id"`
 	}{}
 
 	if err := c.ShouldBind(&userIDJson); err != nil {
@@ -118,12 +119,12 @@ func DeleteUser(c *gin.Context)  {
 	}
 
 	userIDMap := helper.Struct2Map(userIDJson)
-	if res, err:= userValidate.ValidateMap(userIDMap, "delete"); !res {
+	if res, err:= userValidate.ValidateMap(userIDMap, "deleteUser"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 
-	res := userModel.DeleteUser(userIDJson.Uid)
+	res := userModel.DeleteUser(userIDJson.UserID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
@@ -170,12 +171,12 @@ func GetUserByID(c *gin.Context) {
 	}
 
 	userMap := helper.Struct2Map(userJson)
-	if res, err:= userValidate.ValidateMap(userMap, "find"); !res {
+	if res, err:= userValidate.ValidateMap(userMap, "searchUser_id"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 
-	res := userModel.GetUserByID(userJson.Uid)
+	res := userModel.GetUserByID(userJson.UserID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
@@ -216,7 +217,7 @@ func Login(c *gin.Context) {
 	session := sessions.Default(c)
 	if id := session.Get("user_id"); id != nil {
 		data := make(map[string]interface{}, 0)
-		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
+		_ = json.Unmarshal([]byte(session.Get("admin_data").(string)), &data)
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
 		return
 	}
@@ -242,11 +243,11 @@ func Login(c *gin.Context) {
 	if res.Status == common.CodeSuccess {
 		userInfo := res.Data.(map[string]interface{})["userInfo"].(model.User)
 		returnData := map[string]interface{} {
-			"user_id" : userInfo.Uid,
+			"user_id" : userInfo.UserID,
 			"nick":		userInfo.Nick,
-			"is_admin": userInfo.IsAdmin,
+			"identity": userInfo.Identity,
 		}
-		if menu, auths, err := getUserAllAuth(userInfo.Uid); err == nil {
+		if menu, auths, err := getUserAllAuth(userInfo.UserID); err == nil {
 			returnData["auths"] = auths
 			returnData["menu"] = menu
 		} else {
@@ -255,8 +256,8 @@ func Login(c *gin.Context) {
 		}
 		jsonData, _ := json.Marshal(returnData)
 		session.Set("user_id", returnData["user_id"])
-		session.Set("is_admin", returnData["is_admin"])
-		session.Set("data", string(jsonData))
+		session.Set("identity", returnData["identity"])
+		session.Set("admin_data", string(jsonData))
 		session.Save()
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "登录成功", returnData))
 	} else {
@@ -276,7 +277,7 @@ func GetUserInfo(c *gin.Context)  {
 	session := sessions.Default(c)
 	if id := session.Get("user_id"); id != nil {
 		data := make(map[string]interface{}, 0)
-		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
+		_ = json.Unmarshal([]byte(session.Get("admin_data").(string)), &data)
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
 		return
 	}

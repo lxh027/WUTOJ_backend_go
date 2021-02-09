@@ -6,7 +6,7 @@ import (
 )
 
 type UserRole struct {
-	Uid 	int 	`json:"uid" form:"uid"`
+	UserID 	int 	`json:"user_id" form:"user_id"`
 	Rid		int 	`json:"rid" form:"rid"`
 }
 
@@ -22,7 +22,7 @@ func (model *UserRole) AddUserRole(newUserRole UserRole) helper.ReturnType {
 }
 
 func (model *UserRole) DeleteUserRole(newUserRole UserRole) helper.ReturnType {
-	err := db.Where("uid = ? AND rid = ?", newUserRole.Uid, newUserRole.Rid).Delete(UserRole{}).Error
+	err := db.Where("user_id = ? AND rid = ?", newUserRole.UserID, newUserRole.Rid).Delete(UserRole{}).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: err.Error()}

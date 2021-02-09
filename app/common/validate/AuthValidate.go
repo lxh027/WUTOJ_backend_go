@@ -10,14 +10,13 @@ func init() {
 		"icon"	: "required",
 		"title"	: "required",
 		"type"	: "required",
-		"parent": "required",
 	}
 
 	scenes := map[string] []string {
 		"add" : {"title", "type", "icon"},
 		"delete": {"aid"},
 		"find"	: {"aid"},
-		"findParent": {"parent"},
+		"findParent": {"type"},
 		"update": {"aid", "title", "icon"},
 	}
 

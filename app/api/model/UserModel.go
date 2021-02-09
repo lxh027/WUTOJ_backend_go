@@ -19,7 +19,6 @@ type User struct {
 	Desc    	string 	`json:"desc" form:"desc"`
 	Mail 		string 	`json:"mail" form:"mail"`
 	Status 		int 	`json:"status" form:"status"`
-	RoleGroup	string 	`json:"role_group" form:"role_group"`
 	//AllProblem	interface{}	`json:"all_problem" form:"all_problem"`
 }
 

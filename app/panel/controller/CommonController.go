@@ -23,7 +23,7 @@ func haveAuth(c *gin.Context, authQuery string) int {
 	id := session.Get("user_id")
 	if  id == nil {
 		return common.UnLoggedIn
-	} else if session.Get("is_admin").(int) == 0 {
+	} else if session.Get("identity").(uint) == 0 {
 		return common.UnAuthed
 	}
 	_, auths, err := getUserAllAuth(id.(int))

@@ -6,15 +6,28 @@ import (
 )
 
 type User struct {
-	Uid 	int 	`json:"uid" form:"uid"`
+	UserID	int 	`json:"user_id" form:"user_id"`
 	Nick	string 	`json:"nick" form:"nick"`
 	Password string	`json:"password" form:"password"`
-	Mail 	string 	`json:"mail" form:"mail"`
-	IsAdmin	int 	`json:"is_admin" form:"is_admin"`
+	Realname	string	`json:"realname" form:"realname" gorm:"column:realname"`
+	Avatar		string 	`json:"avatar" form:"avatar"`
+	School		string	`json:"school" form:"school"`
+	Major		string	`json:"major" form:"major"`
+	Class       string  `json:"class" form:"class"`
+	Contact		string	`json:"contact" form:"contact"`
+	Identity 	uint	`json:"identity" form:"identity"`
+	Desc    	string 	`json:"desc" form:"desc"`
+	Mail 		string 	`json:"mail" form:"mail"`
+	Status 		int 	`json:"status" form:"status"`
 }
 
-func (model *User) SetAdmin(uid int, isAdmin int) helper.ReturnType {
-	err := db.Model(&User{}).Where("uid = ?", uid).Update("is_admin", isAdmin).Error
+// 设定表名
+func (User) TableName() string {
+	return "users"
+}
+
+func (model *User) SetAdmin(userID int, isAdmin int) helper.ReturnType {
+	err := db.Model(&User{}).Where("user_id = ?", userID).Update("identity", isAdmin).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
@@ -24,7 +37,7 @@ func (model *User) SetAdmin(uid int, isAdmin int) helper.ReturnType {
 }
 
 func (model *User) UpdateUser(userID int, updateUser User) helper.ReturnType  {
-	err := db.Model(&User{}).Where("uid = ?", userID).Update(updateUser).Error
+	err := db.Model(&User{}).Where("user_id = ?", userID).Update(updateUser).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
@@ -34,7 +47,7 @@ func (model *User) UpdateUser(userID int, updateUser User) helper.ReturnType  {
 }
 
 func (model *User) DeleteUser(userID int) helper.ReturnType  {
-	err := db.Where("uid = ?", userID).Delete(User{}).Error
+	err := db.Where("user_id = ?", userID).Delete(User{}).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
@@ -96,10 +109,10 @@ func (model *User) GetAllUser(offset int, limit int, nick string, email string) 
 	}
 }
 
-func (model *User) GetUserByID(uid int) helper.ReturnType {
+func (model *User) GetUserByID(userID int) helper.ReturnType {
 	var getUser User
 
-	err := db.Select([]string{"nick", "mail"}).Where("uid = ?", uid).First(&getUser).Error
+	err := db.Select([]string{"nick", "mail"}).Where("user_id = ?", userID).First(&getUser).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {

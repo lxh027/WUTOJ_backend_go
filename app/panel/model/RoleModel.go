@@ -41,11 +41,11 @@ func (model *Role) GetAllRole(offset int, limit int, name string, desc string) h
 	}
 }
 
-func (model *Role) GetUserRole(uid int) helper.ReturnType {
+func (model *Role) GetUserRole(userID int) helper.ReturnType {
 	var roles []Role
 
 	err := db.
-		Joins("JOIN user_role ON role.rid = user_role.rid AND user_role.uid = ? ", uid).
+		Joins("JOIN user_role ON role.rid = user_role.rid AND user_role.user_id = ? ", userID).
 		Find(&roles).
 		Error
 

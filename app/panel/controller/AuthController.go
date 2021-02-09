@@ -43,7 +43,7 @@ func GetParentAuth(c *gin.Context)  {
 	authModel := model.Auth{}
 
 	authJson := struct {
-		Parent 	int 	`json:"parent" form:"parent"`
+		Type 	int 	`json:"type" form:"type"`
 	}{}
 
 	if err := c.ShouldBind(&authJson); err != nil {
@@ -57,7 +57,7 @@ func GetParentAuth(c *gin.Context)  {
 		return
 	}
 
-	res := authModel.GetParentAuth(authJson.Parent)
+	res := authModel.GetParentAuth(authJson.Type)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 	
