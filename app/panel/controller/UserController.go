@@ -247,19 +247,22 @@ func Login(c *gin.Context) {
 			"nick":		userInfo.Nick,
 			"identity": userInfo.Identity,
 		}
-		if menu, auths, err := getUserAllAuth(userInfo.UserID); err == nil {
+		/*if menu, auths, err := getUserAllAuth(userInfo.UserID); err == nil {
 			returnData["auths"] = auths
 			returnData["menu"] = menu
 		} else {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "获取权限失败", err.Error()))
 			return
-		}
+		}*/
 		jsonData, _ := json.Marshal(returnData)
 		session.Set("user_id", returnData["user_id"])
 		session.Set("identity", returnData["identity"])
 		session.Set("admin_data", string(jsonData))
-		session.Save()
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "登录成功", returnData))
+		if err := session.Save(); err == nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "登录成功", returnData))
+		} else {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "登录失败", err.Error()))
+		}
 	} else {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, res.Msg, false))
 	}
@@ -268,8 +271,11 @@ func Login(c *gin.Context) {
 
 func Logout(c *gin.Context)  {
 	session := sessions.Default(c)
-	session.Clear()
-	session.Save()
+	if id := session.Get("user_id"); id != nil {
+		session.Clear()
+		session.Save()
+		ClearAuthRedis(id.(int))
+	}
 	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "注销成功", session.Get("user_id")))
 }
 
@@ -278,6 +284,15 @@ func GetUserInfo(c *gin.Context)  {
 	if id := session.Get("user_id"); id != nil {
 		data := make(map[string]interface{}, 0)
 		_ = json.Unmarshal([]byte(session.Get("admin_data").(string)), &data)
+		if menu, auths, err := getUserAllAuth(id.(int)); err == nil {
+			data["auths"] = auths
+			data["menu"] = menu
+		} else {
+			session.Clear()
+			session.Save()
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "获取权限失败，请重新登陆", err.Error()))
+			return
+		}
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
 		return
 	}

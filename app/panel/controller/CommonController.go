@@ -3,10 +3,15 @@ package controller
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/db_server"
 	"container/list"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type menuItem struct {
@@ -17,6 +22,10 @@ type menuItem struct {
 	Child 	[]menuItem `json:"child"`
 }
 
+type redisData struct {
+	Menu 	[]menuItem	`json:"menu"`
+	Auth 	[]string	`json:"auth"`
+}
 
 func haveAuth(c *gin.Context, authQuery string) int {
 	session := sessions.Default(c)
@@ -39,7 +48,21 @@ func haveAuth(c *gin.Context, authQuery string) int {
 	}
 }
 
+func ClearAuthRedis(userID int)  {
+	err := db_server.DeleteFromRedis(strconv.Itoa(userID)+"auth_info")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
 func getUserAllAuth(userID int) ([]menuItem, []string, error) {
+	if info, err := db_server.GetFromRedis(strconv.Itoa(userID)+"auth_info"); err == nil && info != nil {
+		var authInfo redisData
+		bytes, _ := redis.Bytes(info, err)
+		_ = json.Unmarshal(bytes, &authInfo)
+		return authInfo.Menu, authInfo.Auth, nil
+	}
+
 	authModel := model.Auth{}
 
 	if res := authModel.GetUserAllAuth(userID); res.Status == common.CodeSuccess {
@@ -102,7 +125,9 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 				}
 			}
 		}
-
+		authInfo := redisData{menu, authName}
+		dataJson, _ := json.Marshal(authInfo)
+		_ = db_server.PutToRedis(strconv.Itoa(userID)+"auth_info", dataJson, 3600)
 		return menu, authName, nil
 	} else {
 		return nil, nil, errors.New("获取权限列表错误")
