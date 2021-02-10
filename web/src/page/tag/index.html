@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>用户提交状态</title>
+    <title>标签列表</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -19,9 +19,9 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">昵称</label>
+                            <label class="layui-form-label">名称</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="nick" autocomplete="off" class="layui-input">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -60,10 +60,17 @@
                 success: function (return_data) {
                     const data = return_data.data
                     auths = data.auths
-                    if (auths.indexOf("getUserSubmit") === -1) {
+                    if (auths.indexOf("getAllTag") === -1) {
                         layer.msg("权限不足", () => {
                             window.location.href = "../404.html"
                         })
+                    }
+                    if (auths.indexOf("updateTag") !== -1) {
+                        $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        $("#currentTableBar").append(getButton(3, 'status', '状态'))
+                    }
+                    if (auths.indexOf("deleteTag") !== -1) {
+                        $("#currentTableBar").append(getButton(3, 'delete', '删除'))
                     }
                 }
             })
@@ -71,7 +78,7 @@
 
         table.render({
             elem: '#currentTableId',
-            url: getPort()+'submitLog/getUserSubmitStatus',
+            url: getPort()+'tag/getAllTag',
             contentType: 'application/json',
             method: 'post',
             request: {
@@ -83,7 +90,7 @@
                     "code": res.status, //解析接口状态
                     "msg": res.msg, //解析提示文本
                     "count": res.data.count, //解析数据长度
-                    "data": res.data.statuses //解析数据列表
+                    "data": res.data.tags //解析数据列表
                 };
             },
             toolbar: '#toolbarDemo',
@@ -94,16 +101,12 @@
             }],
             cols: [[
                 {type: "checkbox", },
-                {field: 'user_id' , title: 'ID', sort: true},
-                {field: 'nick', title: '昵称', sort: true},
-                {field: 'realname', title: '姓名', sort: true},
-                {field: 'ac', title: 'AC', sort: true},
-                {field: 'wa', title: 'WA', sort: true},
-                {field: 'tle', title: 'TLE', sort: true},
-                {field: 'mle', title: 'MLE', sort: true},
-                {field: 're', title: 'RE', sort: true},
-                {field: 'ce', title: 'CE', sort: true},
-                {field: 'se', title: 'SE', sort: true},
+                {field: 'id' , title: 'ID', sort: true},
+                {field: 'name', title: '名称', sort: true},
+                {field: 'description', title: '描述', sort: true, minWidth:150,},
+                {field: 'color', title: '颜色', sort: true, templet: (d) => {return "<p style='color: "+d.color+"'>"+d.color+"</p>"; }},
+                {field: 'status', title: '状态', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>";}},
+                {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
             limit: 25,
@@ -136,7 +139,70 @@
             console.log(obj)
         });
 
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
 
+                var index = layer.open({
+                    title: '编辑标签',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: './edit.html?id='+data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('确认删除', function (index) {
+                    $.ajax({
+                        url: getPort()+'tag/deleteTag',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "id": data.id,
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }  else if (obj.event === 'status') {
+                layer.confirm('确认更改', function (index) {
+                    $.ajax({
+                        url: getPort()+'tag/changeTagStatus',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "id": data.id,
+                            "status": 1-data.status
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }
+        });
 
     });
 </script>

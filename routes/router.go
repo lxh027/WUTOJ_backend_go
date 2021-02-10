@@ -59,15 +59,28 @@ func Routes(router *gin.Engine)  {
 			auth.POST("/getAuthByID", panelController.GetAuthByID)
 			auth.POST("/updateAuth", panelController.UpdateAuth)
 		}
+
 		roleAuth := panel.Group("roleAuth")
 		{
 			roleAuth.POST("/getRoleAuthsList", panelController.GetRoleAuthsList)
 			roleAuth.POST("/addRoleAuths", panelController.AddRoleAuths)
 			roleAuth.POST("/deleteRoleAuths", panelController.DeleteRoleAuths)
 		}
+
 		submitLog := panel.Group("submitLog")
 		{
 			submitLog.POST("/getUserSubmitStatus", panelController.GetAllUserSubmitStatus)
+		}
+
+		tag := panel.Group("tag")
+		{
+			tag.POST("/getAllTag", panelController.GetAllTag)
+			tag.POST("/addTag", panelController.AddTag)
+			tag.POST("/deleteTag", panelController.DeleteTag)
+			tag.POST("/updateTag", panelController.UpdateTag)
+			tag.POST("/findTagsByName", panelController.FindTagsByName)
+			tag.POST("/getTagByID", panelController.GetTagByID)
+			tag.POST("/changeTagStatus", panelController.ChangeTagStatus)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
