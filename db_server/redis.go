@@ -46,5 +46,11 @@ func PutToRedis(key string, value interface{}, timeout int)  error {
 	return err
 }
 
+func DeleteFromRedis(key string) error {
+	rc := RedisClient.Get()
+	defer rc.Close()
+	_, err := rc.Do("DEL", key)
+	return err
+}
 
 
