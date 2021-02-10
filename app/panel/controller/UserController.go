@@ -91,7 +91,7 @@ func SetUserAdmin(c *gin.Context)  {
 	}
 
 	userIDMap := helper.Struct2Map(userIDJson)
-	if res, err:= userValidate.ValidateMap(userIDMap, "delete"); !res {
+	if res, err:= userValidate.ValidateMap(userIDMap, "updateUser"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
