@@ -82,6 +82,15 @@ func Routes(router *gin.Engine)  {
 			tag.POST("/getTagByID", panelController.GetTagByID)
 			tag.POST("/changeTagStatus", panelController.ChangeTagStatus)
 		}
+
+		notice := panel.Group("notice")
+		{
+			notice.POST("/getAllNotice", panelController.GetAllNotice)
+			notice.POST("/addNotice", panelController.AddNotice)
+			notice.POST("/deleteNotice", panelController.DeleteNotice)
+			notice.POST("/updateNotice", panelController.UpdateNotice)
+			notice.POST("/getNoticeByID", panelController.GetNoticeByID)
+		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
 }
