@@ -65,6 +65,10 @@ func Routes(router *gin.Engine)  {
 			roleAuth.POST("/addRoleAuths", panelController.AddRoleAuths)
 			roleAuth.POST("/deleteRoleAuths", panelController.DeleteRoleAuths)
 		}
+		submitLog := panel.Group("submitLog")
+		{
+			submitLog.POST("/getUserSubmitStatus", panelController.GetAllUserSubmitStatus)
+		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
 }
