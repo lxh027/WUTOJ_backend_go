@@ -24,17 +24,17 @@ func (model *UserSubmitLog) GetAllUserSubmitStatus(offset int, limit int, nick s
 		Nick 	string	`json:"nick"`
 	}
 	nick = "%"+nick+"%"
-	sql := fmt.Sprintf("select users.user_id, users.realname, ac, wa, tle, mle, re, se, ce, nick from user_submit_log left join users on users.user_id = user_submit_log.user_id where users.nick like '%s' limit %d offset %d", nick, limit, offset)
-	fmt.Println(sql)
+	sql := fmt.Sprintf("select count(*) from user_submit_log left join users on users.user_id = user_submit_log.user_id where users.nick like '%s'", nick)
+	var count int
+	db.Raw(sql).Row().Scan(&count)
+	sql = fmt.Sprintf("select users.user_id, users.realname, ac, wa, tle, mle, re, se, ce, nick from user_submit_log left join users on users.user_id = user_submit_log.user_id where users.nick like '%s' limit %d offset %d", nick, limit, offset)
 	var logs []userNickSubmitLog
 	rows, err := db.Raw(sql).Rows()
 	if rows != nil {
 		defer rows.Close()
 	}
 	if err == nil {
-		count := 0
 		for rows.Next() {
-			count++
 			var userLog userNickSubmitLog
 			err := rows.Scan(&userLog.UserID, &userLog.RealName, &userLog.AC, &userLog.WA, &userLog.TLE, &userLog.MLE, &userLog.CE, &userLog.RE, &userLog.SE, &userLog.Nick)
 			if err != nil {
