@@ -28,15 +28,29 @@ func (model *Submit) GetAllSubmit(offset int, limit int, userID, problemID, cont
 		"AND status like ? AND submit_time >= ? AND submit_time <= ?"
 
 	var count int
-
+	if userID == "" {
+		userID = "%%"
+	}
+	if problemID == "" {
+		problemID = "%%"
+	}
+	if contestID == "" {
+		contestID = "%%"
+	}
+	if language == "" {
+		language = "%%"
+	}
+	if status == "" {
+		status = "%%"
+	}
 	db.Model(&Submit{}).
-		Where(where, "%"+userID+"%", "%"+problemID+"%", "%"+contestID+"%", "%"+language+"%", "%"+status+"%", minSubmitTime, maxSubmitTime).
+		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
 		Count(&count)
 
 
 	err := db.Offset(offset).
 		Limit(limit).
-		Where(where, "%"+userID+"%", "%"+problemID+"%", "%"+contestID+"%", "%"+language+"%", "%"+status+"%", minSubmitTime, maxSubmitTime).
+		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
 		Order("id desc").
 		Find(&submits).
 		Error
@@ -59,9 +73,24 @@ func (model *Submit) GetSubmitGroup(userID, problemID, contestID, language, stat
 	where := "user_id like ? AND problem_id like ? AND contest_id like ? AND language like ? " +
 		"AND status like ? AND submit_time >= ? AND submit_time <= ?"
 
+	if userID == "" {
+		userID = "%%"
+	}
+	if problemID == "" {
+		problemID = "%%"
+	}
+	if contestID == "" {
+		contestID = "%%"
+	}
+	if language == "" {
+		language = "%%"
+	}
+	if status == "" {
+		status = "%%"
+	}
+
 	err := db.
-		Where(where, "%"+userID+"%", "%"+problemID+"%", "%"+contestID+"%",
-			"%"+language+"%", "%"+status+"%", minSubmitTime, maxSubmitTime).
+		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
 		Find(&submits).
 		Error
 
