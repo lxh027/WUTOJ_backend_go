@@ -2,6 +2,7 @@ package server
 
 import (
 	"OnlineJudge/config"
+	"OnlineJudge/judger"
 	"OnlineJudge/routes"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -14,6 +15,7 @@ import (
 func Run(httpServer *gin.Engine)  {
 	serverConfig  := config.GetServerConfig()
 	sessionConfig := config.GetSessionConfig()
+	judgeConfig   := config.GetJudgeConfig()
 	// 运行模式
 	gin.SetMode(serverConfig["mode"].(string))
 	httpServer = gin.Default()
@@ -34,6 +36,14 @@ func Run(httpServer *gin.Engine)  {
 	// 设置日志格式
 	httpServer.Use(gin.LoggerWithFormatter(config.GetLogFormat))
 	httpServer.Use(gin.Recovery())
+
+	// 初始化judge
+	instance := judger.InitInstance()
+
+	instance.SetOpt(judger.OPT_SETENV, judgeConfig["env"].(string))
+	instance.SetOpt(judger.OPT_SETADDR, judgeConfig["address"].(string))
+	instance.SetOpt(judger.OPT_BASEDIRECTORY, judgeConfig["base_dir"].(string))
+	instance.SetOpt(judger.OPT_SETTEMPDIRECTORY, judgeConfig["tmp_dir"].(string))
 
 	go func() {
 		for {

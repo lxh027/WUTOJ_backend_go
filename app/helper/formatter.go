@@ -12,6 +12,24 @@ type ReturnType struct {
 	Data 	interface{}
 }
 
+// 获取语言类型
+func LanguageType(typeInt int) string {
+	var language string
+	switch typeInt {
+	case 0:
+		language = "c.gcc"
+	case 1:
+		language = "cpp.g++"
+	case 2:
+		language = "java.openjdk10"
+	case 3:
+		language = "python.cpython3.6"
+	default:
+		language = "undefined"
+	}
+	return language
+}
+
 // 结构体转换为map
 func Struct2Map(obj interface{}) map[string]interface{} {
 	t := reflect.TypeOf(obj)

@@ -101,6 +101,14 @@ func Routes(router *gin.Engine)  {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 		}
+
+		submit := panel.Group("submit")
+		{
+			submit.POST("/getAllSubmit", panelController.GetAllSubmit)
+			submit.POST("/getSubmitByID", panelController.GetSubmitByID)
+			submit.POST("/rejudgeGroupSubmits", panelController.RejudgeGroupSubmits)
+			submit.POST("/rejudgeSubmitByID", panelController.RejudgeSubmitByID)
+		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
 }
