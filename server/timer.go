@@ -52,7 +52,9 @@ func addTimer() {
 		addSql := "INSERT INTO user_submit_log (user_id, ac, wa, tle, mle, re, se, ce) VALUES "
 		index := 0
 		for rows.Next() {
-			_ = rows.Scan(&userSubmitLog)
+			err = rows.Scan(&userSubmitLog.UserID, &userSubmitLog.AC, &userSubmitLog.WA,
+				&userSubmitLog.TLE, &userSubmitLog.MLE, &userSubmitLog.RE,
+				&userSubmitLog.SE, &userSubmitLog.CE)
 			data := fmt.Sprintf("(%d, %d, %d, %d, %d, %d, %d, %d)",
 				userSubmitLog.UserID, userSubmitLog.AC, userSubmitLog.WA, userSubmitLog.TLE,
 				userSubmitLog.MLE, userSubmitLog.RE, userSubmitLog.SE, userSubmitLog.CE)
