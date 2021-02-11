@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加比赛</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="contest_name" id="contest_name" lay-verify="required" lay-reqtext="标题不能为空" placeholder="请输入标题" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">问题</label>
+        <div class="layui-input-block">
+            <input type="text" name="problems" id="problems"  placeholder="请输入问题" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">奖项比例</label>
+        <div class="layui-input-block">
+            <input type="text" name="prize" id="prize" placeholder="请输入奖项比例" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">题目颜色</label>
+        <div class="layui-input-block">
+            <input type="text" name="colors" id="colors" placeholder="请输入题目颜色" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封榜时间</label>
+        <div class="layui-input-block">
+            <input type="number" name="frozen" id="frozen" placeholder="请输入封榜时间" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">比赛规则</label>
+        <div class="layui-input-block">
+            <input type="number" name="rule" id="rule" value=1 class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">开始时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="begin_time" id="begin_time" placeholder="请输入" lay-verify="required" autocomplete="off" class="layui-input">
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">结束时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="end_time" id="end_time" placeholder="请输入" lay-verify="required" autocomplete="off" class="layui-input">
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否可用</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="status" id="status" checked lay-skin="switch">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认添加</button>
+        </div>
+    </div>
+</div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<script>
+    layui.use(['form', 'laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate,
+            $ = layui.$;
+        let auths = [];
+        $(document).ready(() => {
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("addContest") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            })
+        })
+
+        laydate.render({
+            elem: '#begin_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-ddTHH:mm:ssZ'
+        });
+        laydate.render({
+            elem: '#end_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-ddTHH:mm:ssZ'
+        });
+        form.render();
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var index = layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            }, function () {
+                $.ajax({
+                    url: getPort()+'contest/addContest',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "contest_name": $("#contest_name").val(),
+                        "problems" : $("#problems").val(),
+                        "prize": $("#prize").val(),
+                        "colors": $("#colors").val(),
+                        "frozen": $("#frozen").val(),
+                        "rule": $("#rule").val(),
+                        "begin_time": $("#begin_time").val(),
+                        "end_time": $("#end_time").val(),
+                        "status": $("#status").prop("checked")?1:0,
+                    },
+                    success: function (data) {
+                        layer.msg(data.msg)
+                        if (data.status == 0) {
+                            // 关闭弹出层
+                            layer.close(index);
+
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layui.table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                            parent.layer.close(iframeIndex);
+                        }
+                    }
+                })
+            });
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

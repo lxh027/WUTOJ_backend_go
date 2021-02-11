@@ -91,6 +91,16 @@ func Routes(router *gin.Engine)  {
 			notice.POST("/updateNotice", panelController.UpdateNotice)
 			notice.POST("/getNoticeByID", panelController.GetNoticeByID)
 		}
+
+		contest := panel.Group("contest")
+		{
+			contest.POST("/getAllContest", panelController.GetAllContest)
+			contest.POST("/addContest", panelController.AddContest)
+			contest.POST("/deleteContest", panelController.DeleteContest)
+			contest.POST("/updateContest", panelController.UpdateContest)
+			contest.POST("/getContestByID", panelController.GetContestByID)
+			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
+		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
 }
