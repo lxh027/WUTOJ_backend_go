@@ -34,9 +34,12 @@ func GetAllSubmit(c *gin.Context)  {
 	var err error
 	if err = c.ShouldBind(&submitJson); err == nil {
 		submitJson.Offset = (submitJson.Offset-1)*submitJson.Limit
-		res := submitModel.GetAllSubmit(submitJson.Offset, submitJson.Limit, submitJson.Where.UserID,
-			submitJson.Where.ProblemID, submitJson.Where.ContestID, submitJson.Where.Language,
-			submitJson.Where.Status, submitJson.Where.MinSubmitTime, submitJson.Where.MaxSubmitTime)
+		whereData := map[string]string {
+			"user_id": submitJson.Where.UserID, "problem_id": submitJson.Where.ProblemID,
+			"contest_id": submitJson.Where.ContestID, "language": submitJson.Where.ContestID,
+			"status": submitJson.Where.Status,
+		}
+		res := submitModel.GetAllSubmit(submitJson.Offset, submitJson.Limit, whereData, submitJson.Where.MinSubmitTime, submitJson.Where.MaxSubmitTime)
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -88,9 +91,12 @@ func RejudgeGroupSubmits(c *gin.Context)  {
 	}{}
 
 	if c.ShouldBind(&submitJson) == nil {
-		res := submitModel.GetSubmitGroup(submitJson.UserID, submitJson.ProblemID,
-			submitJson.ContestID, submitJson.Language, submitJson.Status,
-			submitJson.MinSubmitTime, submitJson.MaxSubmitTime)
+		whereData := map[string]string {
+			"user_id": submitJson.UserID, "problem_id": submitJson.ProblemID,
+			"contest_id": submitJson.ContestID, "language": submitJson.ContestID,
+			"status": submitJson.Status,
+		}
+		res := submitModel.GetSubmitGroup(whereData, submitJson.MinSubmitTime, submitJson.MaxSubmitTime)
 		submits := res.Data.([]model.Submit)
 		for _, submit := range submits {
 			go func(submitData model.Submit) {

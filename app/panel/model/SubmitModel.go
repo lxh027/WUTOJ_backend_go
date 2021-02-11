@@ -22,35 +22,31 @@ type Submit struct {
 }
 
 
-func (model *Submit) GetAllSubmit(offset int, limit int, userID, problemID, contestID, language, status string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
+func (model *Submit) GetAllSubmit(offset int, limit int, whereData map[string]string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
 	var submits []Submit
-	where := "user_id like ? AND problem_id like ? AND contest_id like ? AND language like ? " +
-		"AND status like ? AND submit_time >= ? AND submit_time <= ?"
-
+	/*where := "user_id like ? AND problem_id like ? AND contest_id like ? AND language like ? " +
+		"AND status like ? AND submit_time >= ? AND submit_time <= ?"*/
+	where := ""
 	var count int
-	if userID == "" {
-		userID = "%%"
-	}
-	if problemID == "" {
-		problemID = "%%"
-	}
-	if contestID == "" {
-		contestID = "%%"
-	}
-	if language == "" {
-		language = "%%"
-	}
-	if status == "" {
-		status = "%%"
-	}
-	db.Model(&Submit{}).
-		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
-		Count(&count)
+	var args []interface{}
 
+	for field, data := range whereData {
+		if data != "" {
+			where += field + " = ? AND "
+			args = append(args, data)
+		}
+	}
+
+	args = append(args, minSubmitTime, maxSubmitTime)
+	where += "submit_time >= ? AND submit_time <= ?"
+
+	db.Model(&Submit{}).
+		Where(where, args...).
+		Count(&count)
 
 	err := db.Offset(offset).
 		Limit(limit).
-		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
+		Where(where, args...).
 		Order("id desc").
 		Find(&submits).
 		Error
@@ -68,29 +64,21 @@ func (model *Submit) GetAllSubmit(offset int, limit int, userID, problemID, cont
 }
 
 
-func (model *Submit) GetSubmitGroup(userID, problemID, contestID, language, status string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
+func (model *Submit) GetSubmitGroup(whereData map[string]string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
 	var submits []Submit
-	where := "user_id like ? AND problem_id like ? AND contest_id like ? AND language like ? " +
-		"AND status like ? AND submit_time >= ? AND submit_time <= ?"
-
-	if userID == "" {
-		userID = "%%"
+	where := ""
+	var args []interface{}
+	for field, data := range whereData {
+		if data != "" {
+			where += field + " = ? AND "
+			args = append(args, data)
+		}
 	}
-	if problemID == "" {
-		problemID = "%%"
-	}
-	if contestID == "" {
-		contestID = "%%"
-	}
-	if language == "" {
-		language = "%%"
-	}
-	if status == "" {
-		status = "%%"
-	}
+	args = append(args, minSubmitTime, maxSubmitTime)
+	where += "submit_time >= ? AND submit_time <= ?"
 
 	err := db.
-		Where(where, userID, problemID, contestID, language, status, minSubmitTime, maxSubmitTime).
+		Where(where, args...).
 		Find(&submits).
 		Error
 
