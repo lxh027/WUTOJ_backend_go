@@ -37,6 +37,7 @@ func (model *Submit) GetAllSubmit(offset int, limit int, userID, problemID, cont
 	err := db.Offset(offset).
 		Limit(limit).
 		Where(where, "%"+userID+"%", "%"+problemID+"%", "%"+contestID+"%", "%"+language+"%", "%"+status+"%", minSubmitTime, maxSubmitTime).
+		Order("id desc").
 		Find(&submits).
 		Error
 
