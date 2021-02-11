@@ -28,6 +28,8 @@ type problemSubmitLog struct {
 }
 
 func addTimer() {
+	//start := time.Now()
+
 	db := db_server.MySqlDb
 	sql := `select t1.user_id AS user_id, ifnull(t2.ac,0) AS ac, 
 		t1.wa AS wa, t1.tle AS tle, t1.mle AS mle, t1.re AS re, t1.se AS se, t1.ce AS ce
@@ -65,10 +67,12 @@ func addTimer() {
 			index++
 		}
 		if index != 0 {
-			addSql = addSql+"ON DUPLICATE KEY UPDATE ac = VALUES(ac), wa = VALUES(wa), tle = VALUES(tle), mle = VALUES(mle), re = VALUES(re), se = VALUES(se), ce = VALUES(ce)"
+			addSql = addSql+" ON DUPLICATE KEY UPDATE ac = VALUES(ac), wa = VALUES(wa), tle = VALUES(tle), mle = VALUES(mle), re = VALUES(re), se = VALUES(se), ce = VALUES(ce)"
 			db.Exec(addSql)
 		}
 	}
+	/*cost := time.Since(start)
+	fmt.Printf("cost=[%s]",cost)*/
 }
 
 
