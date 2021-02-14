@@ -109,6 +109,15 @@ func Routes(router *gin.Engine)  {
 			submit.POST("/rejudgeGroupSubmits", panelController.RejudgeGroupSubmits)
 			submit.POST("/rejudgeSubmitByID", panelController.RejudgeSubmitByID)
 		}
+
+		problem := panel.Group("problem")
+		{
+			problem.POST("/getAllProblem", panelController.GetAllProblem)
+			problem.POST("/addProblem", panelController.AddProblem)
+			problem.POST("/deleteProblem", panelController.DeleteProblem)
+			problem.POST("/UpdateProblem", panelController.UpdateProblem)
+			problem.POST("/changeProblemStatus", panelController.ChangeProblemStatus)
+		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
 }
