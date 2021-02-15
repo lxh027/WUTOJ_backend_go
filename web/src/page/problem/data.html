@@ -1,10 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <title>上传数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
 </head>
 <body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">时间限制</label>
+        <div class="layui-input-block">
+            <input type="number" name="time" id="time" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">空间限制</label>
+        <div class="layui-input-block">
+            <input type="number" name="memory" id="memory" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Special Judge</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="spj" id="spj" lay-filter="spj" lay-skin="switch">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认更改</button>
+        </div>
+    </div>
+    <div class="layui-form-item" id="language-div" hidden>
+        <label class="layui-form-label">Judge Language</label>
+        <div class="layui-input-block">
+            <select name="language" id="language">
+                <option value="" selected>default</option>
+                <option value=0>c.gcc</option>
+                <option value=1>cpp.g++</option>
+                <option value=2>java.openjdk10</option>
+                <option value=3>python.cpython3.6</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" id="code-div" hidden>
+        <label class="layui-form-label">Judge Code</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="code" id="code" value="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" id="upload" lay-submit lay-filter="uploadBtn"><i class="layui-icon">&#xe67c;</i>上传数据</button>
+        </div>
+    </div>
+</div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<script>
+    layui.use(['form', 'upload'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            upload = layui.upload,
+            $ = layui.$;
+        let id
+        $(document).ready(() => {
+            id = getQueryString("id")
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("uploadData") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            }).then(() => {
+                $.ajax({
+                    url: getPort()+'problem/getProblemByID',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "problem_id": id
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            $("#time").val(data.data.time)
+                            $("#memory").val(data.data.memory)
+                            if (data.data.type != "Normal") {
+                                $("#spj").attr("checked", true)
+                                $("#code-div").show()
+                                $("#language-div").show()
+                                form.render()
+                            }
+                        } else {
+                            layer.msg("获取信息错误", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                    }
+                })
+            })
+        })
 
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var index = layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            }, updateProblem);
+            return false;
+        });
+
+        function updateProblem() {
+            $.ajax({
+                url: getPort()+'problem/updateProblem',
+                type: "post",
+                dataType: "json",
+                data: {
+                    "problem_id": id,
+                    "time": $("#time").val(),
+                    "memory": $("#memory").val(),
+                    "type": $("#spj").prop("checked")?"Special Judge":"Normal",
+                },
+                success: function (data) {
+                    layer.msg(data.msg)
+                }
+            })
+        }
+
+        form.on("switch(spj)", function (data) {
+            if (data.elem.checked) {
+                $("#code-div").show()
+                $("#language-div").show()
+            } else {
+                $("#code-div").hide()
+                $("#language-div").hide()
+            }
+        })
+
+        upload.render({
+            elem: "#upload",
+            url: getPort()+'problem/upload',
+            data: {
+                id : id,
+            },
+            exts: "in|out|ans",
+            auto: true,
+            bindAction: "",
+            multiple: true,
+            drag: true,
+            done: function (res, index, upload) {
+
+            },
+            allDone: function (obj){
+
+            },
+            progress: function (n, elem) {
+
+            }
+        })
+    });
+</script>
 </body>
 </html>

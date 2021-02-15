@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/config"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -73,6 +74,7 @@ func AddProblem(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
+	problemJson.Path = config.GetJudgeConfig()["base_dir"].(string)
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err:= problemValidate.ValidateMap(problemMap, "add"); !res {

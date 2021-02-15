@@ -16,7 +16,7 @@ type Problem struct {
 	Public 		int 	`json:"public" form:"public"`
 	Source 		string 	`json:"source" form:"source"`
 	Time 		float32	`json:"time" form:"time"`
-	Memory 		int 	`json:"memory" form:"time"`
+	Memory 		int 	`json:"memory" form:"memory"`
 	Type  		string 	`json:"type" form:"type"`
 	Tag 		string 	`json:"tag" form:"tag"`
 	Path 		string 	`json:"path" form:"path"`
