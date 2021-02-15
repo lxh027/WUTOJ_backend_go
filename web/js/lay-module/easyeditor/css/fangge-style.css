@@ -1,0 +1,4 @@
+.fly-edit span{cursor:pointer; padding:0 10px; line-height: 38px; height: 38px;width: 30px;color:#1E9FFF;font-size: 18px;border-right: 1px solid #e6e6e6;display: inline-block;text-align: center;}
+.fly-right span:first-child{border-left: 1px solid #e6e6e6;}
+.fly-right span:last-child{border-right: 0}
+.fly-edit span:hover{color: #009E94;background-color: #f2f2f2;}

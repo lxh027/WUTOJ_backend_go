@@ -115,8 +115,14 @@ func Routes(router *gin.Engine)  {
 			problem.POST("/getAllProblem", panelController.GetAllProblem)
 			problem.POST("/addProblem", panelController.AddProblem)
 			problem.POST("/deleteProblem", panelController.DeleteProblem)
-			problem.POST("/UpdateProblem", panelController.UpdateProblem)
+			problem.POST("/updateProblem", panelController.UpdateProblem)
+			problem.POST("/getProblemByID", panelController.GetProblemByID )
 			problem.POST("/changeProblemStatus", panelController.ChangeProblemStatus)
+			problem.POST("/addSample", panelController.AddSample)
+			problem.POST("/deleteSample", panelController.DeleteSample)
+			problem.POST("/updateSample", panelController.UpdateSample)
+			problem.POST("/findSamplesByProblemID", panelController.GetSamplesByProblemID)
+
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))

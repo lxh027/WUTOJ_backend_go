@@ -16,7 +16,7 @@ func init() {
 	scenes := map[string] []string {
 		"add" : {"name", "color"},
 		"delete": {"id"},
-		"findByName": {"name"},
+		//"findByName": {"name"},
 		"findByID": {"id"},
 		"update": {"id"},
 		"changeStatus": {"id", "status"},

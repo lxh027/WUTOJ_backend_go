@@ -39,7 +39,7 @@ func FindTagsByName(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
-	tagValidate := validate.TagValidate
+	//tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
 	var tagJson model.Tag
@@ -49,11 +49,11 @@ func FindTagsByName(c *gin.Context) {
 		return
 	}
 
-	tagMap := helper.Struct2Map(tagJson)
+	/*tagMap := helper.Struct2Map(tagJson)
 	if res, err:= tagValidate.ValidateMap(tagMap, "findByName"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
-	}
+	}*/
 
 	res := tagModel.GetAvailTag(tagJson.Name)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))

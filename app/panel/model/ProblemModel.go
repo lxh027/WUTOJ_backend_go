@@ -9,7 +9,7 @@ type Problem struct {
 	ProblemID 	int 	`json:"problem_id" form:"problem_id"`
 	Title 		string 	`json:"title" form:"title"`
 	Background	string 	`json:"background" form:"background"`
-	Description string 	`json:"description" form:"description"`
+	Describe 	string 	`json:"describe" form:"describe"`
 	InputFormat string 	`json:"input_format" form:"input_format"`
 	OutputFormat string `json:"output_format" form:"output_format"`
 	Hint 		string 	`json:"hint" form:"hint"`
@@ -18,7 +18,7 @@ type Problem struct {
 	Time 		float32	`json:"time" form:"time"`
 	Memory 		int 	`json:"memory" form:"time"`
 	Type  		string 	`json:"type" form:"type"`
-	Tag 		string 	`json:"problem" form:"problem"`
+	Tag 		string 	`json:"tag" form:"tag"`
 	Path 		string 	`json:"path" form:"path"`
 	Status 		int 	`json:"status" form:"status"`
 }
@@ -68,7 +68,9 @@ func (model *Problem) AddProblem(newProblem Problem) helper.ReturnType {//jun
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		var idProblem Problem
+		db.First(&idProblem, newProblem)
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: idProblem.ProblemID}
 	}
 }
 
