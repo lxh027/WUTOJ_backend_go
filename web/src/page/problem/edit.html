@@ -277,7 +277,6 @@
                     "problem_id": id
                 },
                 success: function (data) {
-                    layer.msg(data.msg)
                     if (data.status == 0) {
                         samples = data.data
                         for (let i=0; i<samples.length; i++) {
