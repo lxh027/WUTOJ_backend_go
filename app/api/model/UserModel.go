@@ -6,20 +6,20 @@ import (
 )
 
 type User struct {
-	UserID 		uint 	`json:"user_id" form:"user_id"`
-	Nick   		string 	`json:"nick" form:"nick"`
-	Password	string 	`json:"password" form:"password"`
-	Realname	string	`json:"realname" form:"realname" gorm:"column:realname"`
-	Avatar		string 	`json:"avatar" form:"avatar"`
-	School		string	`json:"school" form:"school"`
-	Major		string	`json:"major" form:"major"`
-	Class       string  `json:"class" form:"class"`
-	Contact		string	`json:"contact" form:"contact"`
-	Identity 	uint	`json:"identity" form:"identity"`
-	Desc    	string 	`json:"desc" form:"desc"`
-	Mail 		string 	`json:"mail" form:"mail"`
-	Status 		int 	`json:"status" form:"status"`
-	RoleGroup	string 	`json:"role_group" form:"role_group"`
+	UserID   uint   `json:"user_id" form:"user_id"`
+	Nick     string `json:"nick" form:"nick"`
+	Password string `json:"password" form:"password"`
+	Realname string `json:"realname" form:"realname" gorm:"column:realname"`
+	Avatar   string `json:"avatar" form:"avatar"`
+	School   string `json:"school" form:"school"`
+	Major    string `json:"major" form:"major"`
+	Class    string `json:"class" form:"class"`
+	Contact  string `json:"contact" form:"contact"`
+	Identity uint   `json:"identity" form:"identity"`
+	Desc     string `json:"desc" form:"desc"`
+	Mail     string `json:"mail" form:"mail"`
+	Status   int    `json:"status" form:"status"`
+	//RoleGroup	string 	`json:"role_group" form:"role_group"`
 	//AllProblem	interface{}	`json:"all_problem" form:"all_problem"`
 }
 
@@ -33,7 +33,7 @@ func (model *User) AddUser(data User) helper.ReturnType {
 	user := User{}
 	// 判断昵称是否已存在
 	if err := db.Where("nick = ?", data.Nick).First(&user).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "昵称已存在",  Data: user}
+		return helper.ReturnType{Status: common.CodeError, Msg: "昵称已存在", Data: user}
 	}
 	// 创建记录
 	err := db.Create(&data).Error
@@ -56,7 +56,7 @@ func (model *User) EditUserByID(userId uint, data User) helper.ReturnType {
 }
 
 // 通过nick编辑用户
-func (model *User) EditUserByNick( nick string, data User) helper.ReturnType {
+func (model *User) EditUserByNick(nick string, data User) helper.ReturnType {
 	err := db.Model(model).Where("nick = ?", nick).Update(data).Error
 
 	if err != nil {
@@ -109,6 +109,3 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 		}
 	}
 }
-
-
-
