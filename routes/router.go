@@ -1,13 +1,13 @@
 package routes
 
 import (
-	 apiController "OnlineJudge/app/api/Controller"
-	 panelController "OnlineJudge/app/panel/Controller"
+	apiController "OnlineJudge/app/api/Controller"
+	panelController "OnlineJudge/app/panel/Controller"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func Routes(router *gin.Engine)  {
+func Routes(router *gin.Engine) {
 
 	// api
 	api := router.Group("/api")
@@ -17,7 +17,23 @@ func Routes(router *gin.Engine)  {
 
 		api.POST("/do_login", apiController.DoLogin)
 		api.POST("/do_logout", apiController.DoLogout)
+
 	}
+
+	// Contest
+	contest := router.Group("/contests")
+	{
+		contest.GET("", apiController.GetAll)
+		contest.POST("", apiController.Add)
+		contest.GET("/:id", apiController.GetContest)
+	}
+
+	// problem
+	//problem := router.Group("/api/problems") {
+	//	problem.GET("/", )
+	//	problem.GET("/:id", )
+	//
+	//}
 
 	panel := router.Group("/panel")
 	{
