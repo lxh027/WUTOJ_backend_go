@@ -8,26 +8,25 @@ import (
 	_ "OnlineJudge/config"
 	_ "debug/elf"
 	_ "github.com/go-playground/locales/mgh"
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"time"
 )
 
 type Contest struct {
-	ContestID   int                  `json:"contest_id" form:"contest_id"`
-	ContestName string               `json:"contest_name" form:"contest_name"`
-	BeginTime   timestamp.Timestamp            `json:"begin_time form:"begin_time"`
-	EndTime     timestamp.Timestamp            `json:"end_time form:"end_time"`
-	Frozen      float64 `json:"frozen" form:"frozen"`
-	Problems    string               `json:"problems" form:"problems"`
-	Prize       string               `json:"prize" form:"prize"`
-	Colors 		string				 `json:"colors" form:"colors"`
-	Rule 		int 				 `json:"rule" form:"rule"`
-	Status      int                  `json:"status" form:"status"`
+	ContestID   int       `json:"contest_id" form:"contest_id"`
+	ContestName string    `json:"contest_name" form:"contest_name"`
+	BeginTime   time.Time `json:"begin_time form:"begin_time"`
+	EndTime     time.Time `json:"end_time form:"end_time"`
+	Frozen      float64   `json:"frozen" form:"frozen"`
+	Problems    string    `json:"problems" form:"problems"`
+	Prize       string    `json:"prize" form:"prize"`
+	Colors      string    `json:"colors" form:"colors"`
+	Rule        int       `json:"rule" form:"rule"`
+	Status      int       `json:"status" form:"status"`
 }
 
 func (Contest) TableName() string {
 	return "contest"
 }
-
 
 func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 	contest := Contest{}
@@ -69,12 +68,18 @@ func (model *Contest) GetContestById(contestID string) helper.ReturnType {
 	}
 }
 
-
 func (model *Contest) GetAllContest() helper.ReturnType {
 	var contests []Contest
-	result := db.Find(&contests)
-	if result != nil {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg:"查找成功", Data: result.}
+	//
+	//db.Model(&Contest{}).Find(&contests).Error
+	//
+	err := db.Find(&contests).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查找失败，数据库错误", Data: ""}
+	}
+	if contests != nil {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找成功", Data: contests}
 	} else {
 		return helper.ReturnType{Status: common.CodeError, Msg: "当前无比赛", Data: ""}
 	}
@@ -113,3 +118,13 @@ func (model *Contest) UpdateContest(contestID int, data Contest) helper.ReturnTy
 	}
 }
 
+func (model *Contest) GetContestStatus(ContestID int) helper.ReturnType {
+	var contest = Contest{}
+	err := db.Where("contest_id = ?", ContestID).First(&contest).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: contest.Status, Msg: "获取状态失败", Data: ""}
+	} else {
+		return helper.ReturnType{Status: contest.Status, Msg: "已参加比赛", Data: ""}
+	}
+}
