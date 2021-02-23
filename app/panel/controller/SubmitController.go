@@ -36,7 +36,7 @@ func GetAllSubmit(c *gin.Context)  {
 		submitJson.Offset = (submitJson.Offset-1)*submitJson.Limit
 		whereData := map[string]string {
 			"user_id": submitJson.Where.UserID, "problem_id": submitJson.Where.ProblemID,
-			"contest_id": submitJson.Where.ContestID, "language": submitJson.Where.ContestID,
+			"contest_id": submitJson.Where.ContestID, "language": submitJson.Where.Language,
 			"status": submitJson.Where.Status,
 		}
 		res := submitModel.GetAllSubmit(submitJson.Offset, submitJson.Limit, whereData, submitJson.Where.MinSubmitTime, submitJson.Where.MaxSubmitTime)
