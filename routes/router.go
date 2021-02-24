@@ -118,6 +118,7 @@ func Routes(router *gin.Engine)  {
 			problem.POST("/updateProblem", panelController.UpdateProblem)
 			problem.POST("/getProblemByID", panelController.GetProblemByID )
 			problem.POST("/changeProblemStatus", panelController.ChangeProblemStatus)
+			problem.POST("/changeProblemPublic", panelController.ChangeProblemPublic)
 			problem.POST("/addSample", panelController.AddSample)
 			problem.POST("/deleteSample", panelController.DeleteSample)
 			problem.POST("/updateSample", panelController.UpdateSample)

@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -69,6 +70,7 @@ func AddContest(c *gin.Context) {
 	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
+	problemModel := model.Problem{}
 
 	var contestJson model.Contest
 	if err := c.ShouldBind(&contestJson); err != nil {
@@ -80,6 +82,15 @@ func AddContest(c *gin.Context) {
 	if res, err:= contestValidate.ValidateMap(contestMap, "add"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
+	}
+
+	var problems []int
+	if err := json.Unmarshal([]byte(contestJson.Problems), &problems); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+	for _, problemId := range problems {
+		problemModel.ChangeProblemPublicStatus(problemId, 0)
 	}
 
 	res := contestModel.AddContest(contestJson)
@@ -119,6 +130,7 @@ func UpdateContest(c *gin.Context) {
 	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
+	problemModel := model.Problem{}
 
 	var contestJson model.Contest
 	if err := c.ShouldBind(&contestJson); err != nil {
@@ -130,6 +142,15 @@ func UpdateContest(c *gin.Context) {
 	if res, err:= contestValidate.ValidateMap(contestMap, "update"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
+	}
+
+	var problems []int
+	if err := json.Unmarshal([]byte(contestJson.Problems), &problems); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+	for _, problemId := range problems {
+		problemModel.ChangeProblemPublicStatus(problemId, 0)
 	}
 
 	res := contestModel.UpdateContest(contestJson.ContestID, contestJson)

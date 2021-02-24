@@ -169,6 +169,31 @@ func ChangeProblemStatus(c *gin.Context) {
 	return
 }
 
+func ChangeProblemPublic(c *gin.Context) {
+	if res := haveAuth(c, "updateProblem"); res != common.Authed {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		return
+	}
+	problemValidate := validate.ProblemValidate
+	problemModel := model.Problem{}
+
+	var problemJson model.Problem
+	if err := c.ShouldBind(&problemJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		return
+	}
+
+	problemMap := helper.Struct2Map(problemJson)
+	if res, err:= problemValidate.ValidateMap(problemMap, "update"); !res {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+
+	res := problemModel.ChangeProblemPublicStatus(problemJson.ProblemID, problemJson.Public)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
+}
+
 func UploadData(c *gin.Context) {
 	if res := haveAuth(c, "uploadData"); res != common.Authed {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))

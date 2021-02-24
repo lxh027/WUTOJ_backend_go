@@ -68,6 +68,7 @@
                     if (auths.indexOf("updateProblem") !== -1) {
                         $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
                         $("#currentTableBar").append(getButton(3, 'status', '状态'))
+                        $("#currentTableBar").append(getButton(3, 'public', '公众'))
                     }
                     if (auths.indexOf("deleteProblem") !== -1) {
                         $("#currentTableBar").append(getButton(3, 'delete', '删除'))
@@ -106,11 +107,11 @@
                 {type: "checkbox", },
                 {field: 'problem_id' , title: 'ID', sort: true},
                 {field: 'title', title: '标题', sort: true},
-                {field: 'public', title: '公众可见', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>Private</p>"; else if (d.status == "1") return "<p style='color: green'>Public</p>";}},
+                {field: 'public', title: '公众可见', sort: true, templet: (d) => {if (d.public == "0") return "<p style='color: red'>Private</p>"; else if (d.public == "1") return "<p style='color: green'>Public</p>";}},
                 {field: 'source', title: '来源', sort: true},
                 {field: 'tag', title: '标签', sort: true},
                 {field: 'status', title: '状态', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>";}},
-                {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
+                {title: '操作', minWidth: 250, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
             limit: 25,
@@ -191,6 +192,29 @@
                         data: {
                             "problem_id": data.problem_id,
                             "status": 1-data.status
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }  else if (obj.event === 'public') {
+                layer.confirm('确认更改', function (index) {
+                    $.ajax({
+                        url: getPort()+'problem/changeProblemPublic',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "problem_id": data.problem_id,
+                            "public": 1-data.public
                         },
                         success: function (data) {
                             table.reload('currentTableId', {
