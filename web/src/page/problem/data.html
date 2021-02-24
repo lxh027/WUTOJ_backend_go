@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <link rel="stylesheet" href="../../../lib/fonts/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../lib/bootstrap/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../../../lib/fileinput/fileinput.min.css">
     <style>
         body {
             background-color: #ffffff;
@@ -44,10 +47,10 @@
         <div class="layui-input-block">
             <select name="language" id="language">
                 <option value="" selected>default</option>
-                <option value=0>c.gcc</option>
-                <option value=1>cpp.g++</option>
-                <option value=2>java.openjdk10</option>
-                <option value=3>python.cpython3.6</option>
+                <option value="c.gcc">c.gcc</option>
+                <option value="cpp.g++">cpp.g++</option>
+                <option value="java.openjdk10">java.openjdk10</option>
+                <option value="python.cpython3.6">python.cpython3.6</option>
             </select>
         </div>
     </div>
@@ -59,7 +62,8 @@
     </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <button class="layui-btn layui-btn-normal" id="upload" lay-submit lay-filter="uploadBtn"><i class="layui-icon">&#xe67c;</i>上传数据</button>
+            <input id="input-id" name="file[]" multiple type="file" data-show-caption="true">
+
         </div>
     </div>
 </div>
@@ -67,13 +71,16 @@
 <script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script src="../../../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
 <script src="../../js/common.js"></script>
+<script src="../../../lib/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../lib/fileinput/fileinput.js"></script>
+<script type="text/javascript" src="../../../lib/fileinput/locales/zh.js"></script>
 <script>
+    let path_pos = 0;
+    let id
     layui.use(['form', 'upload'], function () {
         var form = layui.form,
             layer = layui.layer,
-            upload = layui.upload,
             $ = layui.$;
-        let id
         $(document).ready(() => {
             id = getQueryString("id")
             $.ajax({
@@ -108,12 +115,18 @@
                                 $("#language-div").show()
                                 form.render()
                             }
+                            const path = data.data.path
+                            if (path[path.length-1] === '1') {
+                                path_pos = 1;
+                            }
                         } else {
                             layer.msg("获取信息错误", () => {
                                 window.location.href = "../404.html"
                             })
                         }
                     }
+                }).then(() => {
+                    initFileInput("input-id")
                 })
             })
         })
@@ -126,23 +139,6 @@
             return false;
         });
 
-        function updateProblem() {
-            $.ajax({
-                url: getPort()+'problem/updateProblem',
-                type: "post",
-                dataType: "json",
-                data: {
-                    "problem_id": id,
-                    "time": $("#time").val(),
-                    "memory": $("#memory").val(),
-                    "type": $("#spj").prop("checked")?"Special Judge":"Normal",
-                },
-                success: function (data) {
-                    layer.msg(data.msg)
-                }
-            })
-        }
-
         form.on("switch(spj)", function (data) {
             if (data.elem.checked) {
                 $("#code-div").show()
@@ -153,28 +149,78 @@
             }
         })
 
-        upload.render({
-            elem: "#upload",
-            url: getPort()+'problem/upload',
+    });
+
+    function updateProblem() {
+        $.ajax({
+            url: getPort()+'problem/updateProblem',
+            type: "post",
+            dataType: "json",
             data: {
-                id : id,
+                "problem_id": id,
+                "time": $("#time").val(),
+                "memory": $("#memory").val(),
+                "type": $("#spj").prop("checked")?"Special Judge":"Normal",
             },
-            exts: "in|out|ans",
-            auto: true,
-            bindAction: "",
-            multiple: true,
-            drag: true,
-            done: function (res, index, upload) {
-
-            },
-            allDone: function (obj){
-
-            },
-            progress: function (n, elem) {
-
+            success: function (data) {
+                layer.msg(data.msg)
             }
         })
-    });
+    }
+    function initFileInput(ctrlName) {
+        var control = $('#' + ctrlName);
+        control.fileinput({
+            language: 'zh', //设置语言
+            uploadUrl: getPort()+'problem/uploadData', //上传的地址
+            allowedFileExtensions: ['in', 'out'],//接收的文件后缀
+            //uploadExtraData:{"id": 1, "fileName":'123.mp3'},
+            uploadAsync: false, //默认异步上传
+            showUpload: true, //是否显示上传按钮
+            showRemove : true, //显示移除按钮
+            showPreview : true, //是否显示预览
+            showCaption: false,//是否显示标题
+            browseClass: "layui-btn layui-btn-normal", //按钮样式
+            //dropZoneEnabled: true,//是否显示拖拽区域
+            //minImageWidth: 50, //图片的最小宽度
+            //minImageHeight: 50,//图片的最小高度
+            //maxImageWidth: 1000,//图片的最大宽度
+            //maxImageHeight: 1000,//图片的最大高度
+            //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+            //minFileCount: 0,
+            //maxFileCount: 10, //表示允许同时上传的最大文件个数
+            enctype: 'multipart/form-data',
+            validateInitialCount:true,
+            previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+            msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+            uploadExtraData: function(){
+                //updateProblem();
+                let data = {
+                    'problem_id': getQueryString('id')
+                };
+                data["time"] = $("#time").val();
+                data["memory"] = $("#memory").val();
+                const type = $("#spj").prop("checked");
+                data["spj"] = type;
+                if (type) {
+                    data['language'] = $("#language").val();
+                    data['code'] = $("#code").val()
+                }
+                data['path_pos'] = path_pos;
+                return data;
+            }
+        }).on('filepreupload', function(event, data, previewId, index) {     //上传中
+            var form = data.form, files = data.files, extra = data.extra,
+                response = data.response, reader = data.reader;
+            console.log('文件正在上传');
+        }).on("fileuploaded", function (event, data, previewId, index) {    //一个文件上传成功
+            console.log('文件上传成功！'+data.id);
+            //updateProblem();
+        }).on('fileerror', function(event, data, msg) {  //一个文件上传失败
+            console.log('文件上传失败！'+data.id);
+        }).on("filebatchuploadsuccess", function () {
+            updateProblem()
+        })
+    }
 </script>
 </body>
 </html>

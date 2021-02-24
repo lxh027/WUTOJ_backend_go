@@ -60,19 +60,19 @@ func Routes(router *gin.Engine)  {
 			auth.POST("/updateAuth", panelController.UpdateAuth)
 		}
 
-		roleAuth := panel.Group("roleAuth")
+		roleAuth := panel.Group("/roleAuth")
 		{
 			roleAuth.POST("/getRoleAuthsList", panelController.GetRoleAuthsList)
 			roleAuth.POST("/addRoleAuths", panelController.AddRoleAuths)
 			roleAuth.POST("/deleteRoleAuths", panelController.DeleteRoleAuths)
 		}
 
-		submitLog := panel.Group("submitLog")
+		submitLog := panel.Group("/submitLog")
 		{
 			submitLog.POST("/getUserSubmitStatus", panelController.GetAllUserSubmitStatus)
 		}
 
-		tag := panel.Group("tag")
+		tag := panel.Group("/tag")
 		{
 			tag.POST("/getAllTag", panelController.GetAllTag)
 			tag.POST("/addTag", panelController.AddTag)
@@ -83,7 +83,7 @@ func Routes(router *gin.Engine)  {
 			tag.POST("/changeTagStatus", panelController.ChangeTagStatus)
 		}
 
-		notice := panel.Group("notice")
+		notice := panel.Group("/notice")
 		{
 			notice.POST("/getAllNotice", panelController.GetAllNotice)
 			notice.POST("/addNotice", panelController.AddNotice)
@@ -92,7 +92,7 @@ func Routes(router *gin.Engine)  {
 			notice.POST("/getNoticeByID", panelController.GetNoticeByID)
 		}
 
-		contest := panel.Group("contest")
+		contest := panel.Group("/contest")
 		{
 			contest.POST("/getAllContest", panelController.GetAllContest)
 			contest.POST("/addContest", panelController.AddContest)
@@ -102,7 +102,7 @@ func Routes(router *gin.Engine)  {
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 		}
 
-		submit := panel.Group("submit")
+		submit := panel.Group("/submit")
 		{
 			submit.POST("/getAllSubmit", panelController.GetAllSubmit)
 			submit.POST("/getSubmitByID", panelController.GetSubmitByID)
@@ -110,7 +110,7 @@ func Routes(router *gin.Engine)  {
 			submit.POST("/rejudgeSubmitByID", panelController.RejudgeSubmitByID)
 		}
 
-		problem := panel.Group("problem")
+		problem := panel.Group("/problem")
 		{
 			problem.POST("/getAllProblem", panelController.GetAllProblem)
 			problem.POST("/addProblem", panelController.AddProblem)
@@ -122,7 +122,7 @@ func Routes(router *gin.Engine)  {
 			problem.POST("/deleteSample", panelController.DeleteSample)
 			problem.POST("/updateSample", panelController.UpdateSample)
 			problem.POST("/findSamplesByProblemID", panelController.GetSamplesByProblemID)
-
+			problem.POST("/uploadData", panelController.UploadData)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))

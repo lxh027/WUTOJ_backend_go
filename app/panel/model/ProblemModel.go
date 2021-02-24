@@ -103,3 +103,14 @@ func (model *Problem) ChangeProblemStatus(problemID int, status int) helper.Retu
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
+
+func (model *Problem) SaveProblemPath(problemID int, path string) helper.ReturnType {
+	err := db.Model(&Problem{}).Where("problem_id = ?", problemID).Update("path", path).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+	} else {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+	}
+
+}

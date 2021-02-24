@@ -6,8 +6,15 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
+	"fmt"
+	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
+	"math"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func GetAllProblem(c *gin.Context)  {
@@ -74,7 +81,7 @@ func AddProblem(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
-	problemJson.Path = config.GetJudgeConfig()["base_dir"].(string)
+	problemJson.Path = config.GetJudgeConfig()["base_dir"].(string)+"/tmp/0"
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err:= problemValidate.ValidateMap(problemMap, "add"); !res {
@@ -160,4 +167,149 @@ func ChangeProblemStatus(c *gin.Context) {
 	res := problemModel.ChangeProblemStatus(problemJson.ProblemID, problemJson.Status)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
+}
+
+func UploadData(c *gin.Context) {
+	if res := haveAuth(c, "uploadData"); res != common.Authed {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		return
+	}
+
+	var problemModel model.Problem
+
+	form, _ := c.MultipartForm()
+	files := form.File["file[]"]
+	problemDataJson := struct {
+		ProblemID 	int 	`json:"problem_id" form:"problem_id"`
+		Time 		float64 `json:"time" form:"time"`
+		Memory 		float64 `json:"memory" form:"memory"`
+		Spj 		bool 	`json:"spj" form:"spj"`
+		Language 	string 	`json:"language" form:"language"`
+		Code 		string 	`json:"code" form:"code"`
+		PathPos 	int 	`json:"path_pos" form:"path_pos"`
+	}{}
+	// 绑定数据
+	if err := c.ShouldBind(&problemDataJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		return
+	}
+	//c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "绑定数据模型成功", 1))
+	judgeConfig := config.GetJudgeConfig()
+	var problemType string
+	if problemDataJson.Spj {
+		problemType = "Special Judge"
+	} else {
+		problemType = "Normal"
+	}
+	// 解析数据
+	secsFloat, nanosFloat := math.Modf(problemDataJson.Time)
+	// 秒 纳秒 内粗你
+	secs, nanos, memory := int(secsFloat), int(nanosFloat*100000000), int(problemDataJson.Memory * 1024 * 1024)
+	// spj文件名
+	spjFileName := "spj."+problemDataJson.Language[:strings.Index(problemDataJson.Language, ".")]
+	// 数据路径 path = {base_dir}/{env}/{id}/{0/1}
+	dataPath := judgeConfig["base_dir"].(string)+"/"+judgeConfig["env"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)+"/"+strconv.Itoa(1-problemDataJson.PathPos)
+	//fmt.Println(dataPath)
+	// 删除原目录
+	_ = os.RemoveAll(dataPath)
+	if err := os.MkdirAll(dataPath, 755); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "创建路径失败", err.Error()))
+		return
+	}
+	timeType := map[string]int { "secs": secs, "nanos": nanos}
+
+	tomlPath := dataPath+"/config.toml"
+	// 创建config.toml
+	if tomlFile, err := os.Create(tomlPath); err == nil {
+		defer tomlFile.Close()
+		tomlEncode := toml.NewEncoder(tomlFile)
+		tomlMap := map[string]interface{} {
+			"problem_type": problemType,
+			"limit": map[string]interface{} {
+				"memory": memory, "real_time": timeType, "cpu_time": timeType,
+			},
+		}
+		if problemDataJson.Spj {
+			// SPJ
+			tomlMap["spj"] = map[string]interface{} {
+				"source": spjFileName, "language": problemDataJson.Language,
+			}
+		}
+		err = tomlEncode.Encode(tomlMap)
+		if err != nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "保存配置文件失败", err.Error()))
+			return
+		}
+	} else {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "打开配置文件失败", err.Error()))
+		return
+	}
+
+	// 创建spj文件
+	if problemDataJson.Spj {
+		spjPath := dataPath+"/extern_program"
+		if err := os.MkdirAll(spjPath, 755); err != nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "创建路径失败", err.Error()))
+			return
+		}
+		if tomlFile, err := os.Create(spjPath+"/config.toml"); err == nil {
+			defer tomlFile.Close()
+			tomlEncode := toml.NewEncoder(tomlFile)
+			spjToml := map[string]interface{} {
+				"source": spjFileName,
+				"language": problemDataJson.Language,
+				"timeout": timeType,
+			}
+			if err = tomlEncode.Encode(spjToml); err != nil {
+				c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "保存SPJ配置文件失败", err.Error()))
+				return
+			}
+		} else {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "打开SPJ配置文件失败", err.Error()))
+			return
+		}
+		if spjFile, err := os.Create(spjPath+"/"+spjFileName); err == nil {
+			defer spjFile.Close()
+			if _, err = spjFile.WriteString(problemDataJson.Code); err != nil {
+				c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "写入spj失败", err.Error()))
+				return
+			}
+		} else {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "打开SPJ配置文件失败", err.Error()))
+			return
+		}
+	}
+	// 保存数据文件
+	filePairs := map[string]map[string]*multipart.FileHeader{}
+	for _, file := range files {
+		filename := file.Filename
+		nameSlice := strings.Split(filename, ".")
+		if len(filePairs[nameSlice[0]]) == 0{
+			filePairs[nameSlice[0]] = make(map[string]*multipart.FileHeader)
+		}
+		filePairs[nameSlice[0]][nameSlice[1]] = file
+	}
+
+	index := 0
+	for _, filePair := range filePairs {
+		dataPairPath := dataPath+"/"+strconv.Itoa(index)
+		if err := os.MkdirAll(dataPairPath, 755); err != nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "创建路径失败", err.Error()))
+			return
+		}
+		/*inputFile, err1 := os.Create(dataPath+"/input")
+		outputFile, err2 := os.Create(dataPath+"/answer")
+		if err1 != nil || err2 != nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "打开输入/输出文件失败", 1))
+		}*/
+		fmt.Println(filePair["in"].Filename, filePair["out"].Filename)
+		err1 := c.SaveUploadedFile(filePair["in"], dataPairPath+"/input")
+		err2 := c.SaveUploadedFile(filePair["out"], dataPairPath+"/answer")
+		if err1 != nil || err2 != nil {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "保存输入/输出文件失败", 1))
+			return
+		}
+	}
+	problemModel.SaveProblemPath(problemDataJson.ProblemID, dataPath)
+	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "上传成功", "OK"))
 }
