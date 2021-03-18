@@ -14,8 +14,8 @@ import (
 type Contest struct {
 	ContestID   int       `json:"contest_id" form:"contest_id"`
 	ContestName string    `json:"contest_name" form:"contest_name"`
-	BeginTime   time.Time `json:"begin_time form:"begin_time"`
-	EndTime     time.Time `json:"end_time form:"end_time"`
+	BeginTime   time.Time `json:"begin_time" form:"begin_time"`
+	EndTime     time.Time `json:"end_time" form:"end_time"`
 	Frozen      float64   `json:"frozen" form:"frozen"`
 	Problems    string    `json:"problems" form:"problems"`
 	Prize       string    `json:"prize" form:"prize"`
@@ -31,7 +31,7 @@ func (Contest) TableName() string {
 func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 	contest := Contest{}
 	if contestName != "" {
-		err := db.Where("contest_id = ?", contestName).First(&contest).Error
+		err := db.Where("contest_name = ?", contestName).First(&contest).Error
 		if err != nil {
 			return helper.ReturnType{Status: common.CodeError, Msg: "未找到数据", Data: err.Error()}
 		} else {
@@ -95,12 +95,15 @@ func (model *Contest) AddContest(data Contest) helper.ReturnType {
 }
 
 func (model *Contest) DeleteContest(contestID int) helper.ReturnType {
-	contest := Contest{}
-	err := db.Where("contest_id = ?", contestID).First(&contest).Error
-	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "数据库错误||删除比赛失败", Data: err.Error()}
-	}
-	err = db.Model(model).Where("contest_id = ?", contestID).Update("status", 0).Error
+	//contest := Contest{}
+	//err := db.Where("contest_id = ?", contestID).First(&contest).Error
+	//if err != nil {
+	//	return helper.ReturnType{Status: common.CodeError, Msg: "数据库错误||删除比赛失败", Data: err.Error()}
+	//}
+	//err = db.Delete(&contest).Error
+	//contest.Status = 0
+	//err = db.Create(&contest).Error
+	err := db.Model(model).Where("contest_id = ?", contestID).Update("status", 0).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "删除比赛失败", Data: err.Error()}
 	} else {
