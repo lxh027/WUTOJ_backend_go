@@ -4,18 +4,11 @@ import (
 	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	_ "strconv"
 )
-
-func isInt(contestID string) bool {
-	if contestID[0] > '0' && contestID[0] < '9' {
-		return true
-	} else {
-		return false
-	}
-}
 
 func GetAllContest(c *gin.Context) {
 	contestModel := model.Contest{}
@@ -24,48 +17,25 @@ func GetAllContest(c *gin.Context) {
 }
 
 func GetContest(c *gin.Context) {
-	ContestID := c.Param("id")
+	ContestID := c.Param("contest_id")
+	fmt.Println(ContestID)
 	contestModel := model.Contest{}
 	var res helper.ReturnType
 	res = contestModel.GetContestById(ContestID)
 	if res.Status != common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
 	} else {
 		res = contestModel.GetContestByName(ContestID)
 		if res.Status != common.CodeError {
 			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+			return
 		} else {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "查找失败", ""))
+			return
 		}
-	}
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-}
 
-func AddContest(c *gin.Context) {
-	var contestModel = model.Contest{}
-	var contestJson struct {
-		model.Contest
 	}
-	if err := c.ShouldBind(&contestJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
-		return
-	}
-
-	res := contestModel.AddContest(contestJson.Contest)
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-
-}
-
-func DeleteContest(c *gin.Context) {
-	var contestModel = model.Contest{}
-	var ContestID struct {
-		ID int `form:contest_id`
-	}
-	if err := c.ShouldBind(&ContestID); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
-		return
-	}
-	res := contestModel.DeleteContest(ContestID.ID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 }
 
@@ -97,20 +67,14 @@ func GetContestStatus(c *gin.Context) {
 }
 
 func GetUserContest(c *gin.Context) {
-
-}
-
-func UpdateContest(c *gin.Context) {
-	var contestModel = model.Contest{}
-	var contestJson struct {
-		model.Contest
+	var queryInfo struct {
+		UserID int `form:"user_id"`
 	}
-	if err := c.ShouldBind(&contestJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+	contestUserModel := model.ContestUser{}
+	if err := c.ShouldBind(&queryInfo); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", ""))
 		return
 	}
-
-	res := contestModel.UpdateContest(contestJson.ContestID, contestJson.Contest)
+	res := contestUserModel.GetUserContest(queryInfo.UserID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-
 }
