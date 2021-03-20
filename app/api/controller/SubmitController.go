@@ -39,9 +39,9 @@ func Submit(c *gin.Context) {
 	}
 
 	res := submitModel.AddSubmit(submitJson)
-	go func(submit model.Submit) {
-		judge(submit)
-	}(submitJson)
+	//go func(submit model.Submit) {
+	//	judge(submit)
+	//}(submitJson)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return

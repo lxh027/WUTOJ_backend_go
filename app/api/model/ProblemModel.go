@@ -14,7 +14,7 @@ type Problem struct {
 	OutputFormat string  `json:"output_format" form:"output_format"`
 	Hint         string  `json:"hint" form:"hint"`
 	Public       uint    `json:"public" form:"public"`
-	Source       string  `json:"source" form:"source`
+	Source       string  `json:"source" form:"source"`
 	Time         float64 `json:"time" form:"time"`
 	Memory       int     `json:"memory" form:"memory"`
 	Type         string  `json:"type" form:"type"`
