@@ -103,6 +103,7 @@ func (model *Submit) FindSubmitByID(id int) helper.ReturnType {
 
 func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}) helper.ReturnType {
 	err := db.Model(&Submit{}).
+		Where("id = ?", id).
 		Select([]string{"status", "time", "memory", "msg"}).
 		Updates(data).
 		Error
