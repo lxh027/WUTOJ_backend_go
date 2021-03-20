@@ -18,22 +18,50 @@ func Routes(router *gin.Engine) {
 		api.POST("/do_login", apiController.DoLogin)
 		api.POST("/do_logout", apiController.DoLogout)
 
-	}
+		api.GET("/rotation")
+		api.GET("/data")
+		api.GET("/notice")
 
-	// Contest
-	contest := router.Group("/contests")
-	{
-		contest.GET("", apiController.GetAll)
-		contest.POST("", apiController.Add)
-		contest.GET("/:id", apiController.GetContest)
-	}
+		api.GET("/rank/contest/:contest_id")
 
-	// problem
-	//problem := router.Group("/api/problems") {
-	//	problem.GET("/", )
-	//	problem.GET("/:id", )
-	//
-	//}
+		contest := api.Group("/contests")
+		{
+			contest.GET("", apiController.GetAllContest)
+			contest.GET("/contest/:param", apiController.SearchContest)
+			contest.GET("/user/:contest_id", apiController.CheckContest)
+			contest.POST("/user/:contest_id", apiController.JoinContest)
+		}
+
+		submit := api.Group("/submit")
+		{
+			submit.GET("", apiController.GetSubmitInfo)
+			submit.POST("", apiController.Submit)
+		}
+
+		problem := api.Group("/problems")
+		{
+			problem.GET("", apiController.GetAllProblems)
+			problem.GET("/contest/:contest_id", apiController.GetContestProblems)
+			problem.GET("/{problem_id}", apiController.GetProblemByID)
+
+		}
+
+		discuss := api.Group("/discussions")
+		{
+			discuss.GET("", apiController.GetAllDiscuss)
+			discuss.GET("/problem/:problem_id", apiController.GetProblemDiscussion)
+			discuss.GET("/contest/:contest_id", apiController.GetContestDiscussion)
+			discuss.GET("/discuss", apiController.GetDiscussionByID) // changed
+			discuss.POST("", apiController.AddDiscussion)
+
+		}
+
+		replies := api.Group("/replies")
+		{
+			replies.POST("", apiController.AddReply)
+		}
+
+	}
 
 	panel := router.Group("/panel")
 	{
