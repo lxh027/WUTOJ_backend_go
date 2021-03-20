@@ -1,7 +1,5 @@
 package model
 
-// Wait To Do
-
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
@@ -111,23 +109,23 @@ func (model *Contest) DeleteContest(contestID int) helper.ReturnType {
 	}
 }
 
-func (model *Contest) UpdateContest(contestID int, data Contest) helper.ReturnType {
-	err := db.Model(model).Where("contest_id = ?", contestID).Update(&data).Error
-
-	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "编辑比赛失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "编辑比赛成功", Data: 1}
-	}
-}
-
 func (model *Contest) GetContestStatus(ContestID int) helper.ReturnType {
 	var contest = Contest{}
 	err := db.Where("contest_id = ?", ContestID).First(&contest).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: contest.Status, Msg: "获取状态失败", Data: ""}
-	} else {
-		return helper.ReturnType{Status: contest.Status, Msg: "已参加比赛", Data: ""}
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取比赛状态失败", Data: ""}
 	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取比赛状态成功", Data: contest.Status}
+}
+
+func (model *Contest) GetContestProblems(ContestID int) helper.ReturnType {
+	var contest = Contest{}
+	err := db.Where("contest_id = ?", ContestID).First(&contest).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取题目失败，数据库错误", Data: ""}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取题目成功", Data: contest.Problems}
 }

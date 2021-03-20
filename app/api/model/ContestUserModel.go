@@ -22,6 +22,13 @@ func (model *ContestUser) AddContestUser(data ContestUser) helper.ReturnType {
 }
 
 func (model *ContestUser) GetUserContest(UserID int) helper.ReturnType {
-	// to do
-	// ask ljw for detail
+	var contestUsers []ContestUser
+	err := db.Find(&contestUsers).Where("user_id = ?", UserID).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
+	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: contestUsers}
+
 }

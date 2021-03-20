@@ -3,6 +3,7 @@ package controller
 import (
 	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/common"
+	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -77,4 +78,23 @@ func GetUserContest(c *gin.Context) {
 	}
 	res := contestUserModel.GetUserContest(queryInfo.UserID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+}
+
+func GetContestProblems(c *gin.Context) {
+	var ContestJson model.Contest
+	contestModel := model.Contest{}
+	if err := c.ShouldBind(&ContestJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", ""))
+		return
+	}
+	contestValidte := validate.ContestValidate
+	contestMap := helper.Struct2Map(ContestJson)
+	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, string(ContestJson.ContestID), 0))
+	if res, err := contestValidte.ValidateMap(contestMap, "getProblems"); !res {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+	res := contestModel.GetContestProblems(ContestJson.ContestID)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
 }
