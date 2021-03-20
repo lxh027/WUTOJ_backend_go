@@ -23,6 +23,7 @@ func init() {
 		"findByID":    {"contest_id"},
 		"update":      {"contest_id"},
 		"getProblems": {"contest_id"},
+		"join":        {"contest_id"},
 	}
 
 	ContestValidate.Rules = rules
