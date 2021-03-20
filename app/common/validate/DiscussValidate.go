@@ -6,7 +6,7 @@ var DiscussValidate helper.Validator
 
 func init() {
 	rules := map[string]string{
-		"id":          "required",
+		"discuss_id":  "required",
 		"contest_id":  "required",
 		"problem_id":  "required",
 		"user_id":     "required",
@@ -21,7 +21,7 @@ func init() {
 		"add":             {"contest_id", "problem_id", "content", "title"},
 		"findByContestID": {"contest_id", "page_number"},
 		"findByProblemID": {"problem_id", "page_number"},
-		"findByID":        {"id", "page_number"},
+		"findByID":        {"discuss_id", "page_number"},
 	}
 
 	DiscussValidate.Rules = rules

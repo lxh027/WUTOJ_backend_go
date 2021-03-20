@@ -3,6 +3,7 @@ package model
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"log"
 	"time"
 )
 
@@ -13,25 +14,24 @@ type Discuss struct {
 	UserID    int       `json:"user_id" form:"user_id"`
 	Title     string    `json:"title" form:"title"`
 	Content   string    `json:"content" form:"content"`
-	Time      time.Time `json:"time" form:"time"`
+	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
 	Status    int       `json:"status" form:"status"`
 }
 
-func (model *Discuss) GetAllDiscuss() helper.ReturnType {
+func (model *Discuss) GetAllDiscuss(Offset int, Limit int) helper.ReturnType {
 	var discussions []Discuss
 
-	err := db.Find(&discussions).Error
-
+	err := db.Offset(Offset).Limit(Limit).Find(&discussions).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败，数据库错误", Data: ""}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询失败", Data: discussions}
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
 	}
 }
 
 func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnType {
 	var discuss Discuss
-	err := db.Where("discuss_id = ?", id).First(&discuss).Error
+	err := db.Where("id = ?", id).First(&discuss).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
@@ -44,7 +44,8 @@ func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnTyp
 func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
 	//var discuss Discuss
 
-	err := db.Create(&newDiscussion).Error
+	log.Print(newDiscussion)
+	err := db.Omit("time").Create(&newDiscussion).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "添加失败", Data: err.Error()}
