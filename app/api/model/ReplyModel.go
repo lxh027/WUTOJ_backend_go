@@ -10,11 +10,13 @@ type Reply struct {
 	ID        int       `json:"id" form:"id"`
 	DiscussID int       `json:"discuss_id" form:"discuss_id"`
 	UserID    int       `json:"user_id" form:"user_id"`
-	Content   int       `json:"content" form:"content"`
-	Time      time.Time `json:"time" form:"time"`
+	Content   string    `json:"content" form:"content"`
+	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
 }
 
 func (model *Reply) AddReply(data Reply) helper.ReturnType {
+
+	data.Time = time.Now()
 
 	err := db.Create(&data).Error
 

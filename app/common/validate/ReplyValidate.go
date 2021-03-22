@@ -15,7 +15,7 @@ func init() {
 	}
 
 	scenes := map[string][]string{
-		"add": {"discuss_id", "user_id", "content", "time"},
+		"add": {"discuss_id", "user_id", "content"},
 	}
 
 	ReplyValidate.Rules = rules
