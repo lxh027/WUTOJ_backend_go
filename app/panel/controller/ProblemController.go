@@ -318,6 +318,7 @@ func UploadData(c *gin.Context) {
 	index := 0
 	for _, filePair := range filePairs {
 		dataPairPath := dataPath+"/"+strconv.Itoa(index)
+		index++
 		if err := os.MkdirAll(dataPairPath, 755); err != nil {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "创建路径失败", err.Error()))
 			return
