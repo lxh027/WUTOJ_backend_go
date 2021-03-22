@@ -28,7 +28,7 @@ func CheckContest(c *gin.Context) {
 		return
 	}
 
-	res := contestUserModel.GetUserContest(UserID)
+	res := contestUserModel.CheckUserContest(UserID)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
