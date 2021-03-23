@@ -18,10 +18,10 @@ type Discuss struct {
 	Status    int       `json:"status" form:"status"`
 }
 
-func (model *Discuss) GetAllDiscuss(ContestID string, ProblemID string, Offset int, Limit int) helper.ReturnType {
+func (model *Discuss) GetAllDiscuss(ContestID int, ProblemID int, Offset int, Limit int) helper.ReturnType {
 	var discussions []Discuss
 
-	if ContestID != "" {
+	if ContestID != 0 {
 		err := db.Offset(Offset).Limit(Limit).Where("contest_id = ?", ContestID).Find(&discussions).Error
 		if err != nil {
 			return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}

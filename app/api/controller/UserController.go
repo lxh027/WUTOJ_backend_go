@@ -13,7 +13,7 @@ import (
 
 func UpdateUserInfo(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -50,7 +50,7 @@ func UpdateUserInfo(c *gin.Context) {
 
 func SearchUser(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return

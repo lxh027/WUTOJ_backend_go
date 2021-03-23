@@ -13,7 +13,7 @@ import (
 
 func GetAllDiscuss(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -23,9 +23,9 @@ func GetAllDiscuss(c *gin.Context) {
 
 	discussJson := struct {
 		//discuss model.Discuss
-		ContestID  string `json:"contest_id" form:"contest_id"`
-		ProblemID  string `json:"problem_id" form:"problem_id"`
-		PageNumber int    `json:"page_number" form:"page_number"`
+		ContestID  int `json:"contest_id" form:"contest_id"`
+		ProblemID  int `json:"problem_id" form:"problem_id"`
+		PageNumber int `json:"page_number" form:"page_number"`
 	}{}
 
 	ConfigMap := config.GetWutOjConfig()
@@ -48,7 +48,7 @@ func GetAllDiscuss(c *gin.Context) {
 
 func GetDiscussionByID(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -80,7 +80,7 @@ func GetDiscussionByID(c *gin.Context) {
 
 func GetContestDiscussion(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -111,7 +111,7 @@ func GetContestDiscussion(c *gin.Context) {
 
 func GetProblemDiscussion(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -142,7 +142,7 @@ func GetProblemDiscussion(c *gin.Context) {
 
 func AddDiscussion(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -173,7 +173,7 @@ func AddDiscussion(c *gin.Context) {
 
 func AddReply(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -191,7 +191,7 @@ func AddReply(c *gin.Context) {
 	replyJson.UserID = int(middleware.GetUserIdFromSession(c))
 	replyMap := helper.Struct2Map(replyJson)
 	if res, err := replyValidate.ValidateMap(replyMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据校验失败", err.Error()))
 		return
 	}
 

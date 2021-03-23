@@ -6,7 +6,6 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/middleware"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -15,7 +14,7 @@ import (
 
 func GetAllContest(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -39,14 +38,13 @@ func GetAllContest(c *gin.Context) {
 
 func GetContest(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
 
 	ContestID := c.Param("contest_id")
-	fmt.Println(ContestID)
 	contestModel := model.Contest{}
 
 	res = contestModel.GetContestById(ContestID)
@@ -62,15 +60,13 @@ func GetContest(c *gin.Context) {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "查找失败", ""))
 			return
 		}
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
 	}
 
 }
 
 func JoinContest(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -96,7 +92,7 @@ func JoinContest(c *gin.Context) {
 
 func GetContestStatus(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -116,7 +112,7 @@ func GetContestStatus(c *gin.Context) {
 
 func GetUserContest(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -135,7 +131,7 @@ func GetUserContest(c *gin.Context) {
 
 func GetContestProblems(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -161,7 +157,7 @@ func GetContestProblems(c *gin.Context) {
 
 func SearchContest(c *gin.Context) {
 
-	res := CheckLogin(c)
+	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
