@@ -5,7 +5,6 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
-	"OnlineJudge/middleware"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -122,7 +121,7 @@ func GetUserContest(c *gin.Context) {
 		return
 	}
 
-	UserID := middleware.GetUserIdFromSession(c)
+	UserID := GetUserIdFromSession(c)
 	log.Print(UserID)
 	contestUserModel := model.ContestUser{}
 	if UserID == 0 {

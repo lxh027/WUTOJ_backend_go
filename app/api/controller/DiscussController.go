@@ -6,7 +6,6 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
-	"OnlineJudge/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -188,7 +187,7 @@ func AddReply(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
-	replyJson.UserID = int(middleware.GetUserIdFromSession(c))
+	replyJson.UserID = int(GetUserIdFromSession(c))
 	replyMap := helper.Struct2Map(replyJson)
 	if res, err := replyValidate.ValidateMap(replyMap, "add"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
