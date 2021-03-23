@@ -5,18 +5,18 @@ import "OnlineJudge/app/helper"
 var UserRoleValidate helper.Validator
 
 func init() {
-	rules := map[string]string {
-		"user_id"	: "required",
-		"rid"	: "required",
-		"rids" 	: "required",
+	rules := map[string]string{
+		"uid":  "required",
+		"rid":  "required",
+		"rids": "required",
 	}
 
-	scenes := map[string] []string {
-		"add" : {"user_id", "rid"},
-		"addGroup": {"user_id", "rids"},
-		"deleteGroup": {"user_id", "rids"},
-		"delete": {"user_id", "rid"},
-		"getUserRole": {"user_id"},
+	scenes := map[string][]string{
+		"add":         {"uid", "rid"},
+		"addGroup":    {"uid", "rids"},
+		"deleteGroup": {"uid", "rids"},
+		"delete":      {"uid", "rid"},
+		"getUserRole": {"uid"},
 	}
 
 	UserRoleValidate.Rules = rules
