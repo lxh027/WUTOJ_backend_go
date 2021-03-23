@@ -1,13 +1,13 @@
 package routes
 
 import (
-	 apiController "OnlineJudge/app/api/Controller"
-	 panelController "OnlineJudge/app/panel/Controller"
+	apiController "OnlineJudge/app/api/Controller"
+	panelController "OnlineJudge/app/panel/Controller"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func Routes(router *gin.Engine)  {
+func Routes(router *gin.Engine) {
 
 	// api
 	api := router.Group("/api")
@@ -17,6 +17,52 @@ func Routes(router *gin.Engine)  {
 
 		api.POST("/do_login", apiController.DoLogin)
 		api.POST("/do_logout", apiController.DoLogout)
+
+		api.GET("/rotation")
+		api.GET("/data")
+		api.GET("/notice")
+
+		api.GET("/notification", apiController.GetNotification)
+
+		api.GET("/rank/contest/:contest_id")
+
+		contest := api.Group("/contests")
+		{
+			contest.GET("", apiController.GetAllContest)
+			contest.GET("/contest/:param", apiController.SearchContest)
+			contest.GET("/user/:contest_id", apiController.CheckContest)
+			contest.POST("/user/:contest_id", apiController.JoinContest)
+		}
+
+		submit := api.Group("/submit")
+		{
+			submit.GET("", apiController.GetSubmitInfo)
+			submit.POST("", apiController.Submit)
+		}
+
+		problem := api.Group("/problems")
+		{
+			problem.GET("", apiController.GetAllProblems)
+			problem.GET("/contest/:contest_id", apiController.GetContestProblems)
+			problem.GET("/{problem_id}", apiController.GetProblemByID)
+
+		}
+
+		discuss := api.Group("/discussions")
+		{
+			discuss.GET("", apiController.GetAllDiscuss)
+			discuss.GET("/problem/:problem_id", apiController.GetProblemDiscussion)
+			discuss.GET("/contest/:contest_id", apiController.GetContestDiscussion)
+			discuss.GET("/discuss", apiController.GetDiscussionByID) // changed
+			discuss.POST("", apiController.AddDiscussion)
+
+		}
+
+		replies := api.Group("/replies")
+		{
+			replies.POST("", apiController.AddReply)
+		}
+
 	}
 
 	panel := router.Group("/panel")
@@ -116,7 +162,7 @@ func Routes(router *gin.Engine)  {
 			problem.POST("/addProblem", panelController.AddProblem)
 			problem.POST("/deleteProblem", panelController.DeleteProblem)
 			problem.POST("/updateProblem", panelController.UpdateProblem)
-			problem.POST("/getProblemByID", panelController.GetProblemByID )
+			problem.POST("/getProblemByID", panelController.GetProblemByID)
 			problem.POST("/changeProblemStatus", panelController.ChangeProblemStatus)
 			problem.POST("/changeProblemPublic", panelController.ChangeProblemPublic)
 			problem.POST("/addSample", panelController.AddSample)
