@@ -32,6 +32,19 @@ func init()  {
 	}
 }
 
+func ZAddToRedis(key string, score string, member interface{}) error  {
+	rc := RedisClient.Get()
+	defer rc.Close()
+	_, err := rc.Do("ZADD", key, score, member)
+	return err
+}
+
+func ZGetAllFromRedis(key string) (interface{}, error)  {
+	rc := RedisClient.Get()
+	defer rc.Close()
+	return rc.Do("ZRANGE", key, 0, -1)
+}
+
 func GetFromRedis(key string) (interface{}, error)  {
 	rc := RedisClient.Get()
 	defer rc.Close()
