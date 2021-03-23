@@ -73,3 +73,8 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submits}
 
 }
+
+// TODO
+func (model *Submit) GetContestSubmit() helper.ReturnType {
+	return helper.ReturnType{}
+}

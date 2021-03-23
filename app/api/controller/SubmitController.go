@@ -67,6 +67,7 @@ func judge(submit model.Submit) {
 
 	callback := func(id uint64, result judger.JudgeResult) {
 		// Put Result To DB
+		// TODO if set contest, update redis rank info
 		if result.IsFinished {
 			data := map[string]interface{}{
 				"status": result.Status,
