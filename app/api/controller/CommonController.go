@@ -36,12 +36,12 @@ func CheckContest(c *gin.Context) {
 }
 
 func CheckLogin(c *gin.Context) helper.ReturnType {
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
-	//session := sessions.Default(c)
-	//if id := session.Get("user_id"); id != nil {
-	//	return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: 1}
-	//}
 	//return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
+	session := sessions.Default(c)
+	if id := session.Get("user_id"); id != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: 1}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
 }
 
 //func Upload(FileDst string, file *multipart.FileHeader) helper.ReturnType {
