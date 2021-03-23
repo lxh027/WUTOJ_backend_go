@@ -1,19 +1,16 @@
-package middleware
+package helper
 
 import (
 	"OnlineJudge/app/common"
-	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
 	"OnlineJudge/db_server"
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"gopkg.in/gomail.v2"
 	"math/rand"
 	"time"
 )
 
-func SendMail(EmailAddress string) (helper.ReturnType, error) {
+func SendMail(EmailAddress string) (ReturnType, error) {
 
 	mailConfig := config.GetMailConfig()
 
@@ -47,15 +44,7 @@ func SendMail(EmailAddress string) (helper.ReturnType, error) {
 	dia := gomail.NewDialer(mailConfig["host"].(string), mailConfig["port"].(int), mailConfig["username"].(string), mailConfig["password"].(string))
 
 	if err := dia.DialAndSend(message); err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "邮件发送失败", Data: err.Error()}, err
+		return ReturnType{Status: common.CodeError, Msg: "邮件发送失败", Data: err.Error()}, err
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "邮件发送成功，请注意查收", Data: ""}, nil
-}
-
-func GetUserIdFromSession(c *gin.Context) uint {
-	session := sessions.Default(c)
-	if id := session.Get("user_id"); id != nil {
-		return id.(uint)
-	}
-	return 0
+	return ReturnType{Status: common.CodeSuccess, Msg: "邮件发送成功，请注意查收", Data: ""}, nil
 }
