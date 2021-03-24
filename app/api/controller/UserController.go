@@ -5,7 +5,6 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
-	"OnlineJudge/middleware"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -33,7 +32,7 @@ func UpdateUserInfo(c *gin.Context) {
 		return
 	}
 
-	userJson.UserID = middleware.GetUserIdFromSession(c)
+	userJson.UserID = GetUserIdFromSession(c)
 
 	log.Print(userJson)
 	userMap := helper.Struct2Map(userJson)

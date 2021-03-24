@@ -217,7 +217,7 @@ func Login(c *gin.Context) {
 	session := sessions.Default(c)
 	if id := session.Get("user_id"); id != nil {
 		data := make(map[string]interface{}, 0)
-		_ = json.Unmarshal([]byte(session.Get("admin_data").(string)), &data)
+		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
 		return
 	}
@@ -257,7 +257,7 @@ func Login(c *gin.Context) {
 		jsonData, _ := json.Marshal(returnData)
 		session.Set("user_id", returnData["user_id"])
 		session.Set("identity", returnData["identity"])
-		session.Set("admin_data", string(jsonData))
+		session.Set("data", string(jsonData))
 		if err := session.Save(); err == nil {
 			c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "登录成功", returnData))
 		} else {
@@ -283,7 +283,7 @@ func GetUserInfo(c *gin.Context)  {
 	session := sessions.Default(c)
 	if id := session.Get("user_id"); id != nil {
 		data := make(map[string]interface{}, 0)
-		_ = json.Unmarshal([]byte(session.Get("admin_data").(string)), &data)
+		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
 		if menu, auths, err := getUserAllAuth(id.(int)); err == nil {
 			data["auths"] = auths
 			data["menu"] = menu

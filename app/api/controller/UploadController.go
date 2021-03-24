@@ -4,7 +4,6 @@ import (
 	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
-	"OnlineJudge/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path"
@@ -56,7 +55,7 @@ func UploadAvatar(c *gin.Context) {
 
 	dst := "../uploads/image/" + FileNameMd5 + path.Ext(file.Filename)
 
-	UserID := middleware.GetUserIdFromSession(c)
+	UserID := GetUserIdFromSession(c)
 	userModel := model.User{}
 
 	if err := c.SaveUploadedFile(file, dst); err != nil {

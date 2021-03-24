@@ -6,7 +6,6 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/db_server"
-	"OnlineJudge/middleware"
 	"encoding/json"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
@@ -92,7 +91,7 @@ func ForgetPassword(c *gin.Context) {
 		return
 	}
 
-	res, err := middleware.SendMail(userJson.Mail)
+	res, err := helper.SendMail(userJson.Mail)
 
 	if err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))

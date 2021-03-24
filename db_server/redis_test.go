@@ -32,3 +32,32 @@ func Test(t *testing.T) {
 	}
 
 }
+
+func TestSortedSet(t *testing.T) {
+	m1 := map[string]interface{} {
+		"asdaqsd": 123,
+		"asd": map[string]interface{}{
+			"ddd": "ddd",
+		},
+	}
+	m2 := map[string]interface{} {
+		"asdaqsd": 234,
+		"asd": map[string]interface{}{
+			"ddd": "555",
+		},
+	}
+	jsonM1, _ := json.Marshal(m1)
+	jsonM2, _ := json.Marshal(m2)
+	_ = ZAddToRedis("rank", "123", jsonM1)
+	_ = ZAddToRedis("rank", "123", jsonM2)
+
+	if k, err := ZGetAllFromRedis("rank"); err == nil {
+		//var mp []interface{}
+		mpBytes, _ := redis.Strings(k, err)
+		//_ = json.Unmarshal(mpBytes, &mp)
+		fmt.Println(mpBytes)
+	} else {
+		fmt.Println(err.Error())
+	}
+
+}
