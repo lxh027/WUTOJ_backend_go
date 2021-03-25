@@ -116,7 +116,6 @@ func UpdatePassword(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
-	log.Print(userJson)
 
 	userMap := helper.Struct2Map(userJson)
 	if res, err := userValidate.ValidateMap(userMap, "update_password"); !res {
@@ -127,6 +126,7 @@ func UpdatePassword(c *gin.Context) {
 	KeyValue := "VerifyCode" + userJson.Mail
 
 	VerifyCodeCorrect, err := redis.String(db_server.GetFromRedis(KeyValue))
+	db_server.DeleteFromRedis(KeyValue)
 	if err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "验证码已过期，请重新发送验证码", err.Error()))
 		return
