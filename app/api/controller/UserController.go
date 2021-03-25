@@ -59,17 +59,9 @@ func SearchUser(c *gin.Context) {
 		Param string `json:"param" form:"param" uri:"param"`
 	}{}
 	userModel := model.User{}
-	userValidate := validate.UserValidate
 
 	if err := c.ShouldBindUri(&userJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
-		return
-	}
-
-	userMap := helper.Struct2Map(userJson)
-
-	if res, err := userValidate.ValidateMap(userMap, "search"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 

@@ -7,9 +7,9 @@ import (
 )
 
 type ReturnType struct {
-	Status 	int
-	Msg		string
-	Data 	interface{}
+	Status int
+	Msg    string
+	Data   interface{}
 }
 
 // 获取语言类型
@@ -54,8 +54,8 @@ func Struct2Map(obj interface{}) map[string]interface{} {
 		for j := 0; j < len(upperField)-1; j++ {
 			if (upperField[j] >= 'a' && upperField[j] <= 'z') &&
 				(upperField[j+1] >= 'A' && upperField[j+1] <= 'Z') {
-				field += upperField[index:j+1]+"_"
-				index = j+1
+				field += upperField[index:j+1] + "_"
+				index = j + 1
 			}
 		}
 		field += upperField[index:]
@@ -70,11 +70,10 @@ func ReturnRes(status int, msg string, data interface{}) ReturnType {
 	return returnType
 }
 
-func ApiReturn(status int, msg string, data interface{}) gin.H  {
+func ApiReturn(status int, msg string, data interface{}) gin.H {
 	return gin.H{
-		"status"	: status,
-		"msg"		: msg,
-		"data"		: data,
+		"status":  status,
+		"message": msg,
+		"data":    data,
 	}
 }
-
