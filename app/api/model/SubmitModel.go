@@ -10,8 +10,8 @@ type Submit struct {
 	ID         uint      `json:"id" form:"id"`
 	UserID     uint      `json:"user_id" form:"user_id"`
 	Nick       string    `json:"nick" form:"nick"`
-	ProblemID  uint      `json:"problem_id" form:"problem_id"`
-	ContestID  uint      `json:"contest_id" form:"contest_id"`
+	ProblemID  uint      `json:"problem_id" form:"problem_id" uri:"problem_id"`
+	ContestID  uint      `json:"contest_id" form:"contest_id" uri:"contest_id"`
 	SourceCode string    `json:"source_code" form:"source_code"`
 	Language   int       `json:"language" form:"language"`
 	Status     string    `json:"status" form:"status"`
@@ -64,7 +64,7 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 	var submits []Submit
 
-	err := db.Offset(Offset).Limit(Limit).Find(&submits).Error
+	err := db.Offset(Offset).Limit(Limit).Last(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
@@ -75,6 +75,24 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 }
 
 // TODO
-func (model *Submit) GetContestSubmit() helper.ReturnType {
-	return helper.ReturnType{}
+func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber int) helper.ReturnType {
+	var submits []Submit
+
+	err := db.Where("contest_id = ? and user_id = ?", ContestID, UserID).Offset((PageNumber - 1) * common.PageSubmitLogLimit).Limit(common.PageSubmitLogLimit).Last(&submits).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submits}
+
+}
+
+func (model *Submit) GetProblemSubmit(submit Submit) helper.ReturnType {
+	data := Submit{}
+	err := db.Where("problem_id = ? and user_id = ?", submit.ProblemID, submit.UserID).Last(&data).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: data}
 }
