@@ -19,6 +19,7 @@ func SendMail(EmailAddress string) (ReturnType, error) {
 	VerifyCode := fmt.Sprintf("%06v", rnd.Int31n(1000000))
 	keyValue := "VerifyCode" + EmailAddress
 	// save to redis
+	db_server.DeleteFromRedis(keyValue)
 	db_server.PutToRedis(keyValue, VerifyCode, 1000*60*15)
 
 	SendTime := fmt.Sprintf("%02d-%02d-%02d %02d:%02d:%02d", time.Now().Year(), time.Now().Month(), time.Now().Day(), time.Now().Hour(), time.Now().Minute(), time.Now().Second())
