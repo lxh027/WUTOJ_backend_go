@@ -7,6 +7,7 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -89,21 +90,27 @@ func GetContestDiscussion(c *gin.Context) {
 	discussValidate := validate.DiscussValidate
 
 	discussJson := struct {
-		ContestId  int `json:"contest_id" form:"contest_id"`
+		ContestId  int `json:"contest_id" form:"contest_id" uri:"contest_id"`
 		PageNumber int `json:"page_number" form:"page_number"`
 	}{}
 
-	if err := c.ShouldBind(&discussJson); err != nil {
+	if err := c.ShouldBindUri(&discussJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
 		return
 	}
 
+	if err := c.ShouldBindQuery(&discussJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		return
+	}
+	log.Print(discussJson)
 	discussMap := helper.Struct2Map(discussJson)
 	if res, err := discussValidate.ValidateMap(discussMap, "findByContestID"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
 	}
 
-	res = discussModel.GetDiscussionByID(discussJson.ContestId, discussJson.PageNumber)
+	res = discussModel.GetContestDiscussion(discussJson.ContestId, discussJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
