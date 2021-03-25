@@ -3,6 +3,7 @@ package model
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"github.com/gin-gonic/gin"
 	"log"
 	"time"
 )
@@ -16,6 +17,10 @@ type Discuss struct {
 	Content   string    `json:"content" form:"content"`
 	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
 	Status    int       `json:"status" form:"status"`
+}
+
+func (Discuss) TableName() string {
+	return "discuss"
 }
 
 func (model *Discuss) GetAllDiscuss(ContestID int, ProblemID int, Offset int, Limit int) helper.ReturnType {
@@ -63,13 +68,12 @@ func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
 
 func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper.ReturnType {
 	var discussions []Discuss
-
-	err := db.Where("contest_id = ?", ContestID).Error
-
+	var DiscussCount int
+	err := db.Model(&Discuss{}).Where("contest_id = ?", ContestID).Count(&DiscussCount).Offset((PageNumber - 1) * (common.PageDiscussLimit)).Limit(common.PageDiscussLimit).Find(&discussions).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{"data": discussions, "count": DiscussCount}}
 	}
 
 }
