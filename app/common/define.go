@@ -4,6 +4,8 @@ const CodeError = -1
 const CodeSuccess = 0
 
 const PageLimit = 20
+const PageDiscussLimit = 2
+const PageSubmitLogLimit = 4
 
 const UnLoggedIn = 0
 const UnAuthed = 1
