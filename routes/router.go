@@ -15,8 +15,8 @@ func Routes(router *gin.Engine) {
 		api.GET("/hello", apiController.Index)
 		api.POST("/register", apiController.Register)
 
-		api.POST("/do_login", apiController.DoLogin)
-		api.POST("/do_logout", apiController.DoLogout)
+		api.POST("/login", apiController.DoLogin)
+		api.POST("/logout", apiController.DoLogout)
 
 		api.GET("/rotation")
 		api.GET("/data")
@@ -25,6 +25,17 @@ func Routes(router *gin.Engine) {
 		api.GET("/notification", apiController.GetNotification)
 
 		api.GET("/rank/contest/:contest_id")
+
+		api.POST("/avatar", apiController.UploadAvatar)
+
+		api.POST("/password", apiController.ForgetPassword)
+		api.PUT("/password", apiController.UpdatePassword)
+
+		users := api.Group("/users")
+		{
+			users.GET("/:param", apiController.SearchUser)
+			users.PUT("/:user_id", apiController.UpdateUserInfo)
+		}
 
 		contest := api.Group("/contests")
 		{
@@ -36,7 +47,9 @@ func Routes(router *gin.Engine) {
 
 		submit := api.Group("/submit")
 		{
-			submit.GET("", apiController.GetSubmitInfo)
+			submit.GET("", apiController.GetAllSubmitInfo)
+			submit.GET("/problem/:problem_id", apiController.GetProblemSubmitInfo)
+			submit.GET("/contest/:contest_id", apiController.GetUserContestSubmitInfo)
 			submit.POST("", apiController.Submit)
 		}
 
