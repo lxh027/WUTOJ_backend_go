@@ -102,3 +102,12 @@ func (model *Contest) ChangeContestStatus(contestID int, status int) helper.Retu
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
+
+func (model *Contest) GetContestById(contestID uint) helper.ReturnType {
+	contest := Contest{}
+	err := db.Where("contest_id = ?", contestID).First(&contest).Error
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "未找到数据", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找成功", Data: contest}
+}

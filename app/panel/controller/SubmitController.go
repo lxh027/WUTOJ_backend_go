@@ -5,11 +5,38 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
+	"encoding/json"
+	"fmt"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
+
+type problem struct {
+	SuccessTime 	int64 	`json:"success_time"`
+	Times 			uint 	`json:"times"`
+}
+type user struct {
+	UserID 	uint 	`json:"user_id"`
+	Nick 	string 	`json:"nick"`
+	Penalty int64 	`json:"penalty"`
+	ACNum 	uint 	`json:"ac_num"`
+	ProblemID 	map[uint]problem 	`json:"problem_id"`
+}
+type userSort []user
+func (a userSort) Len() int           { return len(a) }
+func (a userSort) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a userSort) Less(i, j int) bool {
+	if a[i].ACNum != a[j].ACNum {
+		return a[i].ACNum < a[j].ACNum
+	} else {
+		return a[i].Penalty < a[j].Penalty
+	}
+}
 
 func GetAllSubmit(c *gin.Context)  {
 	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
@@ -162,6 +189,39 @@ func rejudge(submit model.Submit) {
 			}
 			submitModel := model.Submit{}
 			submitModel.UpdateStatusAfterSubmit(int(id), data)
+			if submit.ContestID != 0 {
+				// set to redis
+				beginTime, _, frozenTime, err := getContestTime(submit.ContestID)
+				if err != nil {
+					return
+				}
+				now := submit.SubmitTime.Unix()
+				if now < beginTime.Unix() || now > frozenTime.Unix() {
+					return
+				}
+				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
+				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(submit.UserID)))); err == nil {
+					_ = json.Unmarshal([]byte(itemStr), &user)
+				}
+				if _, ok := user.ProblemID[submit.ProblemID]; !ok {
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: 0}
+				}
+				userProblem := user.ProblemID[submit.ProblemID]
+				if submit.Status == "AC" {
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times+1}
+					user.ACNum++
+					for _, problem := range user.ProblemID {
+						user.Penalty += int64(problem.Times*20*60)+problem.SuccessTime
+					}
+				} else if submit.Status != "CE" {
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times+1}
+				}
+
+				itemStr, _ := json.Marshal(user)
+				_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
+				score := fmt.Sprintf("%03d.%d", user.ACNum, user.Penalty)
+				_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
+			}
 		}
 	}
 

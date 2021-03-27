@@ -12,6 +12,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"time"
 )
 
 type menuItem struct {
@@ -133,4 +134,19 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 		return nil, nil, errors.New("获取权限列表错误")
 	}
 
+}
+
+func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error)  {
+	contestModel := model.Contest{}
+	res := contestModel.GetContestById(contestID)
+	now := time.Now()
+	if res.Status != common.CodeSuccess {
+		return now, now, now, errors.New(res.Msg)
+	}
+	beginTime := res.Data.(model.Contest).BeginTime
+	endTime := res.Data.(model.Contest).EndTime
+	frozen := res.Data.(model.Contest).Frozen
+	frozenTime := time.Unix(int64(float64(endTime.Unix())*frozen+float64(beginTime.Unix())), 0)
+
+	return beginTime, frozenTime, endTime, nil
 }

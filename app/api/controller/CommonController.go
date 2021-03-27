@@ -1,10 +1,14 @@
 package controller
 
 import (
+	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"strconv"
+	"time"
 )
 
 func GetUserIdFromSession(c *gin.Context) uint {
@@ -22,6 +26,22 @@ func checkLogin(c *gin.Context) helper.ReturnType {
 		return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: 1}
 	}
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
+}
+
+// return begin, frozen, end
+func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error)  {
+	contestModel := model.Contest{}
+	res := contestModel.GetContestById(strconv.FormatInt(int64(contestID), 10))
+	now := time.Now()
+	if res.Status != common.CodeSuccess {
+		return now, now, now, errors.New(res.Msg)
+	}
+	beginTime := res.Data.(model.Contest).BeginTime
+	endTime := res.Data.(model.Contest).EndTime
+	frozen := res.Data.(model.Contest).Frozen
+	frozenTime := time.Unix(int64(float64(endTime.Unix())*frozen+float64(beginTime.Unix())), 0)
+
+	return beginTime, frozenTime, endTime, nil
 }
 
 //func Upload(FileDst string, file *multipart.FileHeader) helper.ReturnType {

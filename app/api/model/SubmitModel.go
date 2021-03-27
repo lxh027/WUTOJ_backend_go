@@ -96,3 +96,14 @@ func (model *Submit) GetProblemSubmit(submit Submit) helper.ReturnType {
 	}
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: data}
 }
+
+func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime time.Time) helper.ReturnType {
+	var submits []Submit
+
+	err := db.Where("contest_id = ? AND submit_time BETWEEN ? AND ?", contestID, beginTime, endTime).Order("id").Find(&submits).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取比赛提交失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取比赛提交成功", Data: submits}
+}

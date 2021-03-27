@@ -8,10 +8,10 @@ import (
 
 type Submit struct {
 	ID 		int 	`json:"id" form:"id"`
-	UserID 	int		`json:"user_id" form:"user_id"`
+	UserID 	uint		`json:"user_id" form:"user_id"`
 	Nick 	string 	`json:"nick" form:"nick"`
-	ProblemID 	int `json:"problem_id" form:"problem_id"`
-	ContestID 	int `json:"contest_id" form:"contest_id"`
+	ProblemID 	uint `json:"problem_id" form:"problem_id"`
+	ContestID 	uint `json:"contest_id" form:"contest_id"`
 	SourceCode 	string `json:"source_code" form:"source_code"`
 	Language 	int 	`json:"language" form:"language"`
 	Status 		string 	`json:"status" form:"status"`
