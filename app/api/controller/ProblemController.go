@@ -11,7 +11,7 @@ import (
 
 func GetAllProblems(c *gin.Context) {
 
-	res := checkLogin(c)
+	res := CheckLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
@@ -48,7 +48,7 @@ func GetProblemByID(c *gin.Context) {
 
 func SearchProblem(c *gin.Context) {
 
-	res := checkLogin(c)
+	res := CheckLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
