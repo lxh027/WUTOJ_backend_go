@@ -15,7 +15,7 @@ func GetUserIdFromSession(c *gin.Context) uint {
 	return 0
 }
 
-func CheckLogin(c *gin.Context) helper.ReturnType {
+func checkLogin(c *gin.Context) helper.ReturnType {
 	//return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
 	session := sessions.Default(c)
 	if id := session.Get("user_id"); id != nil {

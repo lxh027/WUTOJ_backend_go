@@ -176,7 +176,7 @@ func SearchContest(c *gin.Context) {
 	}
 }
 
-func checkContest(c *gin.Context) {
+func CheckContest(c *gin.Context) {
 	session := sessions.Default(c)
 	UserID := int(session.Get("user_id").(uint))
 	contestUserModel := model.ContestUser{}

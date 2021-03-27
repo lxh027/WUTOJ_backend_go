@@ -111,3 +111,18 @@ func GetSubmitInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
 
 }
+
+// TODO
+func GetAllSubmitInfo(c *gin.Context)  {
+	
+}
+
+// TODO
+func GetProblemSubmitInfo(c *gin.Context)  {
+
+}
+
+// TODO 
+func GetUserContestSubmitInfo(c *gin.Context)  {
+	
+}
