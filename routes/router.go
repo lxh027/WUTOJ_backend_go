@@ -24,7 +24,7 @@ func Routes(router *gin.Engine) {
 
 		api.GET("/notification", apiController.GetNotification)
 
-		api.GET("/rank/contest/:contest_id")
+		api.GET("/rank/contest/:contest_id", apiController.GetUserRank)
 
 		api.POST("/avatar", apiController.UploadAvatar)
 

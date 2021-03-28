@@ -62,10 +62,12 @@ func GetUserRank(c *gin.Context)  {
 		return
 	}
 
-	now := time.Now()
+	format := "2006-01-02 15:04:05"
+	now, _ := time.Parse(format, time.Now().Format(format))
 
 	var begin, end time.Time
 	begin = beginTime
+	fmt.Println(now.String(), beginTime.String())
 	if now.Unix() < beginTime.Unix() {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", nil))
 		return
@@ -78,8 +80,12 @@ func GetUserRank(c *gin.Context)  {
 	}
 
 	// try get from redis
-	if rank, err := db_server.ZGetAllFromRedis("contest_rank"+strconv.Itoa(int(rankJson.ContestID))); err == nil {
+	if rank, err := db_server.ZGetAllFromRedis("contest_rank"+strconv.Itoa(int(rankJson.ContestID))); err == nil{
 		userIDRank, _ := redis.Strings(rank, err)
+		if len(userIDRank) == 0 {
+			getRankFromDB(c, rankJson.ContestID, begin, end, now)
+			return
+		}
 		var rankBoard []interface{}
 		for _, userID := range userIDRank {
 			// get each user_id
@@ -101,6 +107,7 @@ func GetUserRank(c *gin.Context)  {
 
 // TODO get rank from DB
 func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.Time) {
+	fmt.Println("Get From DB")
 	submitModel := model.Submit{}
 
 	res := submitModel.GetContestSubmitsByTime(contestID, beginTime, endTime)
@@ -108,7 +115,7 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-
+	fmt.Println(res)
 	var users []user
 	userIndexMap := make(map[uint]int)
 	userProblemMap := make(map[string]bool)
