@@ -200,7 +200,7 @@ func UploadData(c *gin.Context) {
 		return
 	}
 
-	var problemModel model.Problem
+	//var problemModel model.Problem
 
 	form, _ := c.MultipartForm()
 	files := form.File["file[]"]
@@ -211,7 +211,6 @@ func UploadData(c *gin.Context) {
 		Spj 		bool 	`json:"spj" form:"spj"`
 		Language 	string 	`json:"language" form:"language"`
 		Code 		string 	`json:"code" form:"code"`
-		PathPos 	int 	`json:"path_pos" form:"path_pos"`
 	}{}
 	// 绑定数据
 	if err := c.ShouldBind(&problemDataJson); err != nil {
@@ -232,8 +231,8 @@ func UploadData(c *gin.Context) {
 	secs, nanos, memory := int(secsFloat), int(nanosFloat*100000000), int(problemDataJson.Memory * 1024 * 1024)
 	// spj文件名
 	spjFileName := "spj."+problemDataJson.Language[:strings.Index(problemDataJson.Language, ".")]
-	// 数据路径 path = {base_dir}/{env}/{id}/{0/1}
-	dataPath := judgeConfig["base_dir"].(string)+"/"+judgeConfig["env"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)+"/"+strconv.Itoa(1-problemDataJson.PathPos)
+	// 数据路径 path = {base_dir}/{env}/{id}
+	dataPath := judgeConfig["base_dir"].(string)+"/"+judgeConfig["env"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)
 	//fmt.Println(dataPath)
 	// 删除原目录
 	_ = os.RemoveAll(dataPath)
@@ -336,6 +335,6 @@ func UploadData(c *gin.Context) {
 			return
 		}
 	}
-	problemModel.SaveProblemPath(problemDataJson.ProblemID, dataPath)
+	//problemModel.SaveProblemPath(problemDataJson.ProblemID, dataPath)
 	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "上传成功", "OK"))
 }

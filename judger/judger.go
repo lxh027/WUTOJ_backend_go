@@ -163,7 +163,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		return
 	}
 
-	err = os.Symlink(path.Join(j.baseDirectory, strconv.FormatUint(submitData.Pid, 10) + j.env, "problem"), path.Join(workspacePath, "problem"))
+	err = os.Symlink(path.Join(j.baseDirectory,  j.env, strconv.FormatUint(submitData.Pid, 10)), path.Join(workspacePath, "problem"))
 	if err != nil {
 		glog.Errorf("link problem path failed, err: %v", err)
 		callback(submitData.Id, NewUndefinedError("link problem path failed"))
