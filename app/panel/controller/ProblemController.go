@@ -229,8 +229,6 @@ func UploadData(c *gin.Context) {
 	secsFloat, nanosFloat := math.Modf(problemDataJson.Time)
 	// 秒 纳秒 内粗你
 	secs, nanos, memory := int(secsFloat), int(nanosFloat*100000000), int(problemDataJson.Memory * 1024 * 1024)
-	// spj文件名
-	spjFileName := "spj."+problemDataJson.Language[:strings.Index(problemDataJson.Language, ".")]
 	// 数据路径 path = {base_dir}/{env}/{id}
 	dataPath := judgeConfig["base_dir"].(string)+"/"+judgeConfig["env"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)
 	//fmt.Println(dataPath)
@@ -255,6 +253,8 @@ func UploadData(c *gin.Context) {
 		}
 		if problemDataJson.Spj {
 			// SPJ
+			// spj文件名
+			spjFileName := "spj."+problemDataJson.Language[:strings.Index(problemDataJson.Language, ".")]
 			tomlMap["spj"] = map[string]interface{} {
 				"source": spjFileName, "language": problemDataJson.Language,
 			}
@@ -271,6 +271,8 @@ func UploadData(c *gin.Context) {
 
 	// 创建spj文件
 	if problemDataJson.Spj {
+		// spj文件名
+		spjFileName := "spj."+problemDataJson.Language[:strings.Index(problemDataJson.Language, ".")]
 		spjPath := dataPath+"/extern_program"
 		if err := os.MkdirAll(spjPath, 755); err != nil {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "创建路径失败", err.Error()))
