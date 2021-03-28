@@ -6,6 +6,7 @@ var SubmitValidate helper.Validator
 
 func init() {
 	rules := map[string]string{
+		"id": 			"required",
 		"user_id":     "required",
 		"problem_id":  "required",
 		"contest_id":  "required",
@@ -19,6 +20,7 @@ func init() {
 		"get_problem_log": {"problem_id", "user_id"},
 		"get_contest_log": {"contest_id", "user_id", "page_number"},
 		"get_all":         {"user_id", "page_number"},
+		"find": 		{"id"},
 	}
 
 	SubmitValidate.Rules = rules

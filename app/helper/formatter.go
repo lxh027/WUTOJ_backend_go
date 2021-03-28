@@ -13,6 +13,24 @@ type ReturnType struct {
 }
 
 // 获取语言类型
+func LanguageID(language string) int {
+	var id int
+	switch language {
+	case "c.gcc":
+		id = 0
+	case "cpp.g++":
+		id = 1
+	case "java.openjdk10":
+		id = 2
+	case "python.cpython3.6":
+		id = 3
+	default:
+		id = -1
+	}
+	return id
+}
+
+// 获取语言类型
 func LanguageType(typeInt int) string {
 	var language string
 	switch typeInt {

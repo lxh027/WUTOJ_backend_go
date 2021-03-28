@@ -17,6 +17,7 @@ type Submit struct {
 	Status     string    `json:"status" form:"status"`
 	Time       int64     `json:"time" form:"time"`
 	Memory     uint      `json:"memory" form:"memory"`
+	Msg			string 	`json:"msg" form:"msg"`
 	SubmitTime time.Time `json:"submit_time" form:"submit_time"`
 }
 

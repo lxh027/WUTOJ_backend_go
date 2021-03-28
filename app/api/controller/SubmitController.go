@@ -11,33 +11,39 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func Submit(c *gin.Context) {
 
-	res := checkLogin(c)
+	/*res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
-	}
+	}*/
 
 	submitModel := model.Submit{}
-	var submitJson model.Submit
 	submitValidate := validate.SubmitValidate
-	//session := sessions.Default(c)
-	//UserID := session.Get("user_id")
-	//
-	//if UserID == nil {
-	//	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "用户未登录", ""))
-	//	return
-	//}
+	session := sessions.Default(c)
+	userID := session.Get("user_id")
 
-	//submitJson.UserID = uint(UserID.(int))
-	submitJson.UserID = 1
+	if userID == nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "用户未登录", ""))
+		return
+	}
+
+	var submitJson struct {
+		Language 	string 	`json:"language"`
+		SourceCode 	string 	`json:"source_code"`
+		ProblemID 	uint 	`json:"problem_id"`
+		ContestID 	uint 	`json:"contest_id"`
+	}
+
 	if err := c.ShouldBind(&submitJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
 		return
@@ -50,10 +56,20 @@ func Submit(c *gin.Context) {
 		return
 	}
 
-	res = submitModel.AddSubmit(submitJson)
-	//go func(submit model.Submit) {
-	//	judge(submit)
-	//}(submitJson)
+	newSubmit := model.Submit{
+		UserID: userID.(uint),
+		Language: helper.LanguageID(submitJson.Language),
+		SourceCode: submitJson.SourceCode,
+		ProblemID: submitJson.ProblemID,
+		ContestID: submitJson.ContestID,
+		SubmitTime: time.Now(),
+	}
+
+	res := submitModel.AddSubmit(newSubmit)
+
+	go func(submit model.Submit) {
+		judge(submit)
+	}(newSubmit)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
