@@ -31,6 +31,8 @@ func Routes(router *gin.Engine) {
 		api.POST("/password", apiController.ForgetPassword)
 		api.PUT("/password", apiController.UpdatePassword)
 
+		api.GET("/checklogin", apiController.Check)
+
 		users := api.Group("/users")
 		{
 			users.GET("/:param", apiController.SearchUser)
@@ -57,7 +59,7 @@ func Routes(router *gin.Engine) {
 		{
 			problem.GET("", apiController.GetAllProblems)
 			problem.GET("/contest/:contest_id", apiController.GetContestProblems)
-			problem.GET("/{problem_id}", apiController.GetProblemByID)
+			problem.GET("/problem/:param", apiController.SearchProblem)
 
 		}
 

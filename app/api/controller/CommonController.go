@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -19,6 +20,15 @@ func GetUserIdFromSession(c *gin.Context) uint {
 	return 0
 }
 
+func Check(c *gin.Context) {
+	res := checkLogin(c)
+	if res.Data == 0 {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+}
+
 func checkLogin(c *gin.Context) helper.ReturnType {
 	//return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
 	session := sessions.Default(c)
@@ -29,7 +39,7 @@ func checkLogin(c *gin.Context) helper.ReturnType {
 }
 
 // return begin, frozen, end
-func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error)  {
+func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	contestModel := model.Contest{}
 	res := contestModel.GetContestById(strconv.FormatInt(int64(contestID), 10))
 	now := time.Now()
