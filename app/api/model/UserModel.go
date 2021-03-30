@@ -99,14 +99,14 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "用户名或密码错误", Data: err.Error()}
 	} else {
-		submitModel := Submit{}
-		res := submitModel.GetUserSubmits(data.UserID)
+		userSubmitLog := UserSubmitLog{}
+		res := userSubmitLog.GetUserSubmitLog(user.UserID)
 		if res.Status != common.CodeSuccess {
 			return res
 		} else {
 			resp := make(map[string]interface{})
 			resp["userInfo"] = user
-			resp["allProblem"] = res.Data
+			resp["submitLog"] = res.Data
 			return helper.ReturnType{Status: common.CodeSuccess, Msg: "登录验证成功", Data: resp}
 		}
 	}
