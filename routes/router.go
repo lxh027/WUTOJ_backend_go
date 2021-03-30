@@ -1,8 +1,8 @@
 package routes
 
 import (
-	apiController "OnlineJudge/app/api/Controller"
-	panelController "OnlineJudge/app/panel/Controller"
+	apiController "OnlineJudge/app/api/controller"
+	panelController "OnlineJudge/app/panel/controller"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
