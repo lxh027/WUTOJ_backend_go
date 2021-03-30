@@ -43,6 +43,7 @@ func Routes(router *gin.Engine) {
 		{
 			contest.GET("", apiController.GetAllContest)
 			contest.GET("/contest/:param", apiController.SearchContest)
+			contest.GET("/user", apiController.GetUserContest)
 			contest.GET("/user/:contest_id", apiController.CheckContest)
 			contest.POST("/user/:contest_id", apiController.JoinContest)
 		}
