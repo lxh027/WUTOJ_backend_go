@@ -4,7 +4,6 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"github.com/gin-gonic/gin"
-	"log"
 	"time"
 )
 
@@ -54,9 +53,7 @@ func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnTyp
 }
 
 func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
-	//var discuss Discuss
 
-	log.Print(newDiscussion)
 	err := db.Omit("time").Create(&newDiscussion).Error
 
 	if err != nil {
@@ -69,7 +66,12 @@ func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
 func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper.ReturnType {
 	var discussions []Discuss
 	var DiscussCount int
-	err := db.Model(&Discuss{}).Where("contest_id = ?", ContestID).Count(&DiscussCount).Offset((PageNumber - 1) * (common.PageDiscussLimit)).Limit(common.PageDiscussLimit).Find(&discussions).Error
+	err := db.Model(&Discuss{}).
+		Where("contest_id = ?", ContestID).
+		Count(&DiscussCount).
+		Offset((PageNumber - 1) * (common.PageDiscussLimit)).
+		Limit(common.PageDiscussLimit).
+		Find(&discussions).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
@@ -81,7 +83,19 @@ func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper
 func (model *Discuss) GetProblemDiscussion(ProblemID int, PageNumber int) helper.ReturnType {
 	var discussions []Discuss
 
-	err := db.Where("problem_id = ?", ProblemID).Error
+	err := db.Where("problem_id = ?", ProblemID).Find(&discussions).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+	} else {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+	}
+}
+
+func (model *Discuss) GetUserDiscussion(UserID int) helper.ReturnType {
+	var discussions []Discuss
+
+	err := db.Where("user_id = ?", UserID).Find(&discussions).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}

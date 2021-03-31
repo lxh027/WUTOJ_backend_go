@@ -205,3 +205,30 @@ func AddReply(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
+
+func GetUserDiscussion(c *gin.Context) {
+	res := checkLogin(c)
+	if res.Status == common.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
+	discussModel := model.Discuss{}
+	//discussValidate := validate.DiscussValidate
+
+	discussJson := model.Discuss{}
+	discussJson.UserID = int(GetUserIdFromSession(c))
+	if err := c.ShouldBind(&discussJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		return
+	}
+
+	//discussMap := helper.Struct2Map(discussJson)
+	//if res, err := discussValidate.ValidateMap(discussMap, "findByProblemID"); !res {
+	//	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+	//}
+
+	res = discussModel.GetUserDiscussion(discussJson.UserID)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
+}
