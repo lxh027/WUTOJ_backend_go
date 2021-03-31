@@ -50,9 +50,9 @@ func Routes(router *gin.Engine) {
 
 		submit := api.Group("/submit")
 		{
-			submit.GET("", apiController.GetAllSubmitInfo)
-			submit.GET("/problem/:problem_id", apiController.GetProblemSubmitInfo)
-			submit.GET("/contest/:contest_id", apiController.GetUserContestSubmitInfo)
+			submit.GET("", apiController.GetSubmitInfo)
+			submit.GET("/problem", apiController.GetProblemSubmitInfo)
+			submit.GET("/contest", apiController.GetUserContestSubmitInfo)
 			submit.POST("", apiController.Submit)
 		}
 
@@ -70,6 +70,7 @@ func Routes(router *gin.Engine) {
 			discuss.GET("/problem/:problem_id", apiController.GetProblemDiscussion)
 			discuss.GET("/contest/:contest_id", apiController.GetContestDiscussion)
 			discuss.GET("/discuss", apiController.GetDiscussionByID) // changed
+			discuss.GET("/user", apiController.GetUserDiscussion)
 			discuss.POST("", apiController.AddDiscussion)
 
 		}
