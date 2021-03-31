@@ -37,11 +37,13 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 
 		var problemData []map[string]interface{}
 		sampleModel := Sample{}
+		problemSubmitLog := ProblemSubmitLog{}
 		for _, problem := range Problems {
 			res := sampleModel.FindSamplesByProblemID(int(problem.ProblemID))
 			problemData = append(problemData, map[string]interface{}{
-				"problem":        problem,
-				"problem_sample": res.Data,
+				"problem":            problem,
+				"problem_sample":     res.Data,
+				"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
 			})
 		}
 
@@ -84,12 +86,13 @@ func (model *Problem) SearchProblem(param string) helper.ReturnType {
 	err := db.Where("problem_id = ?", param).Find(&problem).Error
 
 	sampleModel := Sample{}
-
+	problemSubmitLog := ProblemSubmitLog{}
 	if err == nil {
 
 		problemData := map[string]interface{}{
-			"problem":        problem,
-			"problem_sample": sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+			"problem":            problem,
+			"problem_sample":     sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+			"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
 		}
 
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problemData}
@@ -97,8 +100,9 @@ func (model *Problem) SearchProblem(param string) helper.ReturnType {
 		if err = db.Where("title = ?", param).Find(&problem).Error; err == nil {
 
 			problemData := map[string]interface{}{
-				"problem":        problem,
-				"problem_sample": sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+				"problem":            problem,
+				"problem_sample":     sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+				"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
 			}
 
 			return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problemData}
