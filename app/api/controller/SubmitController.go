@@ -38,10 +38,10 @@ func Submit(c *gin.Context) {
 	}
 
 	var submitJson struct {
-		Language 	string 	`json:"language"`
-		SourceCode 	string 	`json:"source_code"`
-		ProblemID 	uint 	`json:"problem_id"`
-		ContestID 	uint 	`json:"contest_id"`
+		Language   string `json:"language"`
+		SourceCode string `json:"source_code"`
+		ProblemID  uint   `json:"problem_id"`
+		ContestID  uint   `json:"contest_id"`
 	}
 
 	if err := c.ShouldBind(&submitJson); err != nil {
@@ -57,11 +57,11 @@ func Submit(c *gin.Context) {
 	}
 
 	newSubmit := model.Submit{
-		UserID: userID.(uint),
-		Language: helper.LanguageID(submitJson.Language),
+		UserID:     userID.(uint),
+		Language:   helper.LanguageID(submitJson.Language),
 		SourceCode: submitJson.SourceCode,
-		ProblemID: submitJson.ProblemID,
-		ContestID: submitJson.ContestID,
+		ProblemID:  submitJson.ProblemID,
+		ContestID:  submitJson.ContestID,
 		SubmitTime: time.Now(),
 	}
 
@@ -109,7 +109,7 @@ func judge(submit model.Submit) {
 					return
 				}
 				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
-				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(submit.UserID)))); err == nil {
+				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank" + strconv.Itoa(int(submit.ContestID)) + "user_id" + strconv.Itoa(int(submit.UserID)))); err == nil {
 					_ = json.Unmarshal([]byte(itemStr), &user)
 				}
 				if _, ok := user.ProblemID[submit.ProblemID]; !ok {
@@ -117,13 +117,13 @@ func judge(submit model.Submit) {
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
 				if submit.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times+1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times + 1}
 					user.ACNum++
 					for _, problem := range user.ProblemID {
-						user.Penalty += int64(problem.Times*20*60)+problem.SuccessTime
+						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
 					}
 				} else if submit.Status != "CE" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times+1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 				}
 
 				itemStr, _ := json.Marshal(user)
@@ -167,16 +167,63 @@ func GetSubmitInfo(c *gin.Context) {
 }
 
 // TODO
-func GetAllSubmitInfo(c *gin.Context)  {
-	
+func GetAllSubmitInfo(c *gin.Context) {
+	// change to GetSubmitInfo
 }
 
 // TODO
-func GetProblemSubmitInfo(c *gin.Context)  {
+func GetProblemSubmitInfo(c *gin.Context) {
+	res := checkLogin(c)
+	if res.Status == common.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
 
+	submitModel := model.Submit{}
+	submitJson := model.Submit{}
+
+	if c.ShouldBindQuery(&submitJson) != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		return
+	}
+
+	submitJson.UserID = GetUserIdFromSession(c)
+	res = submitModel.GetProblemSubmit(submitJson)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
 }
 
-// TODO 
-func GetUserContestSubmitInfo(c *gin.Context)  {
-	
+// TODO
+func GetUserContestSubmitInfo(c *gin.Context) {
+	res := checkLogin(c)
+	if res.Status == common.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
+	submitValidate := validate.SubmitValidate
+	submitModel := model.Submit{}
+
+	submitJson := struct {
+		ContestID  uint `json:"contest_id" form:"contest_id" uri:"contest_id"`
+		PageNumber int  `json:"page_number" form:"page_number" uri:"page_number"`
+		UserID     uint
+	}{}
+
+	if c.ShouldBindQuery(&submitJson) != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		return
+	}
+
+	submitJson.UserID = GetUserIdFromSession(c)
+
+	submitMap := helper.Struct2Map(submitJson)
+	if res, err := submitValidate.ValidateMap(submitMap, "contest_log"); !res {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+
+	res = submitModel.GetContestSubmit(submitJson.UserID, submitJson.ContestID, submitJson.PageNumber)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
 }

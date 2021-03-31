@@ -17,7 +17,7 @@ type Submit struct {
 	Status     string    `json:"status" form:"status"`
 	Time       int64     `json:"time" form:"time"`
 	Memory     uint      `json:"memory" form:"memory"`
-	Msg			string 	`json:"msg" form:"msg"`
+	Msg        string    `json:"msg" form:"msg"`
 	SubmitTime time.Time `json:"submit_time" form:"submit_time"`
 }
 
@@ -26,10 +26,8 @@ func (Submit) TableName() string {
 }
 
 func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
-	submits := make([]Submit, 0)
-	err := db.Select([]string{"status", "count(*) as cnt"}).
-		Where("user_id = ?", userID).
-		Group("status").
+	var submits []Submit
+	err := db.Model(&Submit{}).Where("user_id = ?", userID).
 		Find(&submits).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
@@ -79,7 +77,11 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber int) helper.ReturnType {
 	var submits []Submit
 
-	err := db.Where("contest_id = ? and user_id = ?", ContestID, UserID).Offset((PageNumber - 1) * common.PageSubmitLogLimit).Limit(common.PageSubmitLogLimit).Last(&submits).Error
+	err := db.Order("submit_time").
+		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
+		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
+		Limit(common.PageSubmitLogLimit).
+		First(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
