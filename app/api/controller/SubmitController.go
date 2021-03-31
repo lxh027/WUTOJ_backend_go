@@ -44,7 +44,7 @@ func Submit(c *gin.Context) {
 		ContestID  uint   `json:"contest_id"`
 	}
 
-	if err := c.ShouldBind(&submitJson); err != nil {
+	if err := c.ShouldBindJSON(&submitJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
 		return
 	}
