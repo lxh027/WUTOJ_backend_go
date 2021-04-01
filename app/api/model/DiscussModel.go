@@ -42,12 +42,18 @@ func (model *Discuss) GetAllDiscuss(ContestID int, ProblemID int, Offset int, Li
 
 func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnType {
 	var discuss Discuss
+	replyModel := Reply{}
+
 	err := db.Where("id = ?", id).First(&discuss).Error
+	res := replyModel.GetReplyByProblemID(id, (PageNumber-1)*common.PageLimit, common.PageLimit)
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discuss}
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{
+			"discuss": discuss,
+			"reply":   res.Data,
+		}}
 	}
 
 }
