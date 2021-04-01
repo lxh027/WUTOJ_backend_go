@@ -69,7 +69,25 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submits}
+	var submitsData []map[string]interface{}
+
+	for _, submit := range submits {
+		submitsData = append(submitsData, map[string]interface{}{
+			"id":          submit.ID,
+			"user_id":     submit.UserID,
+			"nick":        submit.Nick,
+			"problem_id":  submit.ProblemID,
+			"contest_id":  submit.ContestID,
+			"source_code": submit.SourceCode,
+			"language":    helper.LanguageType(submit.Language),
+			"status":      submit.Status,
+			"time":        submit.Time,
+			"memory":      submit.Memory,
+			"submit_time": submit.SubmitTime,
+		})
+	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submitsData}
 
 }
 
