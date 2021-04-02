@@ -134,7 +134,9 @@ func (model *Submit) GetProblemSubmit(submit Submit) helper.ReturnType {
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: data}
+
+	submitData := model.GetReturnData(append([]Submit{}, data))
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submitData[0]}
 }
 
 func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime time.Time) helper.ReturnType {
