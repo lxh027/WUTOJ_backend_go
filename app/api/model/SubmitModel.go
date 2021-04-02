@@ -3,6 +3,7 @@ package model
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -94,9 +95,11 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 // TODO
 func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber int) helper.ReturnType {
 	var submits []Submit
+	var count int
 
 	err := db.Order("submit_time").
 		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
+		Count(&count).
 		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
 		Limit(common.PageSubmitLogLimit).
 		Find(&submits).Error
@@ -104,7 +107,10 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submits}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
+		"data":  submits,
+		"count": count,
+	}}
 
 }
 
