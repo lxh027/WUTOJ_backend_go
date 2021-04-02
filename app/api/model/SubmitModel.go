@@ -99,7 +99,7 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
 		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
 		Limit(common.PageSubmitLogLimit).
-		First(&submits).Error
+		Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
