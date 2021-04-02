@@ -20,6 +20,14 @@ func GetUserIdFromSession(c *gin.Context) uint {
 	return 0
 }
 
+func GetUserNickFromSession(c *gin.Context) string {
+	session := sessions.Default(c)
+	if nick := session.Get("nick"); nick != "" {
+		return nick.(string)
+	}
+	return ""
+}
+
 func Check(c *gin.Context) {
 	res := checkLogin(c)
 	if res.Data == 0 {
