@@ -39,7 +39,7 @@ func (model *ContestUser) CheckUserContest(UserID int, ContestID int) helper.Ret
 	err := db.Where("user_id = ?", UserID).Where("contest_id = ?", ContestID).Find(&contestUser).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: common.CodeError, Msg: "还未参加比赛，请参加比赛", Data: err.Error()}
 	}
 
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: contestUser}
