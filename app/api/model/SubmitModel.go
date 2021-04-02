@@ -149,3 +149,14 @@ func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime 
 	}
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取比赛提交成功", Data: submits}
 }
+
+func (model *Submit) GetSubmitByID(id uint) helper.ReturnType {
+	var submit Submit
+	err := db.Where("id = ?", id).Find(&submit).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
+	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submit}
+}

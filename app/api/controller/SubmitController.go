@@ -227,3 +227,24 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
+
+func GetSubmitByID(c *gin.Context) {
+	submitJson := model.Submit{}
+	submitModel := model.Submit{}
+	submitValidate := validate.SubmitValidate
+
+	if c.ShouldBindQuery(&submitJson) != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		return
+	}
+
+	submitMap := helper.Struct2Map(submitJson)
+	if res, err := submitValidate.ValidateMap(submitMap, "find"); !res {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+
+	res := submitModel.GetSubmitByID(submitJson.ID)
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
+}
