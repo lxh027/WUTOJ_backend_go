@@ -51,6 +51,7 @@ func Routes(router *gin.Engine) {
 		submit := api.Group("/submit")
 		{
 			submit.GET("", apiController.GetSubmitInfo)
+			submit.GET("/id", apiController.GetSubmitByID)
 			submit.GET("/problem", apiController.GetProblemSubmitInfo)
 			submit.GET("/contest", apiController.GetUserContestSubmitInfo)
 			submit.POST("", apiController.Submit)
