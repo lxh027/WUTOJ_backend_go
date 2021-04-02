@@ -26,6 +26,28 @@ func (Submit) TableName() string {
 	return "submit"
 }
 
+func (model *Submit) GetReturnData(submits []Submit) []map[string]interface{} {
+	var submitsData []map[string]interface{}
+
+	for _, submit := range submits {
+		submitsData = append(submitsData, map[string]interface{}{
+			"id":          submit.ID,
+			"user_id":     submit.UserID,
+			"nick":        submit.Nick,
+			"problem_id":  submit.ProblemID,
+			"contest_id":  submit.ContestID,
+			"source_code": submit.SourceCode,
+			"language":    helper.LanguageType(submit.Language),
+			"status":      submit.Status,
+			"time":        submit.Time,
+			"memory":      submit.Memory,
+			"submit_time": submit.SubmitTime,
+		})
+	}
+
+	return submitsData
+}
+
 func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 	var submits []Submit
 	err := db.Model(&Submit{}).Where("user_id = ?", userID).
@@ -63,32 +85,20 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 
 func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 	var submits []Submit
+	var count int
 
-	err := db.Offset(Offset).Limit(Limit).Last(&submits).Error
+	err := db.Count(&count).Offset(Offset).Limit(Limit).Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
 
-	var submitsData []map[string]interface{}
+	submitsData := model.GetReturnData(submits)
 
-	for _, submit := range submits {
-		submitsData = append(submitsData, map[string]interface{}{
-			"id":          submit.ID,
-			"user_id":     submit.UserID,
-			"nick":        submit.Nick,
-			"problem_id":  submit.ProblemID,
-			"contest_id":  submit.ContestID,
-			"source_code": submit.SourceCode,
-			"language":    helper.LanguageType(submit.Language),
-			"status":      submit.Status,
-			"time":        submit.Time,
-			"memory":      submit.Memory,
-			"submit_time": submit.SubmitTime,
-		})
-	}
-
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submitsData}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
+		"data":  submitsData,
+		"count": count,
+	}}
 
 }
 
@@ -107,8 +117,11 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
+
+	submitsData := model.GetReturnData(submits)
+
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
-		"data":  submits,
+		"data":  submitsData,
 		"count": count,
 	}}
 
