@@ -87,7 +87,7 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
 	var submits []Submit
 	var count int
 
-	err := db.Count(&count).Offset(Offset).Limit(Limit).Find(&submits).Error
+	err := db.Model(&Submit{}).Count(&count).Offset(Offset).Limit(Limit).Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
@@ -107,7 +107,7 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 	var submits []Submit
 	var count int
 
-	err := db.Order("submit_time").
+	err := db.Model(&Submit{}).Order("submit_time").
 		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
 		Count(&count).
 		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
