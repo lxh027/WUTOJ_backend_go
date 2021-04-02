@@ -44,14 +44,23 @@ func (model *Notification) GetNotificationByID(id int) helper.ReturnType {
 
 }
 
-func (model *Notification) GetNotification(ContestID int) helper.ReturnType {
-	var notification = Notification{}
+func (model *Notification) GetNotification(ContestID int, LastNotification int) (helper.ReturnType, int) {
+	var notifications []Notification
 
-	err := db.Where("contest_id = ?", ContestID).Where("status = ?", 0).First(&notification).Error
+	err := db.Where("contest_id = ?", ContestID).
+		Where("status = ?", 1).
+		Where("id > ?", LastNotification).
+		Find(&notifications).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}, LastNotification
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: notification}
+		NotificationID := LastNotification
+		for _, notify := range notifications {
+			if notify.ID > NotificationID {
+				NotificationID = notify.ID
+			}
+		}
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: notifications}, NotificationID
 	}
 
 }

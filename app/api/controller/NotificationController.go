@@ -5,7 +5,10 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/db_server"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -29,7 +32,27 @@ func GetNotification(c *gin.Context) {
 		return
 	}
 
-	res := notificationModel.GetNotification(notificationJson.ContestID)
+	UserNick := GetUserNickFromSession(c)
+	keyValue := "User:" + UserNick + ":Notification"
+	log.Print(keyValue)
+	var LastID int
+
+	LastNotification, err := redis.Int(db_server.GetFromRedis(keyValue))
+
+	if err != nil {
+		LastID = 0
+	} else {
+		LastID = LastNotification
+	}
+
+	res, UpdateNotificationID := notificationModel.GetNotification(notificationJson.ContestID, LastID)
+
+	if UpdateNotificationID == LastID {
+		res.Msg = "无最新通知"
+	}
+
+	_ = db_server.DeleteFromRedis(keyValue)
+	_ = db_server.PutToRedis(keyValue, UpdateNotificationID, 86400)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 
