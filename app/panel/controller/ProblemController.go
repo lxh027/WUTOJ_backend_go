@@ -230,7 +230,7 @@ func UploadData(c *gin.Context) {
 	// 秒 纳秒 内粗你
 	secs, nanos, memory := int(secsFloat), int(nanosFloat*100000000), int(problemDataJson.Memory * 1024 * 1024)
 	// 数据路径 path = {base_dir}/{id}{env}/problem
-	dataPath := judgeConfig["base_dir"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)+judgeConfig["env"].(string)+"/problem"
+	dataPath := judgeConfig["base_dir"].(string)+"/"+judgeConfig["env"].(string)+"/"+strconv.Itoa(problemDataJson.ProblemID)+"/problem"
 	//fmt.Println(dataPath)
 	// 删除原目录
 	_ = os.RemoveAll(dataPath)
