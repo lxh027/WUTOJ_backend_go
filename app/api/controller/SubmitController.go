@@ -156,8 +156,10 @@ func GetSubmitInfo(c *gin.Context) {
 	ConfigMap := config.GetWutOjConfig()
 	Limit := ConfigMap["page_limit"].(int)
 
+	UserID := GetUserIdFromSession(c)
+
 	if c.ShouldBind(&submitJson) == nil {
-		res := submitModel.GetAllSubmit(Limit*(submitJson.PageNumber-1), Limit)
+		res := submitModel.GetAllSubmit(Limit*(submitJson.PageNumber-1), Limit, UserID)
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}

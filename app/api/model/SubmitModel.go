@@ -50,7 +50,7 @@ func (model *Submit) GetReturnData(submits []Submit) []map[string]interface{} {
 
 func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 	var submits []Submit
-	err := db.Model(&Submit{}).Where("user_id = ?", userID).
+	err := db.Model(&Submit{}).Order("id desc").Where("user_id = ?", userID).
 		Find(&submits).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
@@ -83,11 +83,11 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 	}
 }
 
-func (model *Submit) GetAllSubmit(Offset int, Limit int) helper.ReturnType {
+func (model *Submit) GetAllSubmit(Offset int, Limit int, UserId uint) helper.ReturnType {
 	var submits []Submit
 	var count int
 
-	err := db.Model(&Submit{}).Count(&count).Offset(Offset).Limit(Limit).Find(&submits).Error
+	err := db.Model(&Submit{}).Count(&count).Order("id desc").Where("user_id = ?", UserId).Offset(Offset).Limit(Limit).Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
@@ -108,6 +108,7 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 	var count int
 
 	err := db.Model(&Submit{}).Order("submit_time").
+		Order("id desc").
 		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
 		Count(&count).
 		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
@@ -129,7 +130,7 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 
 func (model *Submit) GetProblemSubmit(submit Submit) helper.ReturnType {
 	data := Submit{}
-	err := db.Where("problem_id = ? and user_id = ?", submit.ProblemID, submit.UserID).Last(&data).Error
+	err := db.Order("id desc").Where("problem_id = ? and user_id = ?", submit.ProblemID, submit.UserID).Last(&data).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
