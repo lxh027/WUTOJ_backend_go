@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func GetNotification(c *gin.Context) {
@@ -33,11 +34,13 @@ func GetNotification(c *gin.Context) {
 	}
 
 	UserNick := GetUserNickFromSession(c)
-	keyValue := "User:" + UserNick + ":Notification"
+	keyValue := "User:" + UserNick + ":Notification" + strconv.Itoa(notificationJson.ContestID)
 	log.Print(keyValue)
 	var LastID int
 
 	LastNotification, err := redis.Int(db_server.GetFromRedis(keyValue))
+
+	log.Print(LastNotification)
 
 	if err != nil {
 		LastID = 0
@@ -52,7 +55,7 @@ func GetNotification(c *gin.Context) {
 	}
 
 	_ = db_server.DeleteFromRedis(keyValue)
-	_ = db_server.PutToRedis(keyValue, UpdateNotificationID, 86400)
+	_ = db_server.PutToRedis(keyValue, UpdateNotificationID, 84600)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 
