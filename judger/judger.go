@@ -28,7 +28,7 @@ const (
 )
 
 const (
-	MAX_RETRY_TIMES = 2
+	MAX_RETRY_TIMES     = 2
 	MAX_RECONNECT_TIMES = 10
 )
 
@@ -47,12 +47,10 @@ func GetInstance() *judger {
 	return judgerInstance
 }
 
-
 // closeInstance - cleanup the resource which be used by judger
 func CloseInstance() {
 	judgerInstance.anaConn.Close()
 }
-
 
 func (j *judger) SetOpt(opt int, param interface{}) error {
 	if param == nil {
@@ -136,13 +134,13 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		Source:      sourceFile,
 		Language:    submitData.Language,
 		BuildScript: buildScript,
-		Timeout:     TimeConfig{
+		Timeout: TimeConfig{
 			Seconds: 5,
-			Nanos: 0,
+			Nanos:   0,
 		},
 	}
 
-	runnerConfig := RunnerConfig {
+	runnerConfig := RunnerConfig{
 		Runner: Runner{
 			Language: submitData.Language,
 			Rootfs:   submitData.RootfsConfig,
@@ -163,7 +161,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		return
 	}
 
-	err = os.Symlink(path.Join(j.baseDirectory, strconv.FormatUint(submitData.Pid, 10) + j.env, "problem"), path.Join(workspacePath, "problem"))
+	err = os.Symlink(path.Join(j.baseDirectory, j.env, strconv.FormatUint(submitData.Pid, 10), "problem"), path.Join(workspacePath, "problem"))
 	if err != nil {
 		glog.Errorf("link problem path failed, err: %v", err)
 		callback(submitData.Id, NewUndefinedError("link problem path failed"))
@@ -210,24 +208,24 @@ func (j *judger) getConn() {
 
 func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCallback) error {
 	source := Workspace{
-		Id: &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
+		Id:   &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
 		Path: &wrappers.StringValue{Value: workspacePath},
 	}
 
-	rldata := JudgeResult {
-		Time: 0,
-		Memory: 0,
-		Status: "UE",
-		Msg: "",
-		Case: 0,
+	rldata := JudgeResult{
+		Time:       0,
+		Memory:     0,
+		Status:     "UE",
+		Msg:        "",
+		Case:       0,
 		IsFinished: false,
 	}
 
 	resultData := &Report{
 		Usage: &Resource{
-			RealTime:             &duration.Duration{Seconds: 0, Nanos: 0},
-			CpuTime:              &duration.Duration{Seconds: 0, Nanos: 0},
-			Memory:               &wrappers.UInt64Value{Value : 0},
+			RealTime: &duration.Duration{Seconds: 0, Nanos: 0},
+			CpuTime:  &duration.Duration{Seconds: 0, Nanos: 0},
+			Memory:   &wrappers.UInt64Value{Value: 0},
 		},
 	}
 
@@ -238,7 +236,7 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 		return err
 	}
 
-	request := Request {
+	request := Request{
 		Id: &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
 	}
 
@@ -281,5 +279,3 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 	callback(id, rldata)
 	return nil
 }
-
-

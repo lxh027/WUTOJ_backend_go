@@ -65,7 +65,7 @@ func Submit(c *gin.Context) {
 		SubmitTime: time.Now(),
 	}
 
-	res := submitModel.AddSubmit(newSubmit)
+	res := submitModel.AddSubmit(&newSubmit)
 
 	go func(submit model.Submit) {
 		judge(submit)

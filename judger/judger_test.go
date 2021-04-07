@@ -9,10 +9,10 @@ import (
 func createJudgerInstance() {
 	instance := InitInstance()
 
-	instance.SetOpt(OPT_SETENV, "master")
+	instance.SetOpt(OPT_SETENV, "dev")
 	instance.SetOpt(OPT_SETADDR, "127.0.0.1:8800")
 	instance.SetOpt(OPT_BASEDIRECTORY, "/home/acmwhut/data")
-	instance.SetOpt(OPT_SETTEMPDIRECTORY, "/tmpdir")
+	instance.SetOpt(OPT_SETTEMPDIRECTORY, "/home/ana_tmpdir")
 }
 
 const ac_code = `
@@ -72,9 +72,9 @@ func TestSubmit(t *testing.T) {
 	defer CloseInstance()
 
 	testCases := []struct {
-		status 	   string
+		status     string
 		sourceCode string
-	} {
+	}{
 		{"AC", ac_code},
 		{"WA", wa_code},
 		{"CE", ce_code},
@@ -87,14 +87,14 @@ func TestSubmit(t *testing.T) {
 	for index, testCase := range testCases {
 		submitData := SubmitData{
 			Id:           uint64(rand.Int()),
-			Pid:          1000,
+			Pid:          24,
 			Language:     "c.gcc",
 			Code:         testCase.sourceCode,
 			BuildScript:  "",
 			RootfsConfig: nil,
 		}
 
-		ch := make(chan JudgeResult)
+		ch := make(chan JudgeResult, 100)
 
 		// 这里使用chan传递结果是为了方便进行测试assert,
 		// 实际使用中可以完全异步的将结果存放到数据库中

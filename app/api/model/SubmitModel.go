@@ -59,9 +59,9 @@ func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 	}
 }
 
-func (model *Submit) AddSubmit(submit Submit) helper.ReturnType {
+func (model *Submit) AddSubmit(submit *Submit) helper.ReturnType {
 
-	err := db.Omit("time").Create(&submit).Error
+	err := db.Omit("time").Create(submit).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "添加提交记录失败", Data: err.Error()}
