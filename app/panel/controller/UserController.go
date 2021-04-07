@@ -253,7 +253,7 @@ func Login(c *gin.Context) {
 			return
 		}*/
 		jsonData, _ := json.Marshal(returnData)
-		session.Set("user_id", returnData["user_id"])
+		session.Set("userId", returnData["user_id"])
 		session.Set("identity", returnData["identity"])
 		session.Set("data", string(jsonData))
 		if err := session.Save(); err == nil {
