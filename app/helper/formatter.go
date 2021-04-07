@@ -95,3 +95,11 @@ func ApiReturn(status int, msg string, data interface{}) gin.H {
 		"data":    data,
 	}
 }
+
+func BackendApiReturn(status int, msg string, data interface{}) gin.H {
+	return gin.H{
+		"status": status,
+		"msg":    msg,
+		"data":   data,
+	}
+}

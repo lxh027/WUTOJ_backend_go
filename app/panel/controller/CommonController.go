@@ -16,22 +16,22 @@ import (
 )
 
 type menuItem struct {
-	Title 	string `json:"title"`
-	Icon	string `json:"icon"`
-	Href	string `json:"href"`
-	Target 	string `json:"target"`
-	Child 	[]menuItem `json:"child"`
+	Title  string     `json:"title"`
+	Icon   string     `json:"icon"`
+	Href   string     `json:"href"`
+	Target string     `json:"target"`
+	Child  []menuItem `json:"child"`
 }
 
 type redisData struct {
-	Menu 	[]menuItem	`json:"menu"`
-	Auth 	[]string	`json:"auth"`
+	Menu []menuItem `json:"menu"`
+	Auth []string   `json:"auth"`
 }
 
 func haveAuth(c *gin.Context, authQuery string) int {
 	session := sessions.Default(c)
-	id := session.Get("user_id")
-	if  id == nil {
+	id := session.Get("userId")
+	if id == nil {
 		return common.UnLoggedIn
 	} else if session.Get("identity").(uint) == 0 {
 		return common.UnAuthed
@@ -49,15 +49,15 @@ func haveAuth(c *gin.Context, authQuery string) int {
 	}
 }
 
-func ClearAuthRedis(userID int)  {
-	err := db_server.DeleteFromRedis(strconv.Itoa(userID)+"auth_info")
+func ClearAuthRedis(userID int) {
+	err := db_server.DeleteFromRedis(strconv.Itoa(userID) + "auth_info")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
 func getUserAllAuth(userID int) ([]menuItem, []string, error) {
-	if info, err := db_server.GetFromRedis(strconv.Itoa(userID)+"auth_info"); err == nil && info != nil {
+	if info, err := db_server.GetFromRedis(strconv.Itoa(userID) + "auth_info"); err == nil && info != nil {
 		var authInfo redisData
 		bytes, _ := redis.Bytes(info, err)
 		_ = json.Unmarshal(bytes, &authInfo)
@@ -103,11 +103,11 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 			auth := queue.Front().Value.(model.Auth)
 			queue.Remove(queue.Front())
 			item := menuItem{
-				Title: auth.Title,
-				Icon: auth.Icon,
-				Href: auth.Href,
+				Title:  auth.Title,
+				Icon:   auth.Icon,
+				Href:   auth.Href,
 				Target: auth.Target,
-				Child: childMenu[auth.Aid],
+				Child:  childMenu[auth.Aid],
 			}
 			childMenu[auth.Parent] = append(childMenu[auth.Parent], item)
 			hasChild[auth.Parent]--
@@ -115,11 +115,11 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 				parentAuth := authsLeft[auth.Parent]
 				if parentAuth.Type == 0 {
 					menu = append(menu, menuItem{
-						Title: parentAuth.Title,
-						Icon: parentAuth.Icon,
-						Href: parentAuth.Href,
+						Title:  parentAuth.Title,
+						Icon:   parentAuth.Icon,
+						Href:   parentAuth.Href,
 						Target: parentAuth.Target,
-						Child: childMenu[parentAuth.Aid],
+						Child:  childMenu[parentAuth.Aid],
 					})
 				} else {
 					queue.PushBack(authsLeft[auth.Parent])
@@ -136,7 +136,7 @@ func getUserAllAuth(userID int) ([]menuItem, []string, error) {
 
 }
 
-func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error)  {
+func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	contestModel := model.Contest{}
 	res := contestModel.GetContestById(contestID)
 	now := time.Now()

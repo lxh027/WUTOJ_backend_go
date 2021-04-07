@@ -17,19 +17,20 @@ import (
 )
 
 type problem struct {
-	SuccessTime 	int64 	`json:"success_time"`
-	Times 			uint 	`json:"times"`
+	SuccessTime int64 `json:"success_time"`
+	Times       uint  `json:"times"`
 }
 type user struct {
-	UserID 	uint 	`json:"user_id"`
-	Nick 	string 	`json:"nick"`
-	Penalty int64 	`json:"penalty"`
-	ACNum 	uint 	`json:"ac_num"`
-	ProblemID 	map[uint]problem 	`json:"problem_id"`
+	UserID    uint             `json:"user_id"`
+	Nick      string           `json:"nick"`
+	Penalty   int64            `json:"penalty"`
+	ACNum     uint             `json:"ac_num"`
+	ProblemID map[uint]problem `json:"problem_id"`
 }
 type userSort []user
-func (a userSort) Len() int           { return len(a) }
-func (a userSort) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func (a userSort) Len() int      { return len(a) }
+func (a userSort) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a userSort) Less(i, j int) bool {
 	if a[i].ACNum != a[j].ACNum {
 		return a[i].ACNum < a[j].ACNum
@@ -38,45 +39,45 @@ func (a userSort) Less(i, j int) bool {
 	}
 }
 
-func GetAllSubmit(c *gin.Context)  {
+func GetAllSubmit(c *gin.Context) {
 	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
-		Offset 	int 	`json:"offset" form:"offset"`
-		Limit 	int 	`json:"limit" form:"limit"`
-		Where 	struct{
-			UserID 		string 	`json:"user_id" form:"user_id"`
-			ProblemID 	string `json:"problem_id" form:"problem_id"`
-			ContestID 	string `json:"contest_id" form:"contest_id"`
-			Language 	string `json:"language" form:"language"`
-			Status 		string `json:"status" form:"status"`
-			MinSubmitTime 	time.Time 	`json:"min_submit_time" form:"min_submit_time"`
-			MaxSubmitTime 	time.Time 	`json:"max_submit_time" form:"max_submit_time"`
+		Offset int `json:"offset" form:"offset"`
+		Limit  int `json:"limit" form:"limit"`
+		Where  struct {
+			UserID        string    `json:"user_id" form:"user_id"`
+			ProblemID     string    `json:"problem_id" form:"problem_id"`
+			ContestID     string    `json:"contest_id" form:"contest_id"`
+			Language      string    `json:"language" form:"language"`
+			Status        string    `json:"status" form:"status"`
+			MinSubmitTime time.Time `json:"min_submit_time" form:"min_submit_time"`
+			MaxSubmitTime time.Time `json:"max_submit_time" form:"max_submit_time"`
 		}
 	}{}
 	var err error
 	if err = c.ShouldBind(&submitJson); err == nil {
-		submitJson.Offset = (submitJson.Offset-1)*submitJson.Limit
-		whereData := map[string]string {
+		submitJson.Offset = (submitJson.Offset - 1) * submitJson.Limit
+		whereData := map[string]string{
 			"user_id": submitJson.Where.UserID, "problem_id": submitJson.Where.ProblemID,
 			"contest_id": submitJson.Where.ContestID, "language": submitJson.Where.Language,
 			"status": submitJson.Where.Status,
 		}
 		res := submitModel.GetAllSubmit(submitJson.Offset, submitJson.Limit, whereData, submitJson.Where.MinSubmitTime, submitJson.Where.MaxSubmitTime)
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), false))
 	return
 }
 
 func GetSubmitByID(c *gin.Context) {
 	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
 	submitValidate := validate.SubmitValidate
@@ -85,40 +86,40 @@ func GetSubmitByID(c *gin.Context) {
 	var submitJson model.Submit
 
 	if err := c.ShouldBind(&submitJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
-	if res, err:= submitValidate.ValidateMap(submitMap, "find"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+	if res, err := submitValidate.ValidateMap(submitMap, "find"); !res {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 
 	res := submitModel.FindSubmitByID(submitJson.ID)
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
-func RejudgeGroupSubmits(c *gin.Context)  {
+func RejudgeGroupSubmits(c *gin.Context) {
 	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
-		UserID 		string 	`json:"user_id" form:"user_id"`
-		ProblemID 	string `json:"problem_id" form:"problem_id"`
-		ContestID 	string `json:"contest_id" form:"contest_id"`
-		Language 	string `json:"language" form:"language"`
-		Status 		string `json:"status" form:"status"`
-		MinSubmitTime 	time.Time 	`json:"min_submit_time" form:"min_submit_time"`
-		MaxSubmitTime 	time.Time 	`json:"max_submit_time" form:"max_submit_time"`
+		UserID        string    `json:"user_id" form:"user_id"`
+		ProblemID     string    `json:"problem_id" form:"problem_id"`
+		ContestID     string    `json:"contest_id" form:"contest_id"`
+		Language      string    `json:"language" form:"language"`
+		Status        string    `json:"status" form:"status"`
+		MinSubmitTime time.Time `json:"min_submit_time" form:"min_submit_time"`
+		MaxSubmitTime time.Time `json:"max_submit_time" form:"max_submit_time"`
 	}{}
 
 	if c.ShouldBind(&submitJson) == nil {
-		whereData := map[string]string {
+		whereData := map[string]string{
 			"user_id": submitJson.UserID, "problem_id": submitJson.ProblemID,
 			"contest_id": submitJson.ContestID, "language": submitJson.ContestID,
 			"status": submitJson.Status,
@@ -130,16 +131,16 @@ func RejudgeGroupSubmits(c *gin.Context)  {
 				rejudge(submitData)
 			}(submit)
 		}
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "发送重测成功", true))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "发送重测成功", true))
 		return
 	}
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
 	return
 }
 
 func RejudgeSubmitByID(c *gin.Context) {
 	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "权限不足", res))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
 	submitValidate := validate.SubmitValidate
@@ -148,13 +149,13 @@ func RejudgeSubmitByID(c *gin.Context) {
 	var submitJson model.Submit
 
 	if err := c.ShouldBind(&submitJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
-	if res, err:= submitValidate.ValidateMap(submitMap, "rejudge"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+	if res, err := submitValidate.ValidateMap(submitMap, "rejudge"); !res {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -163,17 +164,17 @@ func RejudgeSubmitByID(c *gin.Context) {
 	go func(submitData model.Submit) {
 		rejudge(submitData)
 	}(submit)
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "发送重测成功", true))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "发送重测成功", true))
 	return
 }
 
 func rejudge(submit model.Submit) {
 	submitData := judger.SubmitData{
-		Id: uint64(submit.ID),
-		Pid: uint64(submit.ProblemID),
-		Language: helper.LanguageType(submit.Language),
-		Code: submit.SourceCode,
-		BuildScript: "",
+		Id:           uint64(submit.ID),
+		Pid:          uint64(submit.ProblemID),
+		Language:     helper.LanguageType(submit.Language),
+		Code:         submit.SourceCode,
+		BuildScript:  "",
 		RootfsConfig: nil,
 	}
 
@@ -181,11 +182,11 @@ func rejudge(submit model.Submit) {
 		// Put Result To DB
 		// TODO if set contest, update redis rank info
 		if result.IsFinished {
-			data := map[string]interface{} {
-				"status": 	result.Status,
-				"time": 	result.Time,
-				"memory": 	result.Memory,
-				"msg": 		result.Msg,
+			data := map[string]interface{}{
+				"status": result.Status,
+				"time":   result.Time,
+				"memory": result.Memory,
+				"msg":    result.Msg,
 			}
 			submitModel := model.Submit{}
 			submitModel.UpdateStatusAfterSubmit(int(id), data)
@@ -200,7 +201,7 @@ func rejudge(submit model.Submit) {
 					return
 				}
 				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
-				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(submit.UserID)))); err == nil {
+				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank" + strconv.Itoa(int(submit.ContestID)) + "user_id" + strconv.Itoa(int(submit.UserID)))); err == nil {
 					_ = json.Unmarshal([]byte(itemStr), &user)
 				}
 				if _, ok := user.ProblemID[submit.ProblemID]; !ok {
@@ -208,13 +209,13 @@ func rejudge(submit model.Submit) {
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
 				if submit.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times+1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times + 1}
 					user.ACNum++
 					for _, problem := range user.ProblemID {
-						user.Penalty += int64(problem.Times*20*60)+problem.SuccessTime
+						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
 					}
 				} else if submit.Status != "CE" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times+1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 				}
 
 				itemStr, _ := json.Marshal(user)
