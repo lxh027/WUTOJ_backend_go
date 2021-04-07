@@ -29,7 +29,7 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 
 	db.Model(&Problem{}).Count(&count)
 
-	err := db.Find(&Problems).Error
+	err := db.Where("public = ?", 1).Find(&Problems).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -60,7 +60,7 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
 
-	err := db.Where("problem_id = ?", id).First(&problem).Error
+	err := db.Where("problem_id = ? AND public = ?", id, 1).First(&problem).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -72,7 +72,7 @@ func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 	var problem Problem
 
-	err := db.Where("title = ?", title).First(&problem).Error
+	err := db.Where("title = ? AND public = ?", title, 1).First(&problem).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -83,7 +83,7 @@ func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 
 func (model *Problem) SearchProblem(param string) helper.ReturnType {
 	problem := Problem{}
-	err := db.Where("problem_id = ?", param).Find(&problem).Error
+	err := db.Where("problem_id = ? AND public = ?", param, 1).Find(&problem).Error
 
 	sampleModel := Sample{}
 	problemSubmitLog := ProblemSubmitLog{}
