@@ -58,6 +58,7 @@ func Submit(c *gin.Context) {
 
 	newSubmit := model.Submit{
 		UserID:     userID.(uint),
+		Nick:       GetUserNickFromSession(c),
 		Language:   helper.LanguageID(submitJson.Language),
 		SourceCode: submitJson.SourceCode,
 		ProblemID:  submitJson.ProblemID,
