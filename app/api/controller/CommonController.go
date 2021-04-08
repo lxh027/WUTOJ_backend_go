@@ -30,8 +30,10 @@ func GetUserNickFromSession(c *gin.Context) string {
 
 func Check(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Data == 0 {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	if res.Status == common.CodeSuccess {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, gin.H{
+			"user_id": res.Data,
+		}))
 		return
 	}
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
@@ -40,10 +42,11 @@ func Check(c *gin.Context) {
 func checkLogin(c *gin.Context) helper.ReturnType {
 	//return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
 	session := sessions.Default(c)
-	if id := session.Get("user_id"); id == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: 1}
+	var id interface{}
+	if id = session.Get("user_id"); id == nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: -1}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: 0}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: id}
 }
 
 // return begin, frozen, end
