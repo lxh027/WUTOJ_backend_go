@@ -60,7 +60,7 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
 
-	err := db.Where("problem_id = ? AND public = ?", id, 1).First(&problem).Error
+	err := db.Where("problem_id = ?", id).First(&problem).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
