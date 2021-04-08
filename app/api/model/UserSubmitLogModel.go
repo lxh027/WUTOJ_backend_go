@@ -20,6 +20,22 @@ func (UserSubmitLog) TableName() string {
 	return "user_submit_log"
 }
 
+func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnType {
+	var userSubmitLog UserSubmitLog
+	var user User
+	err := db.Where("nick = ?", UserNick).Find(&user).Error
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
+	}
+	userSubmitLog.UserID = int(user.UserID)
+
+	err = db.Create(&userSubmitLog).Error
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建用户成功", Data: 1}
+}
+
 func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
 	var UserSubmitLog UserSubmitLog
 	err := db.Model(&UserSubmitLog).Where("user_id = ?", int(UserID)).First(&UserSubmitLog).Error
