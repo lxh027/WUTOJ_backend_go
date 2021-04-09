@@ -83,7 +83,7 @@ func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 
 func (model *Problem) SearchProblem(param string) helper.ReturnType {
 	problem := Problem{}
-	err := db.Where("problem_id = ? AND public = ?", param, 1).Find(&problem).Error
+	err := db.Where("problem_id = ?", param).Find(&problem).Error
 
 	sampleModel := Sample{}
 	problemSubmitLog := ProblemSubmitLog{}
