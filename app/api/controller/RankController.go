@@ -17,32 +17,33 @@ import (
 )
 
 type problem struct {
-	SuccessTime 	int64 	`json:"success_time"`
-	Times 			uint 	`json:"times"`
+	SuccessTime int64 `json:"success_time"`
+	Times       uint  `json:"times"`
 }
 type user struct {
-	UserID 	uint 	`json:"user_id"`
-	Nick 	string 	`json:"nick"`
-	Penalty int64 	`json:"penalty"`
-	ACNum 	uint 	`json:"ac_num"`
-	ProblemID 	map[uint]problem 	`json:"problem_id"`
+	UserID    uint             `json:"user_id"`
+	Nick      string           `json:"nick"`
+	Penalty   int64            `json:"penalty"`
+	ACNum     uint             `json:"ac_num"`
+	ProblemID map[uint]problem `json:"problem_id"`
 }
 type userSort []user
-func (a userSort) Len() int           { return len(a) }
-func (a userSort) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func (a userSort) Len() int      { return len(a) }
+func (a userSort) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a userSort) Less(i, j int) bool {
 	if a[i].ACNum != a[j].ACNum {
-		return a[i].ACNum < a[j].ACNum
+		return a[i].ACNum > a[j].ACNum
 	} else {
 		return a[i].Penalty < a[j].Penalty
 	}
 }
 
-func GetUserRank(c *gin.Context)  {
+func GetUserRank(c *gin.Context) {
 	rankValidate := validate.RankValidate
 
 	rankJson := struct {
-		ContestID 	uint 	`uri:"contest_id"`
+		ContestID uint `uri:"contest_id"`
 	}{}
 
 	if err := c.ShouldBindUri(&rankJson); err != nil {
@@ -80,7 +81,7 @@ func GetUserRank(c *gin.Context)  {
 	}
 
 	// try get from redis
-	if rank, err := db_server.ZGetAllFromRedis("contest_rank"+strconv.Itoa(int(rankJson.ContestID))); err == nil{
+	if rank, err := db_server.ZGetAllFromRedis("contest_rank" + strconv.Itoa(int(rankJson.ContestID))); err == nil {
 		userIDRank, _ := redis.Strings(rank, err)
 		if len(userIDRank) == 0 {
 			getRankFromDB(c, rankJson.ContestID, begin, end, now)
@@ -90,7 +91,7 @@ func GetUserRank(c *gin.Context)  {
 		for _, userID := range userIDRank {
 			// get each user_id
 			var item user
-			itemStr, err := redis.String(db_server.GetFromRedis("contest_rank"+strconv.Itoa(int(rankJson.ContestID))+"user_id"+userID))
+			itemStr, err := redis.String(db_server.GetFromRedis("contest_rank" + strconv.Itoa(int(rankJson.ContestID)) + "user_id" + userID))
 			if err != nil {
 				getRankFromDB(c, rankJson.ContestID, begin, end, now)
 				return
@@ -125,12 +126,13 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 		var index int
 		if i, ok := userIndexMap[submit.UserID]; !ok {
 			users = append(users, user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)})
-			index = len(users)-1
+			index = len(users) - 1
+			userIndexMap[submit.UserID] = index
 		} else {
 			index = i
 		}
 
-		userIndex := strconv.Itoa(int(submit.UserID))+"."+strconv.Itoa(int(submit.ProblemID))
+		userIndex := strconv.Itoa(int(submit.UserID)) + "." + strconv.Itoa(int(submit.ProblemID))
 		if ac, ok := userProblemMap[userIndex]; !ok || !ac {
 			// not AC yet
 			if _, ok = users[index].ProblemID[submit.ProblemID]; !ok {
@@ -139,14 +141,14 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 			userProblem := users[index].ProblemID[submit.ProblemID]
 			if submit.Status == "AC" {
 				userProblemMap[userIndex] = true
-				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times+1}
+				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times + 1}
 				users[index].ACNum++
 				for _, problem := range users[index].ProblemID {
-					users[index].Penalty += int64(problem.Times*20*60)+problem.SuccessTime
+					users[index].Penalty += int64(problem.Times*20*60) + problem.SuccessTime
 				}
 			} else if submit.Status != "CE" {
 				userProblemMap[userIndex] = false
-				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times+1}
+				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 			}
 		}
 	}
@@ -161,4 +163,3 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 		_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(contestID)), score, user.UserID)
 	}
 }
-
