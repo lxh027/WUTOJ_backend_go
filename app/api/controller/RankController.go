@@ -68,7 +68,7 @@ func GetUserRank(c *gin.Context) {
 
 	var begin, end time.Time
 	begin = beginTime
-	fmt.Println(now.String(), beginTime.String())
+	fmt.Println(now.String(), beginTime.String(), frozenTime.String(), endTime.String())
 	if now.Unix() < beginTime.Unix() {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", nil))
 		return
