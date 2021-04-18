@@ -105,8 +105,9 @@ func judge(submit model.Submit) {
 				if err != nil {
 					return
 				}
-				now := submit.SubmitTime.Unix()
-				if now < beginTime.Unix() || now > frozenTime.Unix() {
+				format := "2006-01-02 15:04:05"
+				now, _ := time.Parse(format, time.Now().Format(format))
+				if now.Unix() < beginTime.Unix() || now.Unix() > frozenTime.Unix() {
 					return
 				}
 				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
@@ -118,7 +119,7 @@ func judge(submit model.Submit) {
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
 				if submit.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now, Times: userProblem.Times + 1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times + 1}
 					user.ACNum++
 					for _, problem := range user.ProblemID {
 						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
