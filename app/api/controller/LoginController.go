@@ -21,7 +21,7 @@ func DoLogin(c *gin.Context) {
 	if session.Get("user_id") != nil {
 		data := make(map[string]interface{}, 0)
 		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "已登陆", data))
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
 		return
 	}
 
