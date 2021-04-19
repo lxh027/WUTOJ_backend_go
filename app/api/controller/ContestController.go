@@ -14,13 +14,6 @@ import (
 )
 
 func GetAllContest(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == common.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	contestJson := struct {
 		PageNumber int `form:"page_number" json:"page_number"`
 	}{}
