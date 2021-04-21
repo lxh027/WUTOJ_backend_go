@@ -9,7 +9,7 @@ import (
 
 func NewUndefinedError(msg string) JudgeResult {
 	return JudgeResult{
-		Status: "AC",
+		Status: "UE",
 		Time: 0,
 		Memory: 0,
 		Msg: msg,
