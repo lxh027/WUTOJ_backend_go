@@ -63,7 +63,7 @@ func Submit(c *gin.Context) {
 		SourceCode: submitJson.SourceCode,
 		ProblemID:  submitJson.ProblemID,
 		ContestID:  submitJson.ContestID,
-		Status:     "judging",
+		Status:     "Judging",
 		SubmitTime: time.Now(),
 	}
 
