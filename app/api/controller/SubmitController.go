@@ -14,6 +14,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "io"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -119,6 +120,7 @@ func judge(submit model.Submit) {
 					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: 0}
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
+				log.Println(submit)
 				if submit.Status == "AC" {
 					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times + 1}
 					user.ACNum++
