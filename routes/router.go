@@ -164,6 +164,7 @@ func Routes(router *gin.Engine) {
 			contest.POST("/updateContest", panelController.UpdateContest)
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
+			contest.POST("/flushRank", panelController.ClearContestRedis)
 		}
 
 		submit := panel.Group("/submit")

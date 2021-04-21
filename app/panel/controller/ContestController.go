@@ -5,9 +5,11 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/db_server"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -180,5 +182,34 @@ func ChangeContestStatus(c *gin.Context) {
 
 	res := contestModel.ChangeContestStatus(contestJson.ContestID, contestJson.Status)
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+	return
+}
+
+func ClearContestRedis(c *gin.Context) {
+	if res := haveAuth(c, "updateContest"); res != common.Authed {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
+		return
+	}
+	contestValidate := validate.ContestValidate
+
+	var contestJson model.Contest
+	if err := c.ShouldBind(&contestJson); err != nil {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		return
+	}
+
+	contestMap := helper.Struct2Map(contestJson)
+	if res, err := contestValidate.ValidateMap(contestMap, "update"); !res {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		return
+	}
+
+
+	if err := db_server.DeleteFromRedis("contest_rank" + strconv.Itoa(int(contestJson.ContestID))); err != nil {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "刷新排行榜失败", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "刷新排行榜成功", 0))
 	return
 }
