@@ -141,7 +141,7 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 			userProblem := users[index].ProblemID[submit.ProblemID]
 			if submit.Status == "AC" {
 				userProblemMap[userIndex] = true
-				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times + 1}
+				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix()-beginTime.Unix(), Times: userProblem.Times + 1}
 				users[index].ACNum++
 				for _, problem := range users[index].ProblemID {
 					users[index].Penalty += int64(problem.Times*20*60) + problem.SuccessTime

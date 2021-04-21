@@ -120,14 +120,14 @@ func judge(submit model.Submit) {
 					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: 0}
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
-				log.Println(submit)
-				if submit.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: now.Unix(), Times: userProblem.Times + 1}
+				log.Println(result)
+				if result.Status == "AC" {
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix()-beginTime.Unix(), Times: userProblem.Times + 1}
 					user.ACNum++
 					for _, problem := range user.ProblemID {
 						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
 					}
-				} else if submit.Status != "CE" {
+				} else if result.Status != "CE" {
 					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 				}
 
