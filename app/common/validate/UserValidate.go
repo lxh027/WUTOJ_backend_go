@@ -25,6 +25,7 @@ func init() {
 		"is_admin":       "required|bool",
 		"verify_code":    "required",
 		"param":          "required",
+		"users": 			"required",
 	}
 
 	scenes := map[string][]string{
@@ -34,6 +35,8 @@ func init() {
 		"searchUser_nick": {"nick"},
 		"search":          {"param"},
 		"deleteUser":      {"user_id"},
+		"updateUser": 		{"user_id"},
+		"groupDelete": 		{"users"},
 		"foreAddUser":     {},
 		"login":           {"nick", "password"},
 		"register":        {"nick", "password", "password_check", "realname", "school", "major", "class", "contact", "mail"},
