@@ -134,6 +134,7 @@ func Routes(router *gin.Engine) {
 		submitLog := panel.Group("/submitLog")
 		{
 			submitLog.POST("/getUserSubmitStatus", panelController.GetAllUserSubmitStatus)
+			submitLog.POST("/getUserSubmitStatusByTime", panelController.GetUserSubmitStatusByTime)
 		}
 
 		tag := panel.Group("/tag")

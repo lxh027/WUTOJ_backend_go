@@ -29,7 +29,7 @@ func addTimer() {
 	db.Exec(update_user_sql)
 	update_problem_sql := `INSERT IGNORE INTO problem_submit_log(problem_id,ac,wa,tle,mle,re,se,ce)
 		select submit.problem_id AS problem_id,
-			count((case when (submit.status = 'AC'') then submit.status end)) AS ac,
+			count((case when (submit.status = 'AC') then submit.status end)) AS ac,
 			count((case when (submit.status = 'WA') then submit.status end)) AS wa,
 			count((case when (submit.status = 'TLE') then submit.status end)) AS tle,
 			count((case when (submit.status = 'MLE') then submit.status end)) AS mle,

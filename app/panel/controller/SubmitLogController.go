@@ -32,3 +32,25 @@ func GetAllUserSubmitStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
 	return
 }
+
+func GetUserSubmitStatusByTime(c *gin.Context) {
+	if res := haveAuth(c, "getUserSubmit"); res != common.Authed {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
+		return
+	}
+	userLogModel := model.UserSubmitLog{}
+
+	userLogJson := struct {
+		UserId int `json:"user_id" form:"offset"`
+		StartTime  string `json:"start_time" form:"start_time"`
+		EndTime string `json:"end_time" form:"end_time"`
+	}{}
+
+	if c.ShouldBind(&userLogJson) == nil {
+		res := userLogModel.GetUserSubmitStatusByTime(userLogJson.UserId, userLogJson.StartTime, userLogJson.EndTime)
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	return
+}
