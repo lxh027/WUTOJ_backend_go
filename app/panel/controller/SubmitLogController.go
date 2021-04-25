@@ -41,7 +41,7 @@ func GetUserSubmitStatusByTime(c *gin.Context) {
 	userLogModel := model.UserSubmitLog{}
 
 	userLogJson := struct {
-		UserId int `json:"user_id" form:"offset"`
+		UserId []int `json:"user_id" form:"offset"`
 		StartTime  string `json:"start_time" form:"start_time"`
 		EndTime string `json:"end_time" form:"end_time"`
 	}{}
