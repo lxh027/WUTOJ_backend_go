@@ -60,7 +60,7 @@ func (model *UserSubmitLog) GetUserSubmitStatusByTime(userId []int, startTime st
 	}
 	var logs [][]UserSubmitLogByTime
 	for i := 0; i < len(userId); i++ {
-		var result []UserSubmitLogByTime
+		result := make([]UserSubmitLogByTime, 0)
 		sql := fmt.Sprintf("SELECT count((case when (submit.status = 'AC') then submit.status end)) as ac, submit_time as date_time FROM `submit` WHERE user_id = '%d' and submit_time BETWEEN '%s' and '%s' group BY day(submit_time)", userId[i], startTime, endTime)
 		rows, err := db.Raw(sql).Rows()
 		if err == nil {

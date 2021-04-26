@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -41,12 +42,13 @@ func GetUserSubmitStatusByTime(c *gin.Context) {
 	userLogModel := model.UserSubmitLog{}
 
 	userLogJson := struct {
-		UserId []int `json:"user_id" form:"offset"`
+		UserId []int `json:"user_id" form:"user_id"`
 		StartTime  string `json:"start_time" form:"start_time"`
 		EndTime string `json:"end_time" form:"end_time"`
 	}{}
 
 	if c.ShouldBind(&userLogJson) == nil {
+		fmt.Fprintf(gin.DefaultWriter, "userLogJson: %v", userLogJson)
 		res := userLogModel.GetUserSubmitStatusByTime(userLogJson.UserId, userLogJson.StartTime, userLogJson.EndTime)
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
