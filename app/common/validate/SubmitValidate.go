@@ -22,6 +22,7 @@ func init() {
 		"get_all":         {"user_id", "page_number"},
 		"find":            {"id"},
 		"contest_log":     {"page_number", "user_id", "contest_id"},
+		"rejudge": 			{"id"},
 	}
 
 	SubmitValidate.Rules = rules

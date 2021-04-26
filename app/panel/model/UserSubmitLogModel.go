@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"fmt"
+	"time"
 )
 
 type UserSubmitLog struct {
@@ -48,8 +49,37 @@ func (model *UserSubmitLog) GetAllUserSubmitStatus(offset int, limit int, nick s
 				"count": count,
 			},
 		}
-	} else {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+}
+
+func (model *UserSubmitLog) GetUserSubmitStatusByTime(userId []int, startTime string, endTime string) helper.ReturnType {
+	type UserSubmitLogByTime struct {
+		AC int `json:"ac" form:"ac"`
+		DateTime 	time.Time	`json:"date_time" form:"date_time"`
+	}
+	var logs [][]UserSubmitLogByTime
+	for i := 0; i < len(userId); i++ {
+		result := make([]UserSubmitLogByTime, 0)
+		sql := fmt.Sprintf("SELECT count((case when (submit.status = 'AC') then submit.status end)) as ac, submit_time as date_time FROM `submit` WHERE user_id = '%d' and submit_time BETWEEN '%s' and '%s' group BY day(submit_time)", userId[i], startTime, endTime)
+		rows, err := db.Raw(sql).Rows()
+		if err == nil {
+			for rows.Next() {
+				var userLog UserSubmitLogByTime
+				err := rows.Scan(&userLog.AC, &userLog.DateTime)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				result = append(result, userLog)
+			}
+		} else {
+			return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		}
+		rows.Close()
+		logs = append(logs, result)
 	}
 
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		Data: logs,
+	}
 }

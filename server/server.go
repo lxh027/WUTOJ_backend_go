@@ -32,7 +32,7 @@ func Run(httpServer *gin.Engine)  {
 	gin.DisableConsoleColor()
 	// 生成日志
 	logFile, _:= os.Create(config.GetLogPath())
-	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
+	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout, os.Stdin, os.Stderr)
 	// 设置日志格式
 	httpServer.Use(gin.LoggerWithFormatter(config.GetLogFormat))
 	httpServer.Use(gin.Recovery())

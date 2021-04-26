@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,6 +27,29 @@ func GetAllUserSubmitStatus(c *gin.Context) {
 	if c.ShouldBind(&userLogJson) == nil {
 		userLogJson.Offset = (userLogJson.Offset - 1) * userLogJson.Limit
 		res := userLogModel.GetAllUserSubmitStatus(userLogJson.Offset, userLogJson.Limit, userLogJson.Where.Nick)
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	return
+}
+
+func GetUserSubmitStatusByTime(c *gin.Context) {
+	if res := haveAuth(c, "getUserSubmit"); res != common.Authed {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
+		return
+	}
+	userLogModel := model.UserSubmitLog{}
+
+	userLogJson := struct {
+		UserId []int `json:"user_id" form:"user_id"`
+		StartTime  string `json:"start_time" form:"start_time"`
+		EndTime string `json:"end_time" form:"end_time"`
+	}{}
+
+	if c.ShouldBind(&userLogJson) == nil {
+		fmt.Fprintf(gin.DefaultWriter, "userLogJson: %v", userLogJson)
+		res := userLogModel.GetUserSubmitStatusByTime(userLogJson.UserId, userLogJson.StartTime, userLogJson.EndTime)
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}

@@ -2,36 +2,14 @@ package server
 
 import (
 	"OnlineJudge/db_server"
-	"fmt"
 )
-
-type userSubmitLog struct {
-	UserID 	int 	`json:"user_id"`
-	AC 		int 	`json:"ac"`
-	WA 		int 	`json:"wa"`
-	TLE 	int 	`json:"tle"`
-	MLE 	int 	`json:"mle"`
-	RE 		int 	`json:"re"`
-	SE 		int 	`json:"se"`
-	CE 		int 	`json:"ce"`
-}
-
-type problemSubmitLog struct {
-	ProblemID 	int 	`json:"problem_id"`
-	AC 		int 	`json:"ac"`
-	WA 		int 	`json:"wa"`
-	TLE 	int 	`json:"tle"`
-	MLE 	int 	`json:"mle"`
-	RE 		int 	`json:"re"`
-	SE 		int 	`json:"se"`
-	CE 		int 	`json:"ce"`
-}
 
 func addTimer() {
 	//start := time.Now()
 
 	db := db_server.MySqlDb
-	sql := `select t1.user_id AS user_id, ifnull(t2.ac,0) AS ac, 
+	update_user_sql := `INSERT IGNORE INTO user_submit_log(user_id,ac,wa,tle,mle,re,se,ce)
+		select t1.user_id AS user_id, ifnull(t2.ac,0) AS ac, 
 		t1.wa AS wa, t1.tle AS tle, t1.mle AS mle, t1.re AS re, t1.se AS se, t1.ce AS ce
 		from (((select submit.user_id AS user_id, 
 				count(distinct submit.problem_id) AS ac 
@@ -46,31 +24,21 @@ func addTimer() {
 					count((case when (submit.status = 'SE') then submit.status end)) AS se,
 					count((case when (submit.status = 'CE') then submit.status end)) AS ce 
 				from submit group by submit.user_id)) t1 
-			on((t1.user_id = t2.user_id)))`
-	rows, err := db.Raw(sql).Rows()
-	if err == nil {
-		defer func() { _ = rows.Close()}()
-		var userSubmitLog userSubmitLog
-		addSql := "INSERT INTO user_submit_log (user_id, ac, wa, tle, mle, re, se, ce) VALUES "
-		index := 0
-		for rows.Next() {
-			err = rows.Scan(&userSubmitLog.UserID, &userSubmitLog.AC, &userSubmitLog.WA,
-				&userSubmitLog.TLE, &userSubmitLog.MLE, &userSubmitLog.RE,
-				&userSubmitLog.SE, &userSubmitLog.CE)
-			data := fmt.Sprintf("(%d, %d, %d, %d, %d, %d, %d, %d)",
-				userSubmitLog.UserID, userSubmitLog.AC, userSubmitLog.WA, userSubmitLog.TLE,
-				userSubmitLog.MLE, userSubmitLog.RE, userSubmitLog.SE, userSubmitLog.CE)
-			if index != 0 {
-				addSql = addSql+", "
-			}
-			addSql = addSql+data
-			index++
-		}
-		if index != 0 {
-			addSql = addSql+" ON DUPLICATE KEY UPDATE ac = VALUES(ac), wa = VALUES(wa), tle = VALUES(tle), mle = VALUES(mle), re = VALUES(re), se = VALUES(se), ce = VALUES(ce)"
-			db.Exec(addSql)
-		}
-	}
+			on((t1.user_id = t2.user_id)))
+            ON DUPLICATE KEY UPDATE user_submit_log.ac = values(ac), user_submit_log.wa = values(wa), user_submit_log.tle = values(tle), user_submit_log.mle = values(mle), user_submit_log.se = values(se), user_submit_log.ce = values(ce),user_submit_log.re = values(re)`
+	db.Exec(update_user_sql)
+	update_problem_sql := `INSERT IGNORE INTO problem_submit_log(problem_id,ac,wa,tle,mle,re,se,ce)
+		select submit.problem_id AS problem_id,
+			count((case when (submit.status = 'AC') then submit.status end)) AS ac,
+			count((case when (submit.status = 'WA') then submit.status end)) AS wa,
+			count((case when (submit.status = 'TLE') then submit.status end)) AS tle,
+			count((case when (submit.status = 'MLE') then submit.status end)) AS mle,
+			count((case when (submit.status = 'RE') then submit.status end)) AS re,
+			count((case when (submit.status = 'SE') then submit.status end)) AS se,
+			count((case when (submit.status = 'CE') then submit.status end)) AS ce 
+		from submit group by submit.problem_id
+            ON DUPLICATE KEY UPDATE problem_submit_log.ac = values(ac), problem_submit_log.wa = values(wa), problem_submit_log.tle = values(tle), problem_submit_log.mle = values(mle), problem_submit_log.se = values(se), problem_submit_log.ce = values(ce),problem_submit_log.re = values(re)`
+	db.Exec(update_problem_sql)
 	/*cost := time.Since(start)
 	fmt.Printf("cost=[%s]",cost)*/
 }
