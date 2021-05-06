@@ -34,7 +34,7 @@ func (model *Notification) GetAllNotification() helper.ReturnType {
 func (model *Notification) GetNotificationByID(id int) helper.ReturnType {
 	var notification Notification
 
-	err := db.Where("id = ?", id).Error
+	err := db.Where("id = ?", id).First(&notification).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
