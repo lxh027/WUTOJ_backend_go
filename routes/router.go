@@ -166,6 +166,15 @@ func Routes(router *gin.Engine) {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
+			notification := contest.Group("/notification")
+			{
+				notification.POST("/getAllNotification", panelController.GetAllNotification)
+				notification.POST("/addNotification", panelController.AddNotification)
+				notification.POST("/deleteNotification", panelController.DeleteNotification)
+				notification.POST("/updateNotification", panelController.UpdateNotification)
+				notification.POST("/getNotificationByID", panelController.GetNotificationByID)
+				notification.POST("/changeNotificationStatus", panelController.ChangeNotificationStatus)
+			}
 		}
 
 		submit := panel.Group("/submit")

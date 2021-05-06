@@ -74,6 +74,7 @@
                     }
                     if (auths.indexOf("updateContest") !== -1) {
                         $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        $("#currentTableBar").append(getButton(2, 'notification', '公告'))
                         $("#currentTableBar").append(getButton(4, 'status', '状态'))
                         $("#currentTableBar").append(getButton(4, 'rank', '榜单'))
                     }
@@ -125,7 +126,7 @@
                 {field: 'begin_time', title: '开始时间', sort: true, minWidth: 180},
                 {field: 'end_time', title: '结束时间', sort: true, minWidth: 180},
                 {field: 'status', title: '状态', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>";}},
-                {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
+                {title: '操作', minWidth: 250, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
             limit: 25,
@@ -220,6 +221,20 @@
                     })
                     layer.close(index);
                 });
+            } else if (obj.event === 'notification') {
+                var index = layer.open({
+                    title: '比赛公告',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../notification/index.html?id='+data.contest_id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
             }else if (obj.event === 'rank') {
                 layer.confirm('确认刷新', function (index) {
                     $.ajax({
