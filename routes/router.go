@@ -185,6 +185,12 @@ func Routes(router *gin.Engine) {
 			submit.POST("/rejudgeSubmitByID", panelController.RejudgeSubmitByID)
 		}
 
+		balloon := panel.Group("/balloon")
+		{
+			balloon.POST("/getContestBalloon", panelController.GetContestBalloon)
+			balloon.POST("/sendBalloon", panelController.SentBalloon)
+		}
+
 		problem := panel.Group("/problem")
 		{
 			problem.POST("/getAllProblem", panelController.GetAllProblem)

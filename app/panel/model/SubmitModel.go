@@ -113,3 +113,16 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: 0}
 	}
 }
+
+func (model *Submit) GetContestACSubmits(contestID uint) helper.ReturnType {
+	var submits []Submit
+	fields := []string{"user_id", "nick", "problem_id", "id"}
+
+	err := db.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: submits}
+
+}
