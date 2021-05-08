@@ -39,7 +39,6 @@ func GetParentAuth(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
 		return
 	}
-	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
 	authJson := struct {
@@ -51,11 +50,6 @@ func GetParentAuth(c *gin.Context) {
 		return
 	}
 
-	authMap := helper.Struct2Map(authJson)
-	if res, err := authValidate.ValidateMap(authMap, "findParent"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
-		return
-	}
 
 	res := authModel.GetParentAuth(authJson.Type)
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
