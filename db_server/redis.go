@@ -45,6 +45,20 @@ func ZGetAllFromRedis(key string) (interface{}, error)  {
 	return rc.Do("ZRANGE", key, 0, -1)
 }
 
+func SAddToRedisSet(key string, member interface{}) error  {
+	rc := RedisClient.Get()
+	defer rc.Close()
+	_, err := rc.Do("SADD", key, member)
+	return err
+}
+
+func SIsNumberOfRedisSet(key string, member interface{}) (bool, error)  {
+	rc := RedisClient.Get()
+	defer rc.Close()
+	value, err := redis.Bool(rc.Do("SISMEMBER", key, member))
+	return value, err
+}
+
 func GetFromRedis(key string) (interface{}, error)  {
 	rc := RedisClient.Get()
 	defer rc.Close()
