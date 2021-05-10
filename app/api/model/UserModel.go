@@ -3,14 +3,13 @@ package model
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
-	"log"
 	"os"
 )
 
 type User struct {
 	UserID   uint   `json:"user_id" form:"user_id"`
 	Nick     string `json:"nick" form:"nick"`
-	Password string `json:"password" form:"password"`
+	Password string `json:"password,omitempty" form:"password"`
 	Realname string `json:"realname" form:"realname" gorm:"column:realname"`
 	Avatar   string `json:"avatar" form:"avatar"`
 	School   string `json:"school" form:"school"`
@@ -21,8 +20,6 @@ type User struct {
 	Desc     string `json:"desc" form:"desc"`
 	Mail     string `json:"mail" form:"mail"`
 	Status   int    `json:"status" form:"status"`
-	//RoleGroup	string 	`json:"role_group" form:"role_group"`
-	//AllProblem	interface{}	`json:"all_problem" form:"all_problem"`
 }
 
 // 设定表名
@@ -124,16 +121,14 @@ func (model *User) UpdatePassword(user User) helper.ReturnType {
 
 func (model *User) SearchUser(param string) helper.ReturnType {
 	user := User{}
-	err := db.Where("user_id = ?", param).Find(&user).Error
+	err := db.Model(&User{}).
+		Select([]string{"user_id", "nick", "realname", "avatar", "school", "major", "class", "contact", "identity"}).
+		Where("user_id = ?", param).
+		Find(&user).Error
 
 	if err == nil {
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: user}
-	} else {
-		if err = db.Where("nick = ?", param).Find(&user).Error; err == nil {
-			return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: user}
-		}
 	}
-
 	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
 
 }
@@ -144,8 +139,6 @@ func (model *User) AddUserAvatar(UserID int, avatar string) helper.ReturnType {
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取用户信息失败", Data: err.Error()}
 	}
-
-	log.Print(user.Avatar)
 
 	if user.Avatar != "null" {
 		err := os.Remove(user.Avatar)

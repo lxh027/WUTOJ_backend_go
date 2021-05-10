@@ -66,6 +66,7 @@ func SearchUser(c *gin.Context) {
 	}
 
 	res = userModel.SearchUser(userJson.Param)
+
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
