@@ -272,7 +272,7 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 			rldata.Time = 0
 		} else {
 			rldata.Memory = Max(rldata.Memory, resultData.Usage.Memory.Value)
-			rldata.Time = Max(rldata.Time, uint64(resultData.Usage.RealTime.Seconds*1_000_000_000+int64(resultData.Usage.RealTime.Nanos)))
+			rldata.Time = Max(rldata.Time, uint64(resultData.Usage.CpuTime.Seconds*1_000_000_000+int64(resultData.Usage.CpuTime.Nanos)))
 		}
 
 		callback(id, rldata)
