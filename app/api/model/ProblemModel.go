@@ -96,23 +96,7 @@ func (model *Problem) SearchProblem(param string) helper.ReturnType {
 		}
 
 		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problemData}
-	} else {
-		if err = db.Where("title = ?", param).Find(&problem).Error; err == nil {
-
-			problemData := map[string]interface{}{
-				"problem":            problem,
-				"problem_sample":     sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
-				"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
-			}
-
-			return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problemData}
-		} else {
-			if err = db.Where("tag = ?", param).Find(&problem).Error; err == nil {
-				return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problem}
-			}
-		}
 	}
 
 	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
-
 }
