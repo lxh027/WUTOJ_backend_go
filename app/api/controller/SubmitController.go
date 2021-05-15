@@ -147,7 +147,7 @@ func judge(submit model.Submit) {
 
 				itemStr, _ := json.Marshal(user)
 				_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
-				score := fmt.Sprintf("%03d.%d", user.ACNum, user.Penalty)
+				score := -int64(user.ACNum) * 1000000000 + user.Penalty
 				_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
 			}
 		}

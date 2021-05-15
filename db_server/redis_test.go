@@ -48,8 +48,8 @@ func TestSortedSet(t *testing.T) {
 	}
 	jsonM1, _ := json.Marshal(m1)
 	jsonM2, _ := json.Marshal(m2)
-	_ = ZAddToRedis("rank", "123", jsonM1)
-	_ = ZAddToRedis("rank", "123", jsonM2)
+	_ = ZAddToRedis("rank", 123, jsonM1)
+	_ = ZAddToRedis("rank", 123, jsonM2)
 
 	if k, err := ZGetAllFromRedis("rank"); err == nil {
 		//var mp []interface{}

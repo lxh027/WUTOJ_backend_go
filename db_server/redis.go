@@ -32,7 +32,7 @@ func init()  {
 	}
 }
 
-func ZAddToRedis(key string, score string, member interface{}) error  {
+func ZAddToRedis(key string, score int64, member interface{}) error  {
 	rc := RedisClient.Get()
 	defer rc.Close()
 	_, err := rc.Do("ZADD", key, score, member)
