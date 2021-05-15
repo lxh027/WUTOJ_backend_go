@@ -87,7 +87,7 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int, UserId uint) helper.Ret
 	var submits []Submit
 	var count int
 
-	err := db.Model(&Submit{}).Order("id desc").Where("user_id = ?", UserId).Offset(Offset).Limit(Limit).Find(&submits).Count(&count).Error
+	err := db.Model(&Submit{}).Where("user_id = ?", UserId).Count(&count).Limit(Limit).Offset(Offset).Order("id desc").Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
