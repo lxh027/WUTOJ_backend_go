@@ -39,16 +39,16 @@ func Submit(c *gin.Context) {
 	}
 
 	now := time.Now().Unix()
-	interval := config.GetWutOjConfig()["interval_time"].(int)
-	redisStr := "user_last_submit"+strconv.Itoa(int(userID.(uint)))
+	//interval := config.GetWutOjConfig()["interval_time"].(int)
+	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
 	if value, err := db_server.GetFromRedis(redisStr); err == nil {
 		last, _ := redis.Int64(value, err)
 		fmt.Printf("now: %v, last: %v\n", now, last)
 
-		if now - last <= int64(interval) {
-			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
-			return
-		}
+		//if now - last <= int64(interval) {
+		//	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
+		//	return
+		//}
 	}
 	_ = db_server.PutToRedis(redisStr, now, 3600)
 
@@ -136,7 +136,7 @@ func judge(submit model.Submit) {
 				userProblem := user.ProblemID[submit.ProblemID]
 				log.Println(result)
 				if result.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix()-beginTime.Unix(), Times: userProblem.Times + 1}
+					user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
 					user.ACNum++
 					for _, problem := range user.ProblemID {
 						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime

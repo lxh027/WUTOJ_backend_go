@@ -33,7 +33,7 @@ func (a userSort) Len() int      { return len(a) }
 func (a userSort) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a userSort) Less(i, j int) bool {
 	if a[i].ACNum != a[j].ACNum {
-		return a[i].ACNum > a[j].ACNum
+		return a[i].ACNum < a[j].ACNum
 	} else {
 		return a[i].Penalty < a[j].Penalty
 	}
@@ -141,7 +141,7 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 			userProblem := users[index].ProblemID[submit.ProblemID]
 			if submit.Status == "AC" {
 				userProblemMap[userIndex] = true
-				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix()-beginTime.Unix(), Times: userProblem.Times + 1}
+				users[index].ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
 				users[index].ACNum++
 				for _, problem := range users[index].ProblemID {
 					users[index].Penalty += int64(problem.Times*20*60) + problem.SuccessTime
