@@ -96,3 +96,6 @@ if res, err := userValidate.ValidateMap(userMap, "login"); !res {
 后台使用`layui`模板，放于`web/`内
 
 后台api模块为`app/panel`
+
+## Todo List
+- [] 增加数据库操作队列，优化数据库性能，减少数据丢失
