@@ -129,7 +129,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 			return
 		}
 	}
-  
+
 	config := TomlConfig{
 		Source:      sourceFile,
 		Language:    submitData.Language,
@@ -140,7 +140,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		},
 	}
 
-	runnerConfig := submitData.Runner 
+	runnerConfig := submitData.Runner
 
 	err = EncodeTomlFile(path.Join(buildPath, "config.toml"), config)
 	if err != nil {
