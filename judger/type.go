@@ -48,8 +48,8 @@ type SubmitData struct {
 	Code     string
 	// Build script must be absolute path
 	BuildScript string
-	// RootfsConfig - config for the base environment dependent language (eg. python,java)
-	Runner RunnerConfig
+	// Runner toml path must be absolute path
+	RunnerConfig string
 }
 
 type judger struct {
