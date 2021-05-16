@@ -29,11 +29,13 @@ func CopyFile(srcPath string, dstPath string) error {
 	if err != nil {
 		return err
 	}
+  defer srcFp.Close()
 
 	dstFp, err := os.Create(dstPath)
 	if err != nil {
 		return err
 	}
+  defer dstFp.Close()
 
 	_, err = io.Copy(dstFp, srcFp)
 	return err

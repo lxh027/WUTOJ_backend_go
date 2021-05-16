@@ -31,6 +31,9 @@ type TomlConfig struct {
 
 type Runner struct {
 	Language string 	 `toml:"language"`
+  Command  *string    `toml:"command"`
+  Args     *[]string    `toml:"args"`
+  Envs     *map[string]string `toml:"envs"`
 	Rootfs *RootfsConfig `toml:"rootfs"`
 }
 
@@ -46,7 +49,7 @@ type SubmitData struct {
 	// Build script must be absolute path
 	BuildScript  string
 	// RootfsConfig - config for the base environment dependent language (eg. python,java)
-	RootfsConfig *RootfsConfig
+  Runner RunnerConfig
 }
 
 type judger struct {

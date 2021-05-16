@@ -122,14 +122,14 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 	if submitData.BuildScript != "" {
 		script := "build.sh"
 		buildScript = &script
-		err = CopyFile(submitData.BuildScript, path.Join(buildPath, ""))
+		err = CopyFile(submitData.BuildScript, path.Join(buildPath, script))
 		if err != nil {
 			glog.Errorf("create build script failed, err: %v", err)
 			callback(submitData.Id, NewUndefinedError("create build script failed"))
 			return
 		}
 	}
-
+  
 	config := TomlConfig{
 		Source:      sourceFile,
 		Language:    submitData.Language,
@@ -140,12 +140,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		},
 	}
 
-	runnerConfig := RunnerConfig{
-		Runner: Runner{
-			Language: submitData.Language,
-			Rootfs:   submitData.RootfsConfig,
-		},
-	}
+	runnerConfig := submitData.Runner 
 
 	err = EncodeTomlFile(path.Join(buildPath, "config.toml"), config)
 	if err != nil {
