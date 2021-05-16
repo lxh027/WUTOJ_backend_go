@@ -164,44 +164,16 @@ func TestSubmit(t *testing.T) {
 	createJudgerInstance()
 	defer CloseInstance()
 
-	pyCommand := "/usr/local/bin/python"
-	javaCommand := "java"
+	langBasePath := "/home/baka233/acmwhut/env"
 
 	langConfigs := []struct {
-		lang    string
-		rootfs  *RootfsConfig
-		buildSh string
-		command *string
-		args    *[]string
-		envs    *map[string]string
+		lang         string
+		buildSh      string
+		runnerConfig string
 	}{
-		{"c.gcc", nil, "", nil, nil, nil},
-		{"py.cpython3.6",
-			&RootfsConfig{
-				BasePath: "/home/baka233/acmwhut/env/py.cpython3.6/lang_runtime",
-				WithProc: false},
-			"/home/baka233/acmwhut/env/py.cpython3.6/build.sh",
-			&pyCommand,
-			&[]string{"main.py"},
-			&map[string]string{},
-		},
-		{"java.openjdk-10",
-			&RootfsConfig{
-				BasePath: "/home/baka233/acmwhut/env/java.openjdk-10/lang_runtime",
-				WithProc: true,
-			},
-			"/home/baka233/acmwhut/env/java.openjdk-10/build.sh",
-			&javaCommand,
-			&[]string{
-				"Main",
-			},
-			&map[string]string{
-				"JAVA_HOME":           "/docker-java-home",
-				"JAVA_VERSION":        "10.0.2",
-				"JAVA_DEBIAN_VERSION": "10.0.2+13-2",
-				"PATH":                "/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/openjdk-10/bin",
-			},
-		},
+		{"c.gcc", "", langBasePath + "/c.gcc/runner.toml"},
+		{"py.cpython3.6", langBasePath + "/py.cpython3.6/build.sh", langBasePath + "/py.cpython3.6/runner.toml"},
+		{"java.openjdk-10", langBasePath + "/java.openjdk-10/build.sh", langBasePath + "/java.openjdk-10/runner.toml"},
 	}
 
 	testCases := []struct {
@@ -231,22 +203,13 @@ func TestSubmit(t *testing.T) {
 
 	for index, testCase := range testCases {
 		langConfig := langConfigs[testCase.langIndex]
-		runnerConfig := RunnerConfig{
-			Runner: Runner{
-				Language: langConfig.lang,
-				Command:  langConfig.command,
-				Args:     langConfig.args,
-				Envs:     langConfig.envs,
-				Rootfs:   langConfig.rootfs,
-			},
-		}
 		submitData := SubmitData{
-			Id:          uint64(rand.Int()),
-			Pid:         24,
-			Language:    langConfig.lang,
-			Code:        testCase.sourceCode,
-			BuildScript: langConfig.buildSh,
-			Runner:      runnerConfig,
+			Id:           uint64(rand.Int()),
+			Pid:          24,
+			Language:     langConfig.lang,
+			Code:         testCase.sourceCode,
+			BuildScript:  langConfig.buildSh,
+			RunnerConfig: langConfig.runnerConfig,
 		}
 
 		ch := make(chan JudgeResult, 100)

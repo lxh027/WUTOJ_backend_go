@@ -140,8 +140,6 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		},
 	}
 
-	runnerConfig := submitData.Runner
-
 	err = EncodeTomlFile(path.Join(buildPath, "config.toml"), config)
 	if err != nil {
 		glog.Errorf("encode build config toml failed, err: %v", err)
@@ -149,10 +147,10 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		return
 	}
 
-	err = EncodeTomlFile(path.Join(workspacePath, "config.toml"), runnerConfig)
+	err = os.Symlink(submitData.RunnerConfig, path.Join(workspacePath, "config.toml"))
 	if err != nil {
-		glog.Errorf("encode workspace config toml failed, err: %v", err)
-		callback(submitData.Id, NewUndefinedError("encode toml failed"))
+		glog.Errorf("copy runner script failed, err: %v", err)
+		callback(submitData.Id, NewUndefinedError("create workspace config toml failed"))
 		return
 	}
 
