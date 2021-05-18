@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/config"
 	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
 	"encoding/json"
@@ -169,13 +170,14 @@ func RejudgeSubmitByID(c *gin.Context) {
 }
 
 func rejudge(submit model.Submit) {
+	langConfig := config.GetLangConfigs()[submit.Language]
 	submitData := judger.SubmitData{
 		Id:           uint64(submit.ID),
 		Pid:          uint64(submit.ProblemID),
-		Language:     helper.LanguageType(submit.Language),
+		Language:     langConfig.Lang,
 		Code:         submit.SourceCode,
-		BuildScript:  "",
-		RootfsConfig: nil,
+		BuildScript:  langConfig.BuildSh,
+		RunnerConfig: langConfig.RunnerConfig,
 	}
 
 	callback := func(id uint64, result judger.JudgeResult) {
