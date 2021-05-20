@@ -18,7 +18,7 @@ func GetJudgeConfig() map[string]interface{} {
 }
 
 func GetLangConfigs() []LangConfig {
-	langBasePath := "/home/baka233/acmwhut/env"
+	langBasePath := "/home/env"
 
 	langBuildPath := []string {
 		"",
