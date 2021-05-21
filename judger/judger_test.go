@@ -10,9 +10,9 @@ func createJudgerInstance() {
 	instance := InitInstance()
 
 	instance.SetOpt(OPT_SETENV, "dev")
-	instance.SetOpt(OPT_SETADDR, "127.0.0.1:8800")
-	instance.SetOpt(OPT_BASEDIRECTORY, "/home/baka233/acmwhut/data")
-	instance.SetOpt(OPT_SETTEMPDIRECTORY, "/home/baka233/acmwhut/ana_tmpdir")
+	instance.SetOpt(OPT_SETADDR, "172.17.0.1:8800")
+	instance.SetOpt(OPT_BASEDIRECTORY, "/home/acmwhut/data")
+	instance.SetOpt(OPT_SETTEMPDIRECTORY, "/home/ana_tmpdir")
 }
 
 const ac_code = `
@@ -172,8 +172,8 @@ func TestSubmit(t *testing.T) {
 		runnerConfig string
 	}{
 		{"c.gcc", "", langBasePath + "/c.gcc/runner.toml"},
-		{"py.cpython3.6", langBasePath + "/py.cpython3.6/build.sh", langBasePath + "/py.cpython3.6/runner.toml"},
-		{"java.openjdk-10", langBasePath + "/java.openjdk-10/build.sh", langBasePath + "/java.openjdk-10/runner.toml"},
+		{"python.cpython3.6", langBasePath + "/python.cpython3.6/build.sh", langBasePath + "/python.cpython3.6/runner.toml"},
+		{"java.openjdk10", langBasePath + "/java.openjdk10/build.sh", langBasePath + "/java.openjdk10/runner.toml"},
 	}
 
 	testCases := []struct {
