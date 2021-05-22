@@ -33,6 +33,8 @@ func Routes(router *gin.Engine) {
 
 		api.GET("/checklogin", apiController.Check)
 
+		api.POST("/print", apiController.PrintRequest)
+
 		users := api.Group("/users")
 		{
 			users.GET("/:param", apiController.SearchUser)
@@ -189,6 +191,12 @@ func Routes(router *gin.Engine) {
 		{
 			balloon.POST("/getContestBalloon", panelController.GetContestBalloon)
 			balloon.POST("/sendBalloon", panelController.SentBalloon)
+		}
+
+		printRequest := panel.Group("/print")
+		{
+			printRequest.POST("/getAllPrintRequest", panelController.GetAllPrintRequest)
+			printRequest.POST("/handlePrintRequest", panelController.PrintRequest)
 		}
 
 		problem := panel.Group("/problem")
