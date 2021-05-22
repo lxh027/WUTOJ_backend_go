@@ -20,7 +20,7 @@ func LanguageID(language string) int {
 		id = 0
 	case "cpp.g++":
 		id = 1
-	case "java.openjdk10":
+	case "java.openjdk8":
 		id = 2
 	case "python.cpython3.6":
 		id = 3
@@ -39,7 +39,7 @@ func LanguageType(typeInt int) string {
 	case 1:
 		language = "cpp.g++"
 	case 2:
-		language = "java.openjdk10"
+		language = "java.openjdk8"
 	case 3:
 		language = "python.cpython3.6"
 	default:

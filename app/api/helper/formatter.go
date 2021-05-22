@@ -21,7 +21,7 @@ func LanguageType(typeInt int) string {
 	case 1:
 		language = "cpp.g++"
 	case 2:
-		language = "java.openjdk10"
+		language = "java.openjdk8"
 	case 3:
 		language = "python.cpython3.6"
 	default:

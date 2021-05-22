@@ -43,7 +43,7 @@
                                     <option value="" selected>default</option>
                                     <option value=0>c.gcc</option>
                                     <option value=1>cpp.g++</option>
-                                    <option value=2>java.openjdk10</option>
+                                    <option value=2>java.openjdk8</option>
                                     <option value=3>python.cpython3.6</option>
                                 </select>
                             </div>
@@ -165,7 +165,7 @@
                 {field: 'nick', title: '昵称', sort: true},
                 {field: 'problem_id', title: '问题ID', sort: true},
                 {field: 'contest_id', title: '比赛ID', sort: true},
-                {field: 'language', title: '语言', sort: true, templet: (d) => {if (d.language == "0") return "c.gcc"; else if (d.language == "1") return "cpp.g++"; else if (d.language == "2") return "java.openjdk10";else if (d.language == "3") return "python.cpython3.6";}},
+                {field: 'language', title: '语言', sort: true, templet: (d) => {if (d.language == "0") return "c.gcc"; else if (d.language == "1") return "cpp.g++"; else if (d.language == "2") return "java.openjdk8";else if (d.language == "3") return "python.cpython3.6";}},
                 {field: 'status', title: '状态', sort: true},
                 {field: 'msg', title: '消息', sort: true, minWidth: 180, hide:true},
                 {field: 'memory', title: '内存', sort: true, hide:true},

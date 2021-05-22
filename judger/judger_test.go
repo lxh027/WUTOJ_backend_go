@@ -173,7 +173,7 @@ func TestSubmit(t *testing.T) {
 	}{
 		{"c.gcc", "", langBasePath + "/c.gcc/runner.toml"},
 		{"python.cpython3.6", langBasePath + "/python.cpython3.6/build.sh", langBasePath + "/python.cpython3.6/runner.toml"},
-		{"java.openjdk10", langBasePath + "/java.openjdk10/build.sh", langBasePath + "/java.openjdk10/runner.toml"},
+		{"java.openjdk8", langBasePath + "/java.openjdk8/build.sh", langBasePath + "/java.openjdk8/runner.toml"},
 	}
 
 	testCases := []struct {
