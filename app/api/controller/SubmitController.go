@@ -71,6 +71,11 @@ func Submit(c *gin.Context) {
 		return
 	}
 
+	if helper.LanguageID(submitJson.Language) == -1 {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "不支持的语言类型", nil));
+		return
+	}
+
 	newSubmit := model.Submit{
 		UserID:     userID.(uint),
 		Nick:       GetUserNickFromSession(c),
