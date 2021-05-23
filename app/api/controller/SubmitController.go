@@ -141,20 +141,23 @@ func judge(submit model.Submit) {
 				}
 				userProblem := user.ProblemID[submit.ProblemID]
 				log.Println(result)
-				if result.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
-					user.ACNum++
-					for _, problem := range user.ProblemID {
-						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
+				if user.ProblemID[submit.ProblemID].SuccessTime == 0 {
+					if result.Status == "AC" {
+						user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
+						user.ACNum++
+						for _, problem := range user.ProblemID {
+							user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
+						}
+					} else if result.Status != "CE" && result.Status != "UE" {
+						user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 					}
-				} else if result.Status != "CE" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
-				}
 
-				itemStr, _ := json.Marshal(user)
-				_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
-				score := -int64(user.ACNum) * 1000000000 + user.Penalty
-				_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
+					itemStr, _ := json.Marshal(user)
+					_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
+					score := -int64(user.ACNum) * 1000000000 + user.Penalty
+					_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
+
+				}
 			}
 		}
 	}

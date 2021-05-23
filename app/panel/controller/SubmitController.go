@@ -6,14 +6,9 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
-	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
-	"encoding/json"
-	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -192,41 +187,6 @@ func rejudge(submit model.Submit) {
 			}
 			submitModel := model.Submit{}
 			submitModel.UpdateStatusAfterSubmit(int(id), data)
-			if submit.ContestID != 0 {
-				// set to redis
-				beginTime, _, frozenTime, err := getContestTime(submit.ContestID)
-				if err != nil {
-					return
-				}
-				format := "2006-01-02 15:04:05"
-				now, _ := time.Parse(format, time.Now().Format(format))
-				if now.Unix() < beginTime.Unix() || now.Unix() > frozenTime.Unix() {
-					return
-				}
-				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
-				if itemStr, err := redis.String(db_server.GetFromRedis("contest_rank" + strconv.Itoa(int(submit.ContestID)) + "user_id" + strconv.Itoa(int(submit.UserID)))); err == nil {
-					_ = json.Unmarshal([]byte(itemStr), &user)
-				}
-				if _, ok := user.ProblemID[submit.ProblemID]; !ok {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: 0}
-				}
-				userProblem := user.ProblemID[submit.ProblemID]
-				log.Println(result)
-				if result.Status == "AC" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix()-beginTime.Unix(), Times: userProblem.Times + 1}
-					user.ACNum++
-					for _, problem := range user.ProblemID {
-						user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
-					}
-				} else if result.Status != "CE" {
-					user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
-				}
-
-				itemStr, _ := json.Marshal(user)
-				_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
-				score := -int64(user.ACNum) * 1000000000 + user.Penalty
-				_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
-			}
 		}
 	}
 
