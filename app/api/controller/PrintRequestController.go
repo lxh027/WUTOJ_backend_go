@@ -52,7 +52,7 @@ func PrintRequest(c *gin.Context) {
 	}
 
 	SubmitLogModel := model.Submit{}
-	res := SubmitLogModel.GetSubmitByID(uint(PrintLog.SubmitID), userID)
+	res := SubmitLogModel.GetSubmitInPrintRequest(uint(PrintLog.SubmitID), userID)
 
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, res.Msg, 0))

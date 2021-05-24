@@ -186,3 +186,18 @@ func (model *Submit) GetSubmitByID(id uint, UserID uint) helper.ReturnType {
 
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submitData}
 }
+
+func (model *Submit) GetSubmitInPrintRequest(id uint, UserID uint) helper.ReturnType {
+	var submit Submit
+	err := db.
+		Select([]string{"id", "user_id"}).
+		Where("id = ? and user_id = ?", id, UserID).
+		Find(&submit).
+		Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
+	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submit}
+}
