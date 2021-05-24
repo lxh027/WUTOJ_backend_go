@@ -3,6 +3,7 @@ package model
 import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -30,12 +31,23 @@ func (model *Reply) AddReply(data Reply) helper.ReturnType {
 
 func (model *Reply) GetReplyByProblemID(DiscussID int, Offset int, Limit int) helper.ReturnType {
 	var reply []Reply
-	err := db.Where("discuss_id = ?", DiscussID).Offset(Offset).Limit(Limit).Find(&reply).Error
+	var count int
+
+	err := db.
+		Model(&Reply{}).
+		Where("discuss_id = ?", DiscussID).
+		Count(&count).
+		Offset(Offset).
+		Limit(Limit).
+		Find(&reply).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: reply}
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{
+			"data":  reply,
+			"count": count,
+		}}
 	}
 
 }
