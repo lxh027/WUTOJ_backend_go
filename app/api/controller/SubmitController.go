@@ -9,7 +9,6 @@ import (
 	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
 	"encoding/json"
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
