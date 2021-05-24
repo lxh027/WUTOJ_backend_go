@@ -144,9 +144,7 @@ func judge(submit model.Submit) {
 					if result.Status == "AC" {
 						user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
 						user.ACNum++
-						for _, problem := range user.ProblemID {
-							user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
-						}
+						user.Penalty += int64(userProblem.Times*20*60) + user.ProblemID[submit.ProblemID].SuccessTime
 					} else if result.Status != "CE" && result.Status != "UE" {
 						user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 					}
