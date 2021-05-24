@@ -28,7 +28,7 @@ const (
 )
 
 const (
-	MAX_RETRY_TIMES     = 2
+	MAX_RETRY_TIMES     = 5
 	MAX_RECONNECT_TIMES = 10
 )
 
@@ -175,7 +175,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 				}
 			}
 			if i == MAX_RETRY_TIMES {
-				glog.Errorf("submit task failed, err: %v", err)
+				glog.Errorf("max connect retry, submit task failed, err: %v", err)
 				callback(submitData.Id, NewUndefinedError(fmt.Sprintf("submit task failed, err: %v", err)))
 				break
 			}
@@ -238,17 +238,34 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 
 	for {
 		resultData, err = anaClient.GetReport(context.Background(), &request)
+		i := 0
 		if err != nil {
 			if errStatus, ok := status.FromError(err); ok {
 				if errStatus.Code() == codes.OutOfRange {
 					rldata.IsFinished = true
 					break
 				}
+
+				// if grpc connection break, try to reconnect
+				if errStatus.Code() == codes.Unavailable {
+					glog.Warning("reconnect ana")
+					j.getConn()
+					i++
+					if i == MAX_RETRY_TIMES {
+						glog.Errorf("max connect retry, get report failed, err: %v", err)
+						callback(id, NewUndefinedError(fmt.Sprintf("get report failed, err: %v", err)))
+					} else {
+						break
+					}
+				}
 			}
 
 			glog.Errorf("Recv msg from Ana error: %v\n", err)
+			callback(id, NewUndefinedError(fmt.Sprintf("get report failed, err: %v", err)))
 			return err
 		}
+
+		glog.Warningf("%d: rldata is %v", id, rldata)
 
 		if rldata.Status == "AC" || rldata.Status == "UE" {
 			rldata.Status = Report_ResultType_name[int32(resultData.Result)]
