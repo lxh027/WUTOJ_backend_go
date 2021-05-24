@@ -45,7 +45,7 @@ func Submit(c *gin.Context) {
 		last, _ := redis.Int64(value, err)
 		fmt.Printf("now: %v, last: %v\n", now, last)
 
-		if now - last <= int64(interval) {
+		if now-last <= int64(interval) {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
 			return
 		}
@@ -72,7 +72,7 @@ func Submit(c *gin.Context) {
 	}
 
 	if helper.LanguageID(submitJson.Language) == -1 {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "不支持的语言类型", nil));
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "不支持的语言类型", nil))
 		return
 	}
 
@@ -154,7 +154,7 @@ func judge(submit model.Submit) {
 
 					itemStr, _ := json.Marshal(user)
 					_ = db_server.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
-					score := -int64(user.ACNum) * 1000000000 + user.Penalty
+					score := -int64(user.ACNum)*1000000000 + user.Penalty
 					_ = db_server.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
 
 				}
@@ -259,6 +259,13 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 }
 
 func GetSubmitByID(c *gin.Context) {
+
+	res := checkLogin(c)
+	if res.Status == common.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
 	submitJson := model.Submit{}
 	submitModel := model.Submit{}
 	submitValidate := validate.SubmitValidate
@@ -274,7 +281,9 @@ func GetSubmitByID(c *gin.Context) {
 		return
 	}
 
-	res := submitModel.GetSubmitByID(submitJson.ID)
+	submitJson.UserID = GetUserIdFromSession(c)
+
+	res = submitModel.GetSubmitByID(submitJson.ID, submitJson.UserID)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
