@@ -11,7 +11,7 @@ func init() {
 	}
 
 	scenes := map[string][]string{
-		"add": {"id", "submit_id"},
+		"add": {"submit_id"},
 	}
 
 	PrintLogValidate.Rules = rules

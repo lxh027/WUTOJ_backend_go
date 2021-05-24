@@ -7,10 +7,10 @@ import (
 )
 
 type PrintLog struct {
-	ID       int       `gorm:"id"`
-	SubmitID int       `gorm:"submit_id"`
-	Status   int       `gorm:"status"`
-	PrintAt  time.Time `gorm:"print_at"`
+	ID       int       `json:"id" gorm:"id"`
+	SubmitID int       `json:"submit_id" gorm:"submit_id"`
+	Status   int       `json:"status" gorm:"status"`
+	PrintAt  time.Time `json:"print_at" gorm:"print_at"`
 }
 
 func (PrintLog) TableName() string {
