@@ -50,7 +50,9 @@ func (model *Submit) GetReturnData(submits []Submit) []map[string]interface{} {
 
 func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 	var submits []Submit
-	err := db.Model(&Submit{}).Order("id desc").Where("user_id = ?", userID).
+	err := db.Model(&Submit{}).
+		Order("id desc").
+		Where("user_id = ?", userID).
 		Find(&submits).Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
@@ -153,7 +155,15 @@ func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime 
 
 func (model *Submit) GetSubmitByID(id uint, UserID uint) helper.ReturnType {
 	var submit Submit
-	err := db.Where("id = ? and user_id = ?", id, UserID).Find(&submit).Error
+	err := db.Where("id = ? and user_id = ?", id, UserID).
+		Find(&submit).
+		Error
+
+	status := submit.Status
+
+	if status != "CE" && status != "SE" && status != "UE" {
+		submit.Msg = ""
+	}
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
