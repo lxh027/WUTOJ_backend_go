@@ -51,7 +51,6 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
-
 	SubmitLogModel := model.Submit{}
 	res := SubmitLogModel.GetSubmitByID(uint(PrintLog.SubmitID), userID)
 
@@ -60,9 +59,9 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
-	submitlog := res.Data.(model.Submit)
+	submit := res.Data.(model.Submit)
 
-	if submitlog.UserID != userID {
+	if submit.UserID != userID {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "同学别打印了，这题你把握不住", 0))
 		return
 	}
