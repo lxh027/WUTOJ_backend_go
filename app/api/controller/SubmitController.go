@@ -9,6 +9,7 @@ import (
 	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
 	"encoding/json"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -37,9 +38,7 @@ func Submit(c *gin.Context) {
 		return
 	}
 
-	format := "2006-01-02 15:04:05"
-	now, _ := time.Parse(format, time.Now().Format(format))
-
+	now := time.Now().Unix()
 	//interval := config.GetWutOjConfig()["interval_time"].(int)
 	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
 	//if value, err := db_server.GetFromRedis(redisStr); err == nil {
@@ -77,7 +76,7 @@ func Submit(c *gin.Context) {
 		return
 	}
 
-
+	fmt.Println(time.Now())
 
 	newSubmit := model.Submit{
 		UserID:     userID.(uint),
@@ -87,7 +86,7 @@ func Submit(c *gin.Context) {
 		ProblemID:  submitJson.ProblemID,
 		ContestID:  submitJson.ContestID,
 		Status:     "Judging",
-		SubmitTime: now,
+		SubmitTime: time.Now(),
 	}
 
 	resp := submitModel.AddSubmit(&newSubmit)
