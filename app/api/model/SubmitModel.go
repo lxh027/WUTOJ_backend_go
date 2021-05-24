@@ -165,9 +165,24 @@ func (model *Submit) GetSubmitByID(id uint, UserID uint) helper.ReturnType {
 		submit.Msg = ""
 	}
 
+	submitData := map[string]interface{}{
+		"id":          submit.ID,
+		"user_id":     submit.UserID,
+		"nick":        submit.Nick,
+		"problem_id":  submit.ProblemID,
+		"contest_id":  submit.ContestID,
+		"source_code": submit.SourceCode,
+		"language":    helper.LanguageType(submit.Language),
+		"status":      submit.Status,
+		"time":        submit.Time,
+		"msg":         submit.Msg,
+		"memory":      submit.Memory,
+		"submit_time": submit.SubmitTime,
+	}
+
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submit}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submitData}
 }
