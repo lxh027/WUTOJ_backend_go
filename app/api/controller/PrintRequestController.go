@@ -9,7 +9,6 @@ import (
 	"OnlineJudge/db_server"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -20,17 +19,15 @@ func PrintRequest(c *gin.Context) {
 	PrintLog := model.PrintLog{}
 	PrintLogModel := model.PrintLog{}
 	PrintLogValidate := validate.PrintLogValidate
-	session := sessions.Default(c)
-	userID := session.Get("user_id")
-
-	if userID == nil {
+	userID := GetUserIdFromSession(c)
+	if userID == 0 {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "用户未登录", ""))
 		return
 	}
 
 	now := time.Now().Unix()
 	interval := config.GetWutOjConfig()["print_interval_time"].(int)
-	redisStr := "user_last_print_request" + strconv.Itoa(int(userID.(uint)))
+	redisStr := "user_last_print_request" + strconv.Itoa(int(userID))
 	if value, err := db_server.GetFromRedis(redisStr); err == nil {
 		last, _ := redis.Int64(value, err)
 		fmt.Printf("now: %v, last: %v\n", now, last)
@@ -54,9 +51,9 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
-	userID = GetUserIdFromSession(c)
+
 	SubmitLogModel := model.Submit{}
-	res := SubmitLogModel.GetSubmitByID(uint(PrintLog.SubmitID))
+	res := SubmitLogModel.GetSubmitByID(uint(PrintLog.SubmitID), userID)
 
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, res.Msg, 0))
