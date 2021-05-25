@@ -16,10 +16,10 @@ func GetWutOjConfig() map[string]interface{} {
 	}
 
 	/* 交题时间间隔 */
-	wutOjConfig["interval_time"] = 0
+	wutOjConfig["interval_time"] = 5
 
 	/* 打印请求间隔 */
-	wutOjConfig["print_interval_time"] = 0
+	wutOjConfig["print_interval_time"] = 5
 
 	/* 支持语言 */
 	wutOjConfig["language"] = []string{
