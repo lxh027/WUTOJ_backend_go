@@ -33,6 +33,7 @@ func init()  {
 }
 
 func ZAddToRedis(key string, score int64, member interface{}) error  {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	_, err := rc.Do("ZADD", key, score, member)
@@ -40,12 +41,14 @@ func ZAddToRedis(key string, score int64, member interface{}) error  {
 }
 
 func ZGetAllFromRedis(key string) (interface{}, error)  {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	return rc.Do("ZRANGE", key, 0, -1)
 }
 
 func SAddToRedisSet(key string, member interface{}) error  {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	_, err := rc.Do("SADD", key, member)
@@ -53,6 +56,7 @@ func SAddToRedisSet(key string, member interface{}) error  {
 }
 
 func SIsNumberOfRedisSet(key string, member interface{}) (bool, error)  {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	value, err := redis.Bool(rc.Do("SISMEMBER", key, member))
@@ -60,6 +64,7 @@ func SIsNumberOfRedisSet(key string, member interface{}) (bool, error)  {
 }
 
 func GetFromRedis(key string) (interface{}, error)  {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	value, err := rc.Do("GET", key)
@@ -67,6 +72,7 @@ func GetFromRedis(key string) (interface{}, error)  {
 }
 
 func PutToRedis(key string, value interface{}, timeout int)  error {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	_, err := rc.Do("SET", key, value, "EX", timeout)
@@ -74,10 +80,16 @@ func PutToRedis(key string, value interface{}, timeout int)  error {
 }
 
 func DeleteFromRedis(key string) error {
+	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	_, err := rc.Do("DEL", key)
 	return err
+}
+
+func appendPrefix(key string) string {
+	prefix := config.GetRedisConfig()["env"].(string)
+	return prefix+"."+key
 }
 
 

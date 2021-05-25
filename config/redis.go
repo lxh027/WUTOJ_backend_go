@@ -5,6 +5,7 @@ import "time"
 func GetRedisConfig() map[string]interface{} {
 	redisConfig := make(map[string]interface{})
 
+	redisConfig["env"] = "dev"
 	redisConfig["rank_cache_time"] = 5
 	redisConfig["host"] = "172.17.0.1:6379"
 	redisConfig["auth"] = ""
