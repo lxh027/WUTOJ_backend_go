@@ -6,39 +6,50 @@ type LangConfig struct {
 	RunnerConfig string
 }
 
-func GetJudgeConfig() map[string]interface{} {
-	judgeConfig := make(map[string]interface{})
+var judgeConfig map[string]interface{}
+var langConfigs []LangConfig
+
+func init() {
+	judgeConfig = make(map[string]interface{})
+
+	// 初始化 judge config
 
 	judgeConfig["env"] = "dev"
 	judgeConfig["address"] = "127.0.0.1:8800"
 	judgeConfig["base_dir"] = "/home/acmwhut/data"
 	judgeConfig["tmp_dir"] = "/home/ana_tmpdir"
 
-	return judgeConfig
-}
+	// 初始化 lang config
 
-func GetLangConfigs() []LangConfig {
 	langBasePath := "/home/env"
 
-	langBuildPath := []string {
+	langBuildPath := []string{
 		"",
 		"",
 		"/java.openjdk8/build.sh",
 		"/python.cpython3.6/build.sh",
 	}
 
-	langRunnerConfig := []string {
+	langRunnerConfig := []string{
 		"/c.gcc/runner.toml",
 		"/cpp.g++/runner.toml",
 		"/java.openjdk8/runner.toml",
 		"/python.cpython3.6/runner.toml",
 	}
-	
-	langConfigs := []LangConfig{
+
+	langConfigs = []LangConfig{
 		{"c.gcc", "", langBasePath + langRunnerConfig[0]},
 		{"cpp.g++", "", langBasePath + langRunnerConfig[1]},
 		{"java.openjdk8", langBasePath + langBuildPath[2], langBasePath + langRunnerConfig[2]},
 		{"python.cpython3.6", langBasePath + langBuildPath[3], langBasePath + langRunnerConfig[3]},
 	}
+
+}
+
+func GetJudgeConfig() map[string]interface{} {
+	return judgeConfig
+}
+
+func GetLangConfigs() []LangConfig {
 	return langConfigs
 }

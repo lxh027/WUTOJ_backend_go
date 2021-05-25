@@ -2,8 +2,10 @@ package config
 
 import "time"
 
-func GetRedisConfig() map[string]interface{} {
-	redisConfig := make(map[string]interface{})
+var redisConfig map[string]interface{}
+
+func init() {
+	redisConfig = make(map[string]interface{})
 
 	redisConfig["env"] = "dev"
 	redisConfig["rank_cache_time"] = 5
@@ -18,5 +20,8 @@ func GetRedisConfig() map[string]interface{} {
 	// 过期时间
 	redisConfig["timeout"] = 300 * time.Second
 
+}
+
+func GetRedisConfig() map[string]interface{} {
 	return redisConfig
 }
