@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>比赛通知列表</title>
+    <title>打印请求列表</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -41,16 +41,13 @@
                 success: function (return_data) {
                     const data = return_data.data
                     auths = data.auths
-                    if (auths.indexOf("") === -1) {//待添加
+                    if (auths.indexOf("getPrintRequest") === -1) {//待添加
                         layer.msg("权限不足", () => {
                             window.location.href = "../404.html"
                         })
                     }
-                    if (auths.indexOf("") !== -1) {
-                        $("#currentTableBar").append(getButton(2, 'print', '打印预览'))
-                    }
-                    if (auths.indexOf("") !== -1) {//待添加
-
+                    if (auths.indexOf("getPrintRequest") !== -1) {
+                        $("#currentTableBar").append(getButton(2, 'print', '打印'))
                     }
                 }
             })
@@ -64,7 +61,7 @@
 
         table.render({
             elem: '#currentTableId',
-            url: getPort()+'',//待添加
+            url: getPort()+'print/getAllPrintRequest',//待添加
             contentType: 'application/json',
             method: 'post',
             request: {
@@ -76,7 +73,7 @@
                     "code": res.status, //解析接口状态
                     "msg": res.msg, //解析提示文本
                     "count": res.data.count, //解析数据长度
-                    "data": res.data.notices //解析数据列表
+                    "data": res.data.data //解析数据列表
                 };
             },
             toolbar: '#toolbarDemo',
@@ -87,10 +84,10 @@
             }],
             cols: [[
                 {type: "checkbox", },
-                {field: 'ID' , title: 'ID', sort: true},
-                {field: 'SubmitID', title: '打印ID', sort: true},
-                {field: 'Status', title: '打印状态', sort: true, minWidth:150,},
-                {field: 'PrintAt', title: '打印执行时间', sort: true},
+                {field: 'print_id' , title: 'ID', sort: true},
+                {field: 'submit_id', title: '打印ID', sort: true},
+                {field: 'status', title: '打印状态', sort: true, minWidth:150,},
+                {field: 'print_at', title: '打印执行时间', sort: true},
                 {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
@@ -114,7 +111,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: './ovelook.html?id='+data.ID,
+                    content: './overlook.html?id='+data.print_id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
