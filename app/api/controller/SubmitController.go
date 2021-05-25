@@ -37,7 +37,8 @@ func Submit(c *gin.Context) {
 		return
 	}
 
-	now := time.Now().Unix()
+	format := "2006-01-02 15:04:05"
+	now, _ := time.Parse(format, time.Now().Format(format))
 	//interval := config.GetWutOjConfig()["interval_time"].(int)
 	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
 	//if value, err := db_server.GetFromRedis(redisStr); err == nil {
@@ -83,7 +84,7 @@ func Submit(c *gin.Context) {
 		ProblemID:  submitJson.ProblemID,
 		ContestID:  submitJson.ContestID,
 		Status:     "Judging",
-		SubmitTime: time.Now(),
+		SubmitTime: now,
 	}
 
 	resp := submitModel.AddSubmit(&newSubmit)
@@ -144,9 +145,7 @@ func judge(submit model.Submit) {
 					if result.Status == "AC" {
 						user.ProblemID[submit.ProblemID] = problem{SuccessTime: submit.SubmitTime.Unix() - beginTime.Unix(), Times: userProblem.Times + 1}
 						user.ACNum++
-						for _, problem := range user.ProblemID {
-							user.Penalty += int64(problem.Times*20*60) + problem.SuccessTime
-						}
+						user.Penalty += int64(userProblem.Times*20*60) + user.ProblemID[submit.ProblemID].SuccessTime
 					} else if result.Status != "CE" && result.Status != "UE" {
 						user.ProblemID[submit.ProblemID] = problem{SuccessTime: 0, Times: userProblem.Times + 1}
 					}

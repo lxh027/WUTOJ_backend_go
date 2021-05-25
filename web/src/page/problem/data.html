@@ -153,15 +153,17 @@
 
     function updateProblem() {
         $.ajax({
-            url: getPort()+'problem/updateProblem',
+            url: getPort()+'problem/updateJudgeInfo',
             type: "post",
             dataType: "json",
             data: {
-                "problem_id": id,
-                "time": $("#time").val(),
-                "memory": $("#memory").val(),
-                "type": $("#spj").prop("checked")?"Special Judge":"Normal",
-            },
+                'problem_id': getQueryString('id'),
+                'time': $("#time").val(),
+                'memory': $("#memory").val(),
+                'spj': $("#spj").prop("checked"),
+                'language': $("#language").val(),
+                'code': $("#code").val()
+            } ,
             success: function (data) {
                 layer.msg(data.msg)
             }
@@ -217,8 +219,6 @@
             //updateProblem();
         }).on('fileerror', function(event, data, msg) {  //一个文件上传失败
             console.log('文件上传失败！'+data.id);
-        }).on("filebatchuploadsuccess", function () {
-            updateProblem()
         })
     }
 </script>
