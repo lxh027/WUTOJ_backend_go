@@ -9,6 +9,7 @@ import (
 	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
 	"encoding/json"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -39,17 +40,18 @@ func Submit(c *gin.Context) {
 
 	format := "2006-01-02 15:04:05"
 	now, _ := time.Parse(format, time.Now().Format(format))
-	//interval := config.GetWutOjConfig()["interval_time"].(int)
+	interval := config.GetWutOjConfig()["interval_time"].(int)
 	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
-	//if value, err := db_server.GetFromRedis(redisStr); err == nil {
-	//	last, _ := redis.Int64(value, err)
-	//	fmt.Printf("now: %v, last: %v\n", now, last)
+	if value, err := db_server.GetFromRedis(redisStr); err == nil {
+		lastStr, _ := redis.String(value, err)
+		last, _ := time.Parse(format, lastStr)
+		fmt.Printf("now: %v, last: %v\n", now, last)
 
-	//	if now-last <= int64(interval) {
-	//		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
-	//		return
-	//	}
-	//}
+		if now.Unix()-last.Unix() <= int64(interval) {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
+			return
+		}
+	}
 	_ = db_server.PutToRedis(redisStr, now, 3600)
 
 	var submitJson struct {
