@@ -17,7 +17,7 @@ func (model *Auth) GetUserAllAuth(userID int) helper.ReturnType  {
 	var auths []Auth
 
 	db.Joins("JOIN role_auth ON auth.aid = role_auth.aid").
-		Joins("JOIN user_role ON role_auth.rid = user_role.rid AND user_role.uid = ?", userID).
+		Joins("JOIN user_role ON role_auth.rid = user_role.rid AND user_role.user_id = ?", userID).
 		Find(&auths)
 
 	var returnAuths []Auth
@@ -57,14 +57,16 @@ func (model *Auth) GetAllAuth(offset int, limit int, title string) helper.Return
 	}
 }
 
-func (model *Auth) GetParentAuth(parent int) helper.ReturnType {
+func (model *Auth) GetParentAuth(tp int) helper.ReturnType {
 	var auths []Auth
-	where := "type = ?"
 
-	err := db.
-		Where(where, parent).
-		Find(&auths).
-		Error
+	var err error
+	if tp == 2 || tp == 0 {
+		err = db.Where("type = ?", tp-1).Find(&auths).Error
+	} else {
+		err = db.Where("type = ? || type = ?", 0, 1).Find(&auths).Error
+	}
+
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}

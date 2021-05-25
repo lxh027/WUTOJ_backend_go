@@ -9,16 +9,16 @@ import (
 
 func NewUndefinedError(msg string) JudgeResult {
 	return JudgeResult{
-		Status: "UE",
-		Time: 0,
-		Memory: 0,
-		Msg: msg,
+		Status:     "UE",
+		Time:       0,
+		Memory:     0,
+		Msg:        msg,
 		IsFinished: true,
 	}
 }
 
 func Max(a uint64, b uint64) uint64 {
-	if (a > b) {
+	if a > b {
 		return a
 	}
 	return b
@@ -29,11 +29,13 @@ func CopyFile(srcPath string, dstPath string) error {
 	if err != nil {
 		return err
 	}
+	defer srcFp.Close()
 
 	dstFp, err := os.Create(dstPath)
 	if err != nil {
 		return err
 	}
+	defer dstFp.Close()
 
 	_, err = io.Copy(dstFp, srcFp)
 	return err

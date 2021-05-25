@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加问题</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <link rel="stylesheet" href="../../../js/lay-module/easyeditor/css/easyeditor.css">
+    <link rel="stylesheet" type="text/css" href="../../../js/lay-module/easyeditor/css/font_1531710_xb357ub1wmg.css">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" id="title" lay-verify="required" lay-reqtext="标题不能为空" placeholder="请输入名称" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">问题背景</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="background" id="background" placeholder="请输入问题背景" value="" class="layui-textarea editor"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">问题描述</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="description" id="description" placeholder="请输入问题描述" value="" class="layui-textarea editor"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">输入格式</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="input_format" id="input_format" placeholder="请输入输入格式" value="" class="layui-textarea editor"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">输出格式</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="output_format" id="output_format" placeholder="请输入输出格式" value="" class="layui-textarea editor"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">样例</label>
+        <div class="layui-input-block">
+            <button class="layui-btn" id="sample">添加样例</button>
+        </div>
+        <div class="layui-input-block" id="sample_div">
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">注释</label>
+        <div class="layui-input-block">
+            <textarea type="text" name="hint" id="hint" placeholder="请输入注释" value="" class="layui-textarea editor"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">来源</label>
+        <div class="layui-input-block">
+            <input type="text" name="source" id="source" placeholder="请输入来源" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">标签</label>
+        <div class="layui-input-block">
+            <input type=text name="tag" id="tag" value="" class="layui-input">
+        </div>
+        <div class="layui-input-block"  id="tag_div" >
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否可用</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="status" id="status" checked lay-skin="switch">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">公众可见</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="public" id="public" checked lay-skin="switch">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认添加</button>
+        </div>
+    </div>
+</div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="../../../js/lay-module/easyeditor/js/marked.min.js"></script>
+<script src="../../../js/lay-config.js"></script>
+<script src="../../js/common.js"></script>
+<script>
+    layui.use(['form', 'easyeditor'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            easyeditor = layui.easyeditor,
+            $ = layui.$;
+        let auths = [];
+        let sample_id = 0;
+        let tags = new Array(0);
+        $(document).ready(() => {
+            getTagDivs(tags)
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("addProblem") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                }
+            })
+        })
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var index = layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            }, function () {
+                $.ajax({
+                    url: getPort()+'problem/addProblem',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "title": $("#title").val(),
+                        "background": $("#background").val(),
+                        "describe": $("#description").val(),
+                        "input_format": $("#input_format").val(),
+                        "output_format": $("#output_format").val(),
+                        "hint": $("#hint").val(),
+                        "source": $("#source").val(),
+                        "tag": JSON.stringify(tags),
+                        "status": $("#status").prop("checked")?1:0,
+                        "public": $("#public").prop("checked")?1:0,
+                    },
+                    success: function (data) {
+                        layer.msg(data.msg)
+                        if (data.status == 0) {
+                            for (let i=1; i<=sample_id; i++) {
+                                if ($("#input"+i).val() === "" && $("#output"+i).val() === "") continue
+                                $.ajax({
+                                    url: getPort()+'problem/addSample',
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {
+                                        "problem_id": data.data,
+                                        "input": $("#input"+i).val(),
+                                        "output": $("#output"+i).val(),
+                                    }
+                                })
+                            }
+                            // 关闭弹出层
+                            layer.close(index);
+
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layui.table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                            parent.layer.close(iframeIndex);
+                        }
+                    }
+                })
+            });
+
+            return false;
+        });
+
+        $("#sample").click(function () {
+            sample_id++
+            addSample(sample_id)
+        })
+
+        $('#tag').bind('input propertychange', function (){
+            //console.log(tags)
+            getTagDivs(tags)
+        });
+        form.on('checkbox', function (data) {
+            console.log(data.elem)
+            if ($(data.elem).prop('class') != "tag-item") return
+            const tag_id = $(data.elem).prop('id')
+            if (!$(data.elem).prop('checked')){
+                let index
+                for (let i=0; i<tags.length; i++) {
+                    if (tags[i] == tag_id) {
+                        index = i
+                        break
+                    }
+                }
+                tags.splice(index, 1)
+            } else {
+                tags.push(Number(tag_id))
+            }
+            console.log(tags)
+            form.render('checkbox')
+        })
+
+        easyeditor.init({
+            elem: '.editor'
+        })
+
+        function getTagDivs(tags) {
+            $.ajax({
+                url: getPort()+'tag/findTagsByName',
+                type: "post",
+                dataType: "json",
+                data: {
+                    "name": $("#tag").val(),
+                },
+                success: function (data) {
+                    if (data.status == 0) {
+                        let html = ""
+                        data.data.forEach(function (item) {
+                            let flag = false
+                            let checkbox
+                            console.log(tags)
+                            for (let i=0; i<tags.length; i++) {
+                                const tag = tags[i]
+                                if (tag == item.id) {
+                                    checkbox = `<input class="tag-item" type="checkbox" name="`+item.name+`" id="`+item.id+`" checked title="`+item.name+`">`
+                                    flag = true
+                                }
+                            }
+                            if (!flag) {
+                                checkbox = `<input class="tag-item" type="checkbox" name="`+item.name+`" id="`+item.id+`" title="`+item.name+`">`
+                            }
+                            html += checkbox
+                        })
+                        $("#tag_div").html(html)
+                        form.render('checkbox')
+                    }
+                }
+            })
+        }
+        function addSample(index) {
+            const html = `<div class="layui-inline layui-col-md5">
+                        <textarea id="input`+index+`" placeholder="样例`+index+`输入" class="layui-textarea"></textarea>
+                    </div>
+                    <div class="layui-inline layui-col-md5">
+                        <textarea id="output`+index+`" placeholder="样例`+index+`输出" class="layui-textarea"></textarea>
+                    </div>
+                    <hr class="layui-bg-gray" id="line`+index+`">`
+            $("#sample_div").append(html)
+        }
+    });
+
+</script>
+</body>
+</html>

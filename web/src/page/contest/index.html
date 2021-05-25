@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>比赛列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">标题</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">开始时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="begintime" id="begintime" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+
+        </script>
+
+    </div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/template.js"></script>
+
+<script>
+    layui.use(['form', 'table', 'laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate,
+            table = layui.table;
+        let auths
+
+        $(document).ready(() => {
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("getAllContest") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                    if (auths.indexOf("updateContest") !== -1) {
+                        $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        $("#currentTableBar").append(getButton(2, 'notification', '公告'))
+                        $("#currentTableBar").append(getButton(4, 'status', '状态'))
+                        $("#currentTableBar").append(getButton(4, 'rank', '榜单'))
+                    }
+                    if (auths.indexOf("deleteContest") !== -1) {
+                        $("#currentTableBar").append(getButton(3, 'delete', '删除'))
+                    }
+                }
+            })
+        })
+
+        laydate.render({
+            elem: '#begintime'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-ddTHH:mm:ssZ'
+        });
+
+        table.render({
+            elem: '#currentTableId',
+            url: getPort()+'contest/getAllContest',
+            contentType: 'application/json',
+            method: 'post',
+            request: {
+                pageName: 'offset',
+                limitName: 'limit',
+            },
+            parseData: (res) => {
+                return {
+                    "code": res.status, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.contests //解析数据列表
+                };
+            },
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                {type: "checkbox", },
+                {field: 'contest_id' , title: 'ID', sort: true},
+                {field: 'contest_name', title: '标题', sort: true, minWidth: 100},
+                {field: 'problems', title: '问题', sort: true, hide:true},
+                {field: 'prize', title: '奖项比例', sort: true, hide:true},
+                {field: 'colors', title: '题目颜色', sort: true, hide:true},
+                {field: 'frozen', title: '封榜时间', sort: true, hide:true},
+                {field: 'rule', title: '比赛规则', sort: true},
+                {field: 'begin_time', title: '开始时间', sort: true, minWidth: 180},
+                {field: 'end_time', title: '结束时间', sort: true, minWidth: 180},
+                {field: 'status', title: '状态', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>";}},
+                {title: '操作', minWidth: 250, toolbar: '#currentTableBar', align: "center"},
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 25,
+            page: true,
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            layer.alert(result, {
+                title: '最终的搜索信息'
+            });
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    "where": data.field
+                }
+            }, 'data');
+
+            return false;
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '编辑比赛',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: './edit.html?id='+data.contest_id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('确认删除', function (index) {
+                    $.ajax({
+                        url: getPort()+'contest/deleteContest',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "contest_id": data.contest_id,
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }  else if (obj.event === 'status') {
+                layer.confirm('确认更改', function (index) {
+                    $.ajax({
+                        url: getPort()+'contest/changeContestStatus',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "contest_id": data.contest_id,
+                            "status": 1-data.status
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            } else if (obj.event === 'notification') {
+                var index = layer.open({
+                    title: '比赛公告',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../notification/index.html?id='+data.contest_id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            }else if (obj.event === 'rank') {
+                layer.confirm('确认刷新', function (index) {
+                    $.ajax({
+                        url: getPort()+'contest/flushRank',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "contest_id": data.contest_id,
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

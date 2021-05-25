@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>用户列表</title>
@@ -9,231 +10,265 @@
     <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="../../../css/public.css" media="all">
 </head>
+
 <body>
-<div class="layuimini-container">
-    <div class="layuimini-main">
+    <div class="layuimini-container">
+        <div class="layuimini-main">
 
-        <fieldset class="table-search-fieldset">
-            <legend>搜索信息</legend>
-            <div style="margin: 10px 10px 10px 10px">
-                <form class="layui-form layui-form-pane" action="">
-                    <div class="layui-form-item">
-                        <div class="layui-inline">
-                            <label class="layui-form-label">昵称</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="nick" autocomplete="off" class="layui-input">
+            <fieldset class="table-search-fieldset">
+                <legend>搜索信息</legend>
+                <div style="margin: 10px 10px 10px 10px">
+                    <form class="layui-form layui-form-pane" action="">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">昵称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="nick" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">邮箱</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="mail" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
                             </div>
                         </div>
-                        <div class="layui-inline">
-                            <label class="layui-form-label">邮箱</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="mail" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </fieldset>
+                    </form>
+                </div>
+            </fieldset>
 
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
-        <script type="text/html" id="currentTableBar">
+            <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
+            <script type="text/html" id="currentTableBar">
         </script>
 
+            <script type="text/html" id="toolbar">
+            <button class='layui-btn layui-btn-normal layui-btn-sm data-add-btn' lay-event='show-chart'> 显示折线图 </button>
+        </script>
+
+        </div>
     </div>
-</div>
-<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
-<script src="../../js/common.js"></script>
-<script src="../../js/template.js"></script>
+    <script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../../../js/lay-config.js"></script>
+    <script src="../../js/common.js"></script>
+    <script src="../../js/template.js"></script>
 
-<script>
-    layui.use(['form', 'table'], function () {
-        var $ = layui.jquery,
-            form = layui.form,
-            table = layui.table;
-        let auths
+    <script>
+        layui.use(['form', 'table', 'echarts'], function () {
+            var $ = layui.jquery,
+                form = layui.form,
+                table = layui.table,
+                echarts = layui.echarts;
+            let auths
 
-        $(document).ready(() => {
-            $.ajax({
-                url: getPort()+'user/getUserInfo',
-                type: "post",
-                dataType: "json",
-                data: {},
-                success: function (return_data) {
-                    const data = return_data.data
-                    auths = data.auths
-                    if (auths.indexOf("getAllUser") === -1) {
-                        layer.msg("权限不足", () => {
-                            window.location.href = "../404.html"
-                        })
+            $(document).ready(() => {
+                $.ajax({
+                    url: getPort() + 'user/getUserInfo',
+                    type: "post",
+                    dataType: "json",
+                    data: {},
+                    success: function (return_data) {
+                        const data = return_data.data
+                        auths = data.auths
+                        if (auths.indexOf("getAllUser") === -1) {
+                            layer.msg("权限不足", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                        if (auths.indexOf("updateUser") !== -1) {
+                            $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        }
+                        if (auths.indexOf("deleteUser") !== -1) {
+                            $("#currentTableBar").append(getButton(3, 'delete', '删除'))
+                        }
+                        if (auths.indexOf("roleAssign") !== -1) {
+                            $("#currentTableBar").append(getButton(4, 'role', '角色'))
+                            $("#currentTableBar").append(getButton(4, 'admin', '管理员'))
+                        }
                     }
-                    if (auths.indexOf("updateUser") !== -1) {
-                        $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
-                    }
-                    if (auths.indexOf("deleteUser") !== -1) {
-                        $("#currentTableBar").append(getButton(3, 'delete', '删除'))
-                    }
-                    if (auths.indexOf("roleAssign") !== -1) {
-                        $("#currentTableBar").append(getButton(4, 'role', '角色'))
-                        $("#currentTableBar").append(getButton(4, 'admin', '管理员'))
-                    }
-                }
+                })
             })
-        })
 
-        table.render({
-            elem: '#currentTableId',
-            url: getPort()+'user/getAllUser',
-            contentType: 'application/json',
-            method: 'post',
-            request: {
-                pageName: 'offset',
-                limitName: 'limit',
-            },
-            parseData: (res) => {
-                return {
-                    "code": res.status, //解析接口状态
-                    "msg": res.msg, //解析提示文本
-                    "count": res.data.count, //解析数据长度
-                    "data": res.data.users //解析数据列表
-                };
-            },
-            toolbar: '#toolbarDemo',
-            defaultToolbar: ['filter', 'exports', 'print', {
-                title: '提示',
-                layEvent: 'LAYTABLE_TIPS',
-                icon: 'layui-icon-tips'
-            }],
-            cols: [[
-                {type: "checkbox", },
-                {field: 'uid' , title: 'ID', sort: true},
-                {field: 'nick', title: '昵称', sort: true},
-                {field: 'mail', title: '邮箱', sort: true, minWidth:150,},
-                {field: 'is_admin', title: '身份', sort: true, templet: (d) => {if (d.is_admin == "0") return "<p style='color: green'>普通用户</p>"; else if (d.is_admin == "1") return "<p style='color: red'>管理员</p>";}},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"},
-            ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 25,
-            page: true,
-            skin: 'line'
-        });
-
-        // 监听搜索操作
-        form.on('submit(data-search-btn)', function (data) {
-            var result = JSON.stringify(data.field);
-            layer.alert(result, {
-                title: '最终的搜索信息'
+            table.render({
+                elem: '#currentTableId',
+                url: getPort() + 'user/getAllUser',
+                contentType: 'application/json',
+                method: 'post',
+                request: {
+                    pageName: 'offset',
+                    limitName: 'limit',
+                },
+                parseData: (res) => {
+                    return {
+                        "code": res.status, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.data.count, //解析数据长度
+                        "data": res.data.users //解析数据列表
+                    };
+                },
+                toolbar: '#toolbar',
+                defaultToolbar: ['filter', 'exports', 'print', {
+                    title: '提示',
+                    layEvent: 'LAYTABLE_TIPS',
+                    icon: 'layui-icon-tips'
+                }],
+                cols: [[
+                    { type: "checkbox", },
+                    { field: 'user_id', title: 'ID', sort: true },
+                    { field: 'nick', title: '昵称', sort: true },
+                    { field: 'realname', title: '姓名', sort: true },
+                    { field: 'school', title: '学校', sort: true },
+                    { field: 'major', title: '专业', sort: true },
+                    { field: 'grade', title: '年级', sort: true },
+                    { field: 'class', title: '班级', sort: true },
+                    { field: 'contact', title: '联系方式', sort: true },
+                    { field: 'mail', title: '邮箱', sort: true, minWidth: 150, },
+                    { field: 'identity', title: '身份', sort: true, templet: (d) => { if (d.identity == "0") return "<p style='color: green'>普通用户</p>"; else if (d.identity == "1") return "<p style='color: red'>管理员</p>"; } },
+                    { title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center" },
+                ]],
+                limits: [10, 15, 20, 25, 50, 100],
+                limit: 25,
+                page: true,
+                skin: 'line'
             });
 
-            //执行搜索重载
-            table.reload('currentTableId', {
-                page: {
-                    curr: 1
-                }
-                , where: {
-                    "where": data.field
-                }
-            }, 'data');
-
-            return false;
-        });
-
-        //监听表格复选框选择
-        table.on('checkbox(currentTableFilter)', function (obj) {
-            console.log(obj)
-        });
-
-        table.on('tool(currentTableFilter)', function (obj) {
-            var data = obj.data;
-            if (obj.event === 'edit') {
-
-                var index = layer.open({
-                    title: '编辑用户',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: './edit.html?uid='+data.uid,
+            // 监听搜索操作
+            form.on('submit(data-search-btn)', function (data) {
+                var result = JSON.stringify(data.field);
+                layer.alert(result, {
+                    title: '最终的搜索信息'
                 });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
+
+                //执行搜索重载
+                table.reload('currentTableId', {
+                    page: {
+                        curr: 1
+                    }
+                    , where: {
+                        "where": data.field
+                    }
+                }, 'data');
+
                 return false;
-            } else if (obj.event === 'delete') {
-                layer.confirm('确认删除', function (index) {
-                    $.ajax({
-                        url: getPort()+'user/deleteUser',
-                        type: "post",
-                        dataType: "json",
-                        data: {
-                            "uid": data.uid,
-                        },
-                        success: function (data) {
-                            table.reload('currentTableId', {
-                                page: {
-                                    curr: 1
-                                }
-                                , where: {
-                                    "where": data.field
-                                }
-                            }, 'data');
-                        }
-                    })
-                    layer.close(index);
-                });
-            } else if (obj.event === 'role') {
-                if (data.is_admin == 0) {
-                    layer.alert("普通用户无法分配角色");
-                } else {
+            });
+
+            //监听表格复选框选择
+            table.on('checkbox(currentTableFilter)', function (obj) {
+                console.log(obj)
+            });
+
+            table.on('toolbar(currentTableFilter)', function (obj) {
+                if (obj.event === 'show-chart') {
+                    var checkStatus = table.checkStatus('currentTableId');
+                    var data = checkStatus.data;
                     var index = layer.open({
-                        title: '分配用户角色',
+                        title: '提交图表',
                         type: 2,
                         shade: 0.2,
-                        maxmin:true,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['80%', '80%'],
+                        content: './chart.html',
+                        success: function (layero, index) {
+                            var iframe = window['layui-layer-iframe' + index];//拿到iframe元素
+                            iframe.child(data)//向此iframe层方法 传递参数
+                        }
+                    });
+                }
+            });
+
+            table.on('tool(currentTableFilter)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+
+                    var index = layer.open({
+                        title: '编辑用户',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: './role.html?uid='+data.uid,
+                        content: './edit.html?user_id=' + data.user_id,
                     });
                     $(window).on("resize", function () {
                         layer.full(index);
                     });
+                    return false;
+                } else if (obj.event === 'delete') {
+                    layer.confirm('确认删除', function (index) {
+                        $.ajax({
+                            url: getPort() + 'user/deleteUser',
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                "user_id": data.user_id,
+                            },
+                            success: function (data) {
+                                table.reload('currentTableId', {
+                                    page: {
+                                        curr: 1
+                                    }
+                                    , where: {
+                                        "where": data.field
+                                    }
+                                }, 'data');
+                            }
+                        })
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'role') {
+                    if (data.is_admin == 0) {
+                        layer.alert("普通用户无法分配角色");
+                    } else {
+                        var index = layer.open({
+                            title: '分配用户角色',
+                            type: 2,
+                            shade: 0.2,
+                            maxmin: true,
+                            shadeClose: true,
+                            area: ['100%', '100%'],
+                            content: './role.html?user_id=' + data.user_id,
+                        });
+                        $(window).on("resize", function () {
+                            layer.full(index);
+                        });
+                    }
+                    return false;
+                } else if (obj.event === 'admin') {
+                    const is_admin = 1 - obj.data.identity
+                    layer.confirm('确认更改', function (index) {
+                        $.ajax({
+                            url: getPort() + 'user/setAdmin',
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                "user_id": data.user_id,
+                                "identity": is_admin
+                            },
+                            success: function (data) {
+                                table.reload('currentTableId', {
+                                    page: {
+                                        curr: 1
+                                    }
+                                    , where: {
+                                        "where": data.field
+                                    }
+                                }, 'data');
+                            }
+                        })
+                        layer.close(index);
+                    });
                 }
-                return false;
-            } else if (obj.event === 'admin') {
-                const is_admin = 1-obj.data.is_admin
-                layer.confirm('确认更改', function (index) {
-                    $.ajax({
-                        url: getPort()+'user/setAdmin',
-                        type: "post",
-                        dataType: "json",
-                        data: {
-                            "uid": data.uid,
-                            "is_admin": is_admin
-                        },
-                        success: function (data) {
-                            table.reload('currentTableId', {
-                                page: {
-                                    curr: 1
-                                }
-                                , where: {
-                                    "where": data.field
-                                }
-                            }, 'data');
-                        }
-                    })
-                    layer.close(index);
-                });
-            }
 
+            });
         });
-
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

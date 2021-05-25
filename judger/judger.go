@@ -28,7 +28,7 @@ const (
 )
 
 const (
-	MAX_RETRY_TIMES = 2
+	MAX_RETRY_TIMES     = 5
 	MAX_RECONNECT_TIMES = 10
 )
 
@@ -47,12 +47,10 @@ func GetInstance() *judger {
 	return judgerInstance
 }
 
-
 // closeInstance - cleanup the resource which be used by judger
 func CloseInstance() {
 	judgerInstance.anaConn.Close()
 }
-
 
 func (j *judger) SetOpt(opt int, param interface{}) error {
 	if param == nil {
@@ -124,7 +122,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 	if submitData.BuildScript != "" {
 		script := "build.sh"
 		buildScript = &script
-		err = CopyFile(submitData.BuildScript, path.Join(buildPath, ""))
+		err = CopyFile(submitData.BuildScript, path.Join(buildPath, script))
 		if err != nil {
 			glog.Errorf("create build script failed, err: %v", err)
 			callback(submitData.Id, NewUndefinedError("create build script failed"))
@@ -136,16 +134,9 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		Source:      sourceFile,
 		Language:    submitData.Language,
 		BuildScript: buildScript,
-		Timeout:     TimeConfig{
+		Timeout: TimeConfig{
 			Seconds: 5,
-			Nanos: 0,
-		},
-	}
-
-	runnerConfig := RunnerConfig {
-		Runner: Runner{
-			Language: submitData.Language,
-			Rootfs:   submitData.RootfsConfig,
+			Nanos:   0,
 		},
 	}
 
@@ -156,14 +147,14 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 		return
 	}
 
-	err = EncodeTomlFile(path.Join(workspacePath, "config.toml"), runnerConfig)
+	err = os.Symlink(submitData.RunnerConfig, path.Join(workspacePath, "config.toml"))
 	if err != nil {
-		glog.Errorf("encode workspace config toml failed, err: %v", err)
-		callback(submitData.Id, NewUndefinedError("encode toml failed"))
+		glog.Errorf("copy runner script failed, err: %v", err)
+		callback(submitData.Id, NewUndefinedError("create workspace config toml failed"))
 		return
 	}
 
-	err = os.Symlink(path.Join(j.baseDirectory, strconv.FormatUint(submitData.Pid, 10) + j.env, "problem"), path.Join(workspacePath, "problem"))
+	err = os.Symlink(path.Join(j.baseDirectory, j.env, strconv.FormatUint(submitData.Pid, 10), "problem"), path.Join(workspacePath, "problem"))
 	if err != nil {
 		glog.Errorf("link problem path failed, err: %v", err)
 		callback(submitData.Id, NewUndefinedError("link problem path failed"))
@@ -184,7 +175,7 @@ func (j *judger) Submit(submitData SubmitData, callback SubmitCallback) {
 				}
 			}
 			if i == MAX_RETRY_TIMES {
-				glog.Errorf("submit task failed, err: %v", err)
+				glog.Errorf("max connect retry, submit task failed, err: %v", err)
 				callback(submitData.Id, NewUndefinedError(fmt.Sprintf("submit task failed, err: %v", err)))
 				break
 			}
@@ -210,24 +201,24 @@ func (j *judger) getConn() {
 
 func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCallback) error {
 	source := Workspace{
-		Id: &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
+		Id:   &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
 		Path: &wrappers.StringValue{Value: workspacePath},
 	}
 
-	rldata := JudgeResult {
-		Time: 0,
-		Memory: 0,
-		Status: "UE",
-		Msg: "",
-		Case: 0,
+	rldata := JudgeResult{
+		Time:       0,
+		Memory:     0,
+		Status:     "UE",
+		Msg:        "",
+		Case:       0,
 		IsFinished: false,
 	}
 
 	resultData := &Report{
 		Usage: &Resource{
-			RealTime:             &duration.Duration{Seconds: 0, Nanos: 0},
-			CpuTime:              &duration.Duration{Seconds: 0, Nanos: 0},
-			Memory:               &wrappers.UInt64Value{Value : 0},
+			RealTime: &duration.Duration{Seconds: 0, Nanos: 0},
+			CpuTime:  &duration.Duration{Seconds: 0, Nanos: 0},
+			Memory:   &wrappers.UInt64Value{Value: 0},
 		},
 	}
 
@@ -238,7 +229,7 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 		return err
 	}
 
-	request := Request {
+	request := Request{
 		Id: &wrappers.StringValue{Value: strconv.FormatUint(id, 10) + j.env},
 	}
 
@@ -247,17 +238,34 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 
 	for {
 		resultData, err = anaClient.GetReport(context.Background(), &request)
+		i := 0
 		if err != nil {
 			if errStatus, ok := status.FromError(err); ok {
 				if errStatus.Code() == codes.OutOfRange {
 					rldata.IsFinished = true
 					break
 				}
+
+				// if grpc connection break, try to reconnect
+				if errStatus.Code() == codes.Unavailable {
+					glog.Warning("reconnect ana")
+					j.getConn()
+					i++
+					if i == MAX_RETRY_TIMES {
+						glog.Errorf("max connect retry, get report failed, err: %v", err)
+						callback(id, NewUndefinedError(fmt.Sprintf("get report failed, err: %v", err)))
+					} else {
+						break
+					}
+				}
 			}
 
 			glog.Errorf("Recv msg from Ana error: %v\n", err)
+			callback(id, NewUndefinedError(fmt.Sprintf("get report failed, err: %v", err)))
 			return err
 		}
+
+		glog.Warningf("%d: rldata is %v", id, rldata)
 
 		if rldata.Status == "AC" || rldata.Status == "UE" {
 			rldata.Status = Report_ResultType_name[int32(resultData.Result)]
@@ -272,7 +280,7 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 			rldata.Time = 0
 		} else {
 			rldata.Memory = Max(rldata.Memory, resultData.Usage.Memory.Value)
-			rldata.Time = Max(rldata.Time, uint64(resultData.Usage.RealTime.Seconds*1_000_000_000+int64(resultData.Usage.RealTime.Nanos)))
+			rldata.Time = Max(rldata.Time, uint64(resultData.Usage.CpuTime.Seconds*1_000_000_000+int64(resultData.Usage.CpuTime.Nanos)))
 		}
 
 		callback(id, rldata)
@@ -281,5 +289,3 @@ func (j *judger) submitTask(workspacePath string, id uint64, callback SubmitCall
 	callback(id, rldata)
 	return nil
 }
-
-

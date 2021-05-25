@@ -9,11 +9,12 @@ import (
 	"net/http"
 )
 
-func Register(c *gin.Context)  {
+func Register(c *gin.Context) {
 	var userModel = model.User{}
 	var userValidate = validate.UserValidate
+	var userSubmitLogModel = model.UserSubmitLog{}
 
-	var userJson struct{
+	var userJson struct {
 		model.User
 		PasswordCheck string `json:"password_check" form:"password_check"`
 	}
@@ -23,7 +24,7 @@ func Register(c *gin.Context)  {
 	}
 
 	userMap := helper.Struct2Map(userJson)
-	if  res, err := userValidate.ValidateMap(userMap, "register"); !res {
+	if res, err := userValidate.ValidateMap(userMap, "register"); !res {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "输入信息不完整或有误", err.Error()))
 		return
 	}
@@ -39,6 +40,7 @@ func Register(c *gin.Context)  {
 	}
 
 	res := userModel.AddUser(userJson.User)
+	res = userSubmitLogModel.CreatUserSubmitLog(userJson.Nick)
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return

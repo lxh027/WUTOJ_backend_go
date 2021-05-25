@@ -7,7 +7,7 @@ func GetDbConfig() map[string]interface{} {
 
 	dbConfig["hostname"] 	= "localhost"
 	dbConfig["port"] 		= "3306"
-	dbConfig["database"] 	= "online_judge"
+	dbConfig["database"] 	= "online_judge_dev"
 	dbConfig["username"] 	= "root"
 	dbConfig["password"] 	= ""
 	dbConfig["charset"]		= "utf8"

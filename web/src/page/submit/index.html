@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>提交列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户ID</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="user_id" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">问题ID</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="problem_id"  autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">比赛ID</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="contest_id" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">语言</label>
+                            <div class="layui-input-inline">
+                                <select name="language">
+                                    <option value="" selected>default</option>
+                                    <option value=0>c.gcc</option>
+                                    <option value=1>cpp.g++</option>
+                                    <option value=2>java.openjdk8</option>
+                                    <option value=3>python.cpython3.6</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="status" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">最早提交</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="min_submit_time" id="min_submit_time" value="2000-01-01T00:00:00Z" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">最晚提交</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="max_submit_time" id="max_submit_time" value="2099-12-31T23:23:59Z" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="rejudge-btn"><i class="layui-icon"></i> 重 测</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+
+        </script>
+
+    </div>
+</div>
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/template.js"></script>
+
+<script>
+    layui.use(['form', 'table', 'laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate,
+            table = layui.table;
+        let auths
+
+        $(document).ready(() => {
+            $.ajax({
+                url: getPort()+'user/getUserInfo',
+                type: "post",
+                dataType: "json",
+                data: {},
+                success: function (return_data) {
+                    const data = return_data.data
+                    auths = data.auths
+                    if (auths.indexOf("getAllSubmit") === -1) {
+                        layer.msg("权限不足", () => {
+                            window.location.href = "../404.html"
+                        })
+                    }
+                    $("#currentTableBar").append(getButton(2, 'detail', '详情'))
+                    if (auths.indexOf("rejudge") !== -1) {
+                        $("#currentTableBar").append(getButton(3, 'rejudge', '重测'))
+                    }
+                }
+            })
+        })
+
+        laydate.render({
+            elem: '#min_submit_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-ddTHH:mm:ssZ'
+        });
+        laydate.render({
+            elem: '#max_submit_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-ddTHH:mm:ssZ'
+        });
+
+        table.render({
+            elem: '#currentTableId',
+            url: getPort()+'submit/getAllSubmit',
+            contentType: 'application/json',
+            method: 'post',
+            request: {
+                pageName: 'offset',
+                limitName: 'limit',
+            },
+            where: {
+                "where": {
+                    "max_submit_time": $("#max_submit_time").val()
+                }
+            },
+            parseData: (res) => {
+                return {
+                    "code": res.status, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.submits //解析数据列表
+                };
+            },
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                {type: "checkbox", },
+                {field: 'id' , title: 'ID', sort: true},
+                {field: 'user_id', title: '用户ID', sort: true},
+                {field: 'nick', title: '昵称', sort: true},
+                {field: 'problem_id', title: '问题ID', sort: true},
+                {field: 'contest_id', title: '比赛ID', sort: true},
+                {field: 'language', title: '语言', sort: true, templet: (d) => {if (d.language == "0") return "c.gcc"; else if (d.language == "1") return "cpp.g++"; else if (d.language == "2") return "java.openjdk8";else if (d.language == "3") return "python.cpython3.6";}},
+                {field: 'status', title: '状态', sort: true},
+                {field: 'msg', title: '消息', sort: true, minWidth: 180, hide:true},
+                {field: 'memory', title: '内存', sort: true, hide:true},
+                {field: 'time', title: '时间', sort: true, hide:true},
+                {field: 'submit_time', title: '提交时间', sort: true, minWidth: 180},
+                {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 25,
+            page: true,
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            layer.alert(result, {
+                title: '最终的搜索信息'
+            });
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    "where": data.field
+                }
+            }, 'data');
+
+            return false;
+        });
+
+        form.on('submit(rejudge-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            layer.alert(result, {
+                title: '最终的重测信息'
+            }, function () {
+                $.ajax({
+                    url: getPort()+'submit/rejudgeGroupSubmits',
+                    type: "post",
+                    dataType: "json",
+                    data: data.field,
+                    success: function (return_data) {
+                        layer.msg(return_data.msg)
+                        table.reload('currentTableId', {
+                            page: {
+                                curr: 1
+                            }
+                            , where: {
+                                "where": data.field
+                            }
+                        }, 'data');
+                    }
+                })
+            });
+
+            return false;
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+
+                var index = layer.open({
+                    title: '查看提交',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: './detail.html?id='+data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'rejudge') {
+                layer.confirm('确认重判', function (index) {
+                    $.ajax({
+                        url: getPort()+'submit/rejudgeSubmitByID',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "id": data.id,
+                        },
+                        success: function (data) {
+                            layer.msg(data.msg)
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

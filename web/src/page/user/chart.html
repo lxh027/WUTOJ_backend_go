@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>编辑用户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+            <fieldset class="table-search-fieldset">
+                <legend>搜索信息</legend>
+                <div style="margin: 10px 10px 10px 10px">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">开始日期</label>
+                            <div class="layui-input-inline">
+                                <input type="date" id="start_date" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">截止日期</label>
+                            <div class="layui-input-inline">
+                                <input type="date" id="end_date" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="submit" class="layui-btn layui-btn-primary" lay-filter="data-search-btn">展示</button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-xs12 layui-col-md12">
+                    <div id="echarts-dataset" style="background-color:#ffffff;height:600px;padding: 10px"></div>
+                </div>
+            </div>
+
+
+            <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+            <script type="text/html" id="currentTableBar">
+        </script>
+
+            <script type="text/html" id="toolbar">
+            <button class='layui-btn layui-btn-normal layui-btn-sm data-add-btn' lay-event='show-chart'> 显示折线图 </button>
+        </script>
+
+        </div>
+    </div>
+    <script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../../../js/lay-config.js"></script>
+    <script src="../../js/common.js"></script>
+    <script>
+
+
+        let user_data = [];
+        function child(data) {
+            console.log(data);//获取父界面的传值
+            user_data = data;
+        }
+
+        layui.use(['form', 'echarts', 'echartsTheme'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                $ = layui.$, 
+                echarts = layui.echarts,
+                theme = layui.echartsTheme;
+            let auths = [], uid = 0;
+
+            $(document).ready(() => {
+                uid = getQueryString("user_id")
+                $.ajax({
+                    url: getPort() + 'user/getUserInfo',
+                    type: "post",
+                    dataType: "json",
+                    data: {},
+                    success: function (return_data) {
+                        const data = return_data.data
+                        auths = data.auths
+                        if (auths.indexOf("getAllUser") === -1) {
+                            layer.msg("权限不足", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                    }
+                })
+            })
+
+            //监听提交
+
+            $("#submit").click(() => {
+                var start_date = $("#start_date").val(), end_date = $("#end_date").val();
+                console.log(start_date, end_date);
+                renderChart(user_data, start_date, end_date);
+            })
+
+            function renderChart(data, start, end) {
+                let ids = [], nicks = [], series = [];
+
+                for (let i = 0; i < data.length; i++) {
+                    ids.push(data[i].user_id);
+                    nicks.push(data[i].realname);
+                    series.push({
+                        name: data[i].realname,
+                        type: 'line',
+                        data: [],
+                    });
+                }
+
+                const query = {
+                    "user_id": ids,
+                    "start_time": start,
+                    "end_time": end,
+                }
+
+                let dateArray = [];
+                // 计算日期
+                for (let date = query.start_time; date != query.end_time; date = getNextDate(date, 1)) {
+                    dateArray.push(date);
+                }
+                dateArray.push(query.end_time);
+                // 初始化折线图数据
+                $.ajax({
+                    url: getPort() + 'submitLog/getUserSubmitStatusByTime',
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(query),
+                    success: function (data) {
+                        if (data.status === 0) {
+                            let userData = data.data;
+                            for (let i = 0; i < dateArray.length; i++) {
+                                for (let j = 0; j < userData.length; j++) {
+                                    if (userData[j].length == 0) {
+                                        series[j].data.push(0);
+                                        continue;
+                                    }
+                                    let date = userData[j][0].date_time;
+                                    if (date.substr(0, 10) == dateArray[i]) {
+                                        series[j].data.push(userData[j][0].ac);
+                                        userData[j].shift();
+                                    } else {
+                                        series[j].data.push(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }).then(function () {
+                    var echartsDataset = echarts.init(document.getElementById('echarts-dataset'));
+                    var option = {
+                        title: {
+                            text: ''
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        legend: {
+                            data: nicks
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        toolbox: {
+                            feature: {
+                                saveAsImage: {}
+                            }
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: dateArray
+                        },
+                        yAxis: {
+                            type: 'value'
+                        },
+                        series: series
+                    };
+                    echartsDataset.setOption(option);
+                })
+            }
+
+        });
+    </script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>权限管理系统</title>
+    <title>WUTOJ</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
@@ -140,7 +140,7 @@
                         })
                     } else {
                         $("#admin_nick").text(return_data.data.nick)
-                        if (return_data.data.is_admin != 1) {
+                        if (return_data.data.identity != 1) {
                             $.ajax({
                                 url: getPort()+'user/logout',
                                 type: "post",
