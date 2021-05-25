@@ -19,7 +19,7 @@ func GetWutOjConfig() map[string]interface{} {
 	wutOjConfig["interval_time"] = 0
 
 	/* 打印请求间隔 */
-	wutOjConfig["print_interval_time"] = 10
+	wutOjConfig["print_interval_time"] = 0
 
 	/* 支持语言 */
 	wutOjConfig["language"] = []string{

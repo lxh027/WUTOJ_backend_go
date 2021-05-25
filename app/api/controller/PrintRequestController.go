@@ -66,7 +66,7 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
-	res = PrintLogModel.AddPrintLog(PrintLogModel)
+	res = PrintLogModel.AddPrintLog(PrintLog)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
