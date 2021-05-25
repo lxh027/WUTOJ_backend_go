@@ -35,6 +35,7 @@ func (model *Reply) GetReplyByProblemID(DiscussID int, Offset int, Limit int) he
 
 	err := db.
 		Model(&Reply{}).
+		Order("time desc").
 		Where("discuss_id = ?", DiscussID).
 		Count(&count).
 		Offset(Offset).
