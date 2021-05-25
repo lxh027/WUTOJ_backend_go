@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"time"
 )
@@ -20,15 +21,17 @@ func PrintRequest(c *gin.Context) {
 	userModel := model.User{}
 
 	PrintRequestJson := struct {
-		PrintID string `json:"print_id"`
+		PrintID string `json:"print_id" form:"print_id"`
 	}{}
 
-	if err := c.ShouldBindJSON(PrintRequestJson); err != nil {
+	if err := c.ShouldBind(&PrintRequestJson); err != nil {
+		log.Print(PrintRequestJson)
 		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "数据模型绑定失败", err.Error()))
 		return
 	}
-
+	log.Print(PrintRequestJson)
 	res := printLogModel.GetPrintLogByID(PrintRequestJson.PrintID)
+	log.Print(res)
 	requestInfo := res.Data.(model.PrintLog)
 
 	res = submitModel.FindSubmitByID(requestInfo.SubmitID)

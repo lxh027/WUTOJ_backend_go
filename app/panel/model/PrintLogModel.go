@@ -56,11 +56,11 @@ func (model *PrintLog) GetAllPrintLog(Offset int, Limit int) helper.ReturnType {
 func (model *PrintLog) GetPrintLogByID(id string) helper.ReturnType {
 	printLog := PrintLog{}
 	err := db.Model(&PrintLog{}).
-		Where("id = ? and status = 0", id).
+		Where("id = ?", id).
 		Find(&printLog).
 		Error
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败，数据库错误", Data: err.Error()}
 	}
-	return helper.ReturnType{}
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: printLog}
 }
