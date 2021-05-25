@@ -43,8 +43,9 @@ func Submit(c *gin.Context) {
 	interval := config.GetWutOjConfig()["interval_time"].(int)
 	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
 	if value, err := db_server.GetFromRedis(redisStr); err == nil {
+		defaultFormat := "2006-01-02 15:04:05 +0000 UTC"
 		lastStr, _ := redis.String(value, err)
-		last, _ := time.Parse(format, lastStr)
+		last, _ := time.Parse(defaultFormat, lastStr)
 		fmt.Printf("now: %v, last: %v\n", now, last)
 
 		if now.Unix()-last.Unix() <= int64(interval) {
