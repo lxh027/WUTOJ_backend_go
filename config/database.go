@@ -1,16 +1,18 @@
 package config
 
+import "os"
+
 var dbConfig map[string]interface{}
 
 func init() {
 	// init db config
 	dbConfig = make(map[string]interface{})
 
-	dbConfig["hostname"] = "120.77.181.57"
-	dbConfig["port"] = "3306"
-	dbConfig["database"] = "online_judge_dev"
-	dbConfig["username"] = "online_judge_dev"
-	dbConfig["password"] = "12345678"
+	dbConfig["hostname"] = os.Getenv("database_host")
+	dbConfig["port"] = os.Getenv("database_port")
+	dbConfig["database"] = os.Getenv("database_name")
+	dbConfig["username"] = os.Getenv("database_user")
+	dbConfig["password"] = os.Getenv("database_passwd")
 	dbConfig["charset"] = "utf8"
 	dbConfig["parseTime"] = "True"
 }

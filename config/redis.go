@@ -1,15 +1,18 @@
 package config
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 var redisConfig map[string]interface{}
 
 func init() {
 	redisConfig = make(map[string]interface{})
 
-	redisConfig["env"] = "dev"
+	redisConfig["env"] = os.Getenv("env")
 	redisConfig["rank_cache_time"] = 5
-	redisConfig["host"] = "172.17.0.1:6379"
+	redisConfig["host"] = os.Getenv("redis_host")
 	redisConfig["auth"] = ""
 	redisConfig["type"] = "tcp"
 

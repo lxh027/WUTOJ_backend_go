@@ -1,5 +1,7 @@
 package config
 
+import "os"
+
 type LangConfig struct {
 	Lang         string
 	BuildSh      string
@@ -15,8 +17,8 @@ func init() {
 	// 初始化 judge config
 
 	judgeConfig["env"] = "dev"
-	judgeConfig["address"] = "127.0.0.1:8800"
-	judgeConfig["base_dir"] = "/home/acmwhut/data"
+	judgeConfig["address"] = os.Getenv("ana_addr")
+	judgeConfig["base_dir"] = os.Getenv("data")
 	judgeConfig["tmp_dir"] = "/home/ana_tmpdir"
 
 	// 初始化 lang config
