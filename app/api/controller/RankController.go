@@ -108,7 +108,7 @@ func GetUserRank(c *gin.Context) {
 
 // TODO get rank from DB
 func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.Time) {
-	fmt.Println("Get From DB")
+	fmt.Printf("Get From DB between %v and %v\n", beginTime, endTime)
 	submitModel := model.Submit{}
 
 	res := submitModel.GetContestSubmitsByTime(contestID, beginTime, endTime)
