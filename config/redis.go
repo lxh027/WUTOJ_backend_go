@@ -1,12 +1,18 @@
 package config
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
-func GetRedisConfig() map[string]interface{} {
-	redisConfig := make(map[string]interface{})
+var redisConfig map[string]interface{}
 
+func init() {
+	redisConfig = make(map[string]interface{})
+
+	redisConfig["env"] = os.Getenv("env")
 	redisConfig["rank_cache_time"] = 5
-	redisConfig["host"] = "172.17.0.1:6379"
+	redisConfig["host"] = os.Getenv("redis_host")
 	redisConfig["auth"] = ""
 	redisConfig["type"] = "tcp"
 
@@ -17,5 +23,8 @@ func GetRedisConfig() map[string]interface{} {
 	// 过期时间
 	redisConfig["timeout"] = 300 * time.Second
 
+}
+
+func GetRedisConfig() map[string]interface{} {
 	return redisConfig
 }

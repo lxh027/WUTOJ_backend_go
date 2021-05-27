@@ -1,7 +1,9 @@
 package config
 
-func GetWutOjConfig() map[string]interface{} {
-	wutOjConfig := make(map[string]interface{})
+var wutOjConfig map[string]interface{}
+
+func init() {
+	wutOjConfig = make(map[string]interface{})
 
 	/* 排行榜存储时间 */
 	wutOjConfig["rank_cache_time"] = 5
@@ -34,5 +36,8 @@ func GetWutOjConfig() map[string]interface{} {
 
 	/* oj链接 */
 	wutOjConfig["oj_url"] = "http://acmwhut.com"
+}
+
+func GetWutOjConfig() map[string]interface{} {
 	return wutOjConfig
 }
