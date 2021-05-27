@@ -132,6 +132,7 @@ func judge(submit model.Submit) {
 				}
 				format := "2006-01-02 15:04:05"
 				now, _ := time.Parse(format, time.Now().Format(format))
+				fmt.Printf("Submit Time: %v, BeginTime: %v, FrozenTime: %v\n", now, beginTime, frozenTime)
 				if now.Unix() < beginTime.Unix() || now.Unix() > frozenTime.Unix() {
 					return
 				}
