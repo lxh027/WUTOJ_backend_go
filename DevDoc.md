@@ -98,4 +98,5 @@ if res, err := userValidate.ValidateMap(userMap, "login"); !res {
 后台api模块为`app/panel`
 
 ## Todo List
-- [] 增加数据库操作队列，优化数据库性能，减少数据丢失
+- [ ] 增加数据库操作队列，优化数据库性能，减少数据丢失
+- [ ] 后台增加队伍账号导入模块，导入队名csv文件，生成比赛账号密码，自动注册并选择要报名的比赛。
