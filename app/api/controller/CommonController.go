@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"errors"
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -63,6 +64,8 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	frozenTime := time.Unix(int64( (float64(endTime.Unix()) - float64(beginTime.Unix())) * (1-frozen) + float64(beginTime.Unix()) ), 0)
 	format := "2006-01-02 15:04:05"
 	frozenF, _ := time.Parse(format, frozenTime.Format(format))
+	fmt.Printf("beginTime: %v, endTime: %v, frozenTime: %v, frozenF: %v",
+		beginTime, endTime, frozenTime, frozenF)
 	return beginTime, endTime, frozenF, nil
 }
 
