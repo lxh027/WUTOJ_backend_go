@@ -66,7 +66,7 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	frozenF, _ := time.Parse(format, frozenTime.Format(format))
 	fmt.Printf("beginTime: %v, endTime: %v, frozenTime: %v, frozenF: %v",
 		beginTime, endTime, frozenTime, frozenF)
-	return beginTime, endTime, frozenF, nil
+	return beginTime, endTime, frozenTime, nil
 }
 
 //func Upload(FileDst string, file *multipart.FileHeader) helper.ReturnType {
