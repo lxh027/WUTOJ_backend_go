@@ -45,6 +45,7 @@ func GetProblemByID(c *gin.Context) {
 		contest := contestJson.Data.(model.Contest)
 		if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))
+			return
 		}
 	}
 
@@ -73,6 +74,7 @@ func SearchProblem(c *gin.Context) {
 			contest := contestJson.Data.(model.Contest)
 			if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
 				c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))
+				return
 			}
 		}
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
