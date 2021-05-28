@@ -162,7 +162,7 @@ func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
 			for _, problem := range problems {
 				if problem == problemId {
 					log.Print("problem %d in contest %d", problemId, contest.ContestID)
-					return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找Contest成功", Data: contest.Problems}
+					return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找Contest成功", Data: contest}
 				}
 			}
 		}
