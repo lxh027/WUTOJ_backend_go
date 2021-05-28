@@ -41,7 +41,8 @@ func GetProblemByID(c *gin.Context) {
 	// TODO: need remove, temprory workaround
 	contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
 	if contestJson.Status == common.CodeSuccess {
-		now := time.Now()
+		format := "2006-01-02 15:04:05"
+		now, _ := time.Parse(format, time.Now().Format(format))
 		contest := contestJson.Data.(model.Contest)
 		if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
 			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))
@@ -70,7 +71,8 @@ func SearchProblem(c *gin.Context) {
 		problem_id, _ := strconv.Atoi(problemJson.Param)
 		contestJson := contestModel.GetContestByProblemId(problem_id)
 		if contestJson.Status == common.CodeSuccess {
-			now := time.Now()
+			format := "2006-01-02 15:04:05"
+			now, _ := time.Parse(format, time.Now().Format(format))
 			contest := contestJson.Data.(model.Contest)
 			if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
 				c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))

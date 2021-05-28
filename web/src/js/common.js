@@ -1,5 +1,5 @@
 function getPort() {
-    return "http://dev.acmwhut.com:5001/panel/"
+    return "/panel/"
 }
 
 function getQueryString(name) {
