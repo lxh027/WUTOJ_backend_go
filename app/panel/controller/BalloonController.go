@@ -36,14 +36,16 @@ func GetContestBalloon(c *gin.Context)  {
 		return
 	}
 
-	submitRes := SubmitModel.GetContestACSubmits(contestIDJson.ContestID)
+	submitRes := SubmitModel.GetContestACSubmitsWithExtraName(contestIDJson.ContestID)
 	if submitRes.Status != common.CodeSuccess {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, submitRes.Msg, submitRes.Data))
 		return
 	}
 
+
+
 	contest := contestRes.Data.(model.Contest)
-	submits := submitRes.Data.([]model.Submit)
+	submits := submitRes.Data.([]model.SubmitBalloon)
 
 	colors := make([]string, 0)
 	problems := make([]uint, 0)
@@ -57,9 +59,10 @@ func GetContestBalloon(c *gin.Context)  {
 	}
 
 	type balloon struct {
-		ID 		int 	`json:"id"`
+		ID 		uint 	`json:"id"`
 		UserID 	uint 	`json:"user_id"`
 		Nick 	string 	`json:"nick"`
+		Realname string `json:"realname" form:"realname"`
 		ProblemID 	int 	`json:"problem_id"`
 		Color 	string 	`json:"color"`
 		IsSent	bool 	`json:"is_sent"`
@@ -75,6 +78,7 @@ func GetContestBalloon(c *gin.Context)  {
 			Nick: submit.Nick,
 			ProblemID: problemIDMap[submit.ProblemID]+1,
 			Color: colors[problemIDMap[submit.ProblemID]],
+			Realname: submit.Realname,
 		}
 		submitIdentity := strconv.Itoa(int(contestIDJson.ContestID)) + strconv.Itoa(newBalloon.ProblemID)+" "+strconv.Itoa(int(newBalloon.UserID))
 		if _, ok := balloonMap[submitIdentity]; ok {

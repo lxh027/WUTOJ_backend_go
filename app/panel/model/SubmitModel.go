@@ -1,6 +1,7 @@
 package model
 
 import (
+	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"time"
@@ -21,6 +22,10 @@ type Submit struct {
 	SubmitTime 	time.Time	`json:"submit_time" form:"submit_time"`
 }
 
+type SubmitBalloon struct {
+	model.Submit
+	Realname string `json:"realname" form:"realname"`
+}
 
 func (model *Submit) GetAllSubmit(offset int, limit int, whereData map[string]string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
 	var submits []Submit
@@ -114,11 +119,17 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 	}
 }
 
-func (model *Submit) GetContestACSubmits(contestID uint) helper.ReturnType {
-	var submits []Submit
-	fields := []string{"user_id", "nick", "problem_id", "id"}
+func (model *Submit) GetContestACSubmitsWithExtraName(contestID uint) helper.ReturnType {
+	var submits []SubmitBalloon
+	fields := []string{"submit.user_id as user_id", "submit.nick as nick", "submit.problem_id as problem_id", "submit.id as id", "users.realname as realname"}
 
-	err := db.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
+	//err := db.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
+
+	err := db.Table("submit").Joins("JOIN users ON submit.user_id = users.user_id").
+		Select(fields).
+		Where("contest_id = ? AND submit.status = 'AC'", contestID).
+		Order("id desc").
+		Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
