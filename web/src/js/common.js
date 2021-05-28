@@ -8,7 +8,8 @@ function getQueryString(name) {
     if (r != null) return unescape(r[2]);
     else {
         const urls = window.location.href.split('/');
-        let i = 0, iLoop = urls.length;
+        let i = 0,
+            iLoop = urls.length;
         for (; i < iLoop; i++) {
             if (urls[i] === name) {
                 return urls[i + 1].split('.')[0];
