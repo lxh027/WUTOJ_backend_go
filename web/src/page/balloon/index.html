@@ -106,6 +106,7 @@
                 {field: 'id' , title: 'ID', sort: true},
                 {field: 'user_id', title: '用户ID', sort: true},
                 {field: 'nick', title: '昵称', sort: true},
+                {field: 'realname', title: '姓名', sort: true},
                 {field: 'problem_id', title: '问题ID', sort: true, minWidth:200,},
                 {field: 'color', title: '颜色', sort: true, minWidth:150,　templet: (d) => {return "<p style='color: "+d.color+"'>"+d.color+"</p>"}},
                 {field: 'is_sent', title: '类型', sort: true, templet: (d) => {if (d.is_sent) return "<p style='color: green'>已送</p>"; else return "<p style='color: red'>未送</p>";}},

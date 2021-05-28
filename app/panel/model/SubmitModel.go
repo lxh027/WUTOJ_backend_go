@@ -114,11 +114,18 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 	}
 }
 
-func (model *Submit) GetContestACSubmits(contestID uint) helper.ReturnType {
-	var submits []Submit
-	fields := []string{"user_id", "nick", "problem_id", "id"}
+func (model *Submit) GetContestACSubmitsWithExtraName(contestID uint) helper.ReturnType {
+	var submits []struct{
+		Submit
+		Realname string `json:"realname" form:"realname"`
+	}
+	fields := []string{"submit.user_id", "submit.nick", "submit.problem_id", "submit.id", "users.realname"}
 
 	err := db.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
+
+	err = db.Joins("JOIN users ON submit.user_id = users.user_id").
+		Order("id desc").
+		Select(fields).Find(&submits).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
