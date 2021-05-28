@@ -42,13 +42,10 @@ func GetContestBalloon(c *gin.Context)  {
 		return
 	}
 
-	type submitBalloon struct {
-		model.Submit
-		Realname string `json:"realname" form:"realname"`
-	}
+
 
 	contest := contestRes.Data.(model.Contest)
-	submits := submitRes.Data.([]submitBalloon)
+	submits := submitRes.Data.([]model.SubmitBalloon)
 
 	colors := make([]string, 0)
 	problems := make([]uint, 0)
@@ -62,7 +59,7 @@ func GetContestBalloon(c *gin.Context)  {
 	}
 
 	type balloon struct {
-		ID 		int 	`json:"id"`
+		ID 		uint 	`json:"id"`
 		UserID 	uint 	`json:"user_id"`
 		Nick 	string 	`json:"nick"`
 		Realname string `json:"realname" form:"realname"`
