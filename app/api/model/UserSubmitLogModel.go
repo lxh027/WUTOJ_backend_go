@@ -38,9 +38,9 @@ func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnTyp
 
 func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
 	var UserSubmitLog UserSubmitLog
-	err := db.Model(&UserSubmitLog).Where("user_id = ?", int(UserID)).First(&UserSubmitLog).Error
-	if err != nil {
+	db.Model(&UserSubmitLog).Where("user_id = ?", int(UserID)).First(&UserSubmitLog)
+	/*if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交数据失败", Data: err.Error()}
-	}
+	}*/
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交数据成功", Data: UserSubmitLog}
 }
