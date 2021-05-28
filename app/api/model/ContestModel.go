@@ -156,7 +156,7 @@ func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
 			err := json.Unmarshal([]byte(contest.Problems), &problems);
 			if err != nil {
 				// unmarshal failed
-				log.Print("ProblemController: unmarshal contest problems failed, err: "err);
+				log.Print("ProblemController: unmarshal contest problems failed, err: ", err);
 				continue
 			}
 			for _, problem := range problems {
