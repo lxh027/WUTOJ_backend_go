@@ -98,14 +98,11 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 	} else {
 		userSubmitLog := UserSubmitLog{}
 		res := userSubmitLog.GetUserSubmitLog(user.UserID)
-		if res.Status != common.CodeSuccess {
-			return res
-		} else {
-			resp := make(map[string]interface{})
-			resp["userInfo"] = user
-			resp["submitLog"] = res.Data
-			return helper.ReturnType{Status: common.CodeSuccess, Msg: "登录验证成功", Data: resp}
-		}
+
+		resp := make(map[string]interface{})
+		resp["userInfo"] = user
+		resp["submitLog"] = res.Data
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "登录验证成功", Data: resp}
 	}
 }
 
