@@ -5,7 +5,9 @@ import (
 	"OnlineJudge/app/helper"
 	_ "OnlineJudge/config"
 	_ "debug/elf"
+	"encoding/json"
 	_ "github.com/go-playground/locales/mgh"
+	"log"
 	"time"
 )
 
@@ -84,6 +86,20 @@ func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
 
 }
 
+func (model *Contest) GetAllContestWithoutLimit() helper.ReturnType {
+	var contests []Contest
+	err := db.Model(&Contest{}).Find(&contests).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查找失败，数据库错误", Data: ""}
+	}
+	if contests != nil {
+		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找成功", Data: contests}
+	}
+	return helper.ReturnType{Status: common.CodeError, Msg: "当前无比赛", Data: ""}
+
+}
+
 func (model *Contest) AddContest(data Contest) helper.ReturnType {
 	err := db.Create(&data).Error
 	if err != nil {
@@ -129,4 +145,28 @@ func (model *Contest) GetContestProblems(ContestID int) helper.ReturnType {
 		return helper.ReturnType{Status: common.CodeError, Msg: "获取题目失败，数据库错误", Data: ""}
 	}
 	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取题目成功", Data: contest.Problems}
+}
+
+func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
+	contestsJson := model.GetAllContestWithoutLimit()
+	if contestsJson.Status == common.CodeSuccess {
+		contests := contestsJson.Data.([]Contest)
+		for _, contest := range contests {
+			var problems []int
+			err := json.Unmarshal([]byte(contest.Problems), problems);
+			if err != nil {
+				// unmarshal failed
+				log.Print("ProblemController: unmarshal contest problems failed");
+				continue
+			}
+			for _, problem := range problems {
+				if problem == problemId {
+					log.Print("problem %d in contest %d", problemId, contest.ContestID)
+					return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找Contest成功", Data: contest.Problems}
+				}
+			}
+		}
+	}
+
+	return helper.ReturnType{Status: common.CodeError, Msg: "问题不属于任何contest", Data: nil}
 }

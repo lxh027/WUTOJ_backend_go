@@ -7,6 +7,8 @@ import (
 	"OnlineJudge/app/helper"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func GetAllProblems(c *gin.Context) {
@@ -21,6 +23,7 @@ func GetAllProblems(c *gin.Context) {
 func GetProblemByID(c *gin.Context) {
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
+	contestModel := model.Contest{}
 
 	var problemJson model.Problem
 
@@ -35,6 +38,16 @@ func GetProblemByID(c *gin.Context) {
 		return
 	}
 
+	// TODO: need remove, temprory workaround
+	contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
+	if contestJson.Status == common.CodeSuccess {
+		now := time.Now()
+		contest := contestJson.Data.(model.Contest)
+		if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
+			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))
+		}
+	}
+
 	res := problemModel.GetProblemByID(int(problemJson.ProblemID))
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
@@ -47,9 +60,21 @@ func SearchProblem(c *gin.Context) {
 
 	problemJson.Param = c.Param("param")
 	problemModel := model.Problem{}
+	contestModel := model.Contest{}
 
 	if err := c.ShouldBind(&problemJson); err == nil {
 		res := problemModel.SearchProblem(problemJson.Param)
+
+		// TODO: need remove, temprory workaround
+		problem_id, _ := strconv.Atoi(problemJson.Param)
+		contestJson := contestModel.GetContestByProblemId(problem_id)
+		if contestJson.Status == common.CodeSuccess {
+			now := time.Now()
+			contest := contestJson.Data.(model.Contest)
+			if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
+				c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", 0))
+			}
+		}
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
