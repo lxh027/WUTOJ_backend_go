@@ -10,8 +10,8 @@ import (
 )
 
 func Register(c *gin.Context) {
-	//c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛期间不开放注册", 0))
-	//return
+	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛期间不开放注册", 0))
+	return
 	var userModel = model.User{}
 	var userValidate = validate.UserValidate
 	var userSubmitLogModel = model.UserSubmitLog{}
