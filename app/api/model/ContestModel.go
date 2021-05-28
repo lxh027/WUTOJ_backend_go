@@ -153,7 +153,7 @@ func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
 		contests := contestsJson.Data.([]Contest)
 		for _, contest := range contests {
 			var problems []int
-			err := json.Unmarshal([]byte(contest.Problems), problems);
+			err := json.Unmarshal([]byte(contest.Problems), &problems);
 			if err != nil {
 				// unmarshal failed
 				log.Print("ProblemController: unmarshal contest problems failed");
