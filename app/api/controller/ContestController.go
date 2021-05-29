@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -128,6 +129,7 @@ func GetContestProblems(c *gin.Context) {
 
 	var ContestJson model.Contest
 	contestModel := model.Contest{}
+	problemModel := model.Problem{}
 	if err := c.ShouldBindUri(&ContestJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", ""))
 		return
@@ -140,7 +142,52 @@ func GetContestProblems(c *gin.Context) {
 		return
 	}
 	res = contestModel.GetContestProblems(ContestJson.ContestID)
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+
+	if res.Status != common.CodeSuccess {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	// 获取题目id
+	type problemInfo struct {
+		ID	uint 	`json:"id"`
+		Info  map[string]interface{} `json:"info""`
+	}
+
+	problemIDsStr := res.Data.(string)
+	var problemIDs []uint
+
+	if err := json.Unmarshal([]byte(problemIDsStr), &problemIDs); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "题目设置格式出错，请联系管理员", nil))
+		return
+	}
+
+	fields := []string{"problem_id", "title"}
+	res = problemModel.GetProblemFieldsByIDList(problemIDs, fields)
+
+	// init result
+	result := make([]problemInfo, 0)
+	if res.Status != common.CodeSuccess {
+		// 查询题目数据失败
+		for _, problemID := range problemIDs {
+			item := problemInfo{ID: problemID, Info: make(map[string]interface{})}
+			result =  append(result, item)
+		}
+		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "获取题目信息失败", result))
+		return
+	}
+
+	problemInfos := res.Data.([]model.Problem)
+	for _, info := range problemInfos {
+		// gen problem info
+		extraMap := map[string]interface{} {
+			"title": info.Title,
+		}
+
+		item := problemInfo{ID: info.ProblemID, Info: extraMap}
+		result =  append(result, item)
+	}
+	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "获取比赛题目信息成功", result))
+
 	return
 }
 

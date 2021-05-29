@@ -57,6 +57,18 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 
 }
 
+func (model *Problem) GetProblemFieldsByIDList(ids []uint, fields[]string) helper.ReturnType  {
+	var problems []Problem
+
+	err := db.Select(fields).Where("problem_id in (?)", ids).Find(&problems).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+	}
+
+	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problems}
+}
+
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
 
