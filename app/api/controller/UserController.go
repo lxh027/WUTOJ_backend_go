@@ -11,7 +11,8 @@ import (
 )
 
 func UpdateUserInfo(c *gin.Context) {
-
+	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛期间无法修改个人信息", 0))
+	return
 	res := checkLogin(c)
 	if res.Status == common.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
