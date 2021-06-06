@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,7 +26,7 @@ func GetAllAuth(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
@@ -38,7 +38,7 @@ func GetParentAuth(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -56,13 +56,13 @@ func AddAuth(c *gin.Context) {
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -84,13 +84,13 @@ func DeleteAuth(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&authIDJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authIDMap := helper.Struct2Map(authIDJson)
 	if res, err := authValidate.ValidateMap(authIDMap, "delete"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 	res := authModel.DeleteAuth(authIDJson.Aid)
@@ -106,13 +106,13 @@ func UpdateAuth(c *gin.Context) {
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -128,13 +128,13 @@ func GetAuthByID(c *gin.Context) {
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "find"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

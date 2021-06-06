@@ -3,19 +3,19 @@ package constants
 func GetBackendRouterAuth(url string) string{
 	return auths[url]
 }
-const Pass = "PASS"
+const AuthPass = "PASS"
 
 var auths = map[string]string {
 	// user
-	"/panel/user/getAllUser": "getAllUser",
+	"/panel/user/getAllUser":  "getAllUser",
 	"/panel/user/getUserByID": "getAllUser",
-	"/panel/user/register": Pass,
-	"/panel/user/login": Pass,
-	"/panel/user/logout": Pass,
-	"/panel/user/getUserInfo": Pass,
-	"/panel/user/updateUser": "updateUser",
-	"/panel/user/deleteUser": "deleteUser",
-	"/panel/user/setAdmin": "roleAssign",
+	"/panel/user/register":    AuthPass,
+	"/panel/user/login":       AuthPass,
+	"/panel/user/logout":      AuthPass,
+	"/panel/user/getUserInfo": AuthPass,
+	"/panel/user/updateUser":  "updateUser",
+	"/panel/user/deleteUser":  "deleteUser",
+	"/panel/user/setAdmin":    "roleAssign",
 	// role
 	"/panel/role/getAllRole": "getAllRole",
 	"/panel/role/getRoleByID": "getAllRole",

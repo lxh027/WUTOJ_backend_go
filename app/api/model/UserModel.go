@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"os"
 )
 
@@ -32,14 +32,14 @@ func (model *User) AddUser(data User) helper.ReturnType {
 	user := User{}
 	// 判断昵称是否已存在
 	if err := db.Where("nick = ?", data.Nick).First(&user).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "昵称已存在", Data: user}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: user}
 	}
 	// 创建记录
 	err := db.Create(&data).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: 1}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: 1}
 	}
 }
 
@@ -48,9 +48,9 @@ func (model *User) EditUserByID(userId uint, data User) helper.ReturnType {
 	err := db.Model(&data).Where("user_id = ?", userId).Update(data).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: 1}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: 1}
 	}
 }
 
@@ -59,9 +59,9 @@ func (model *User) EditUserByNick(nick string, data User) helper.ReturnType {
 	err := db.Model(model).Where("nick = ?", nick).Update(data).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: 1}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: 1}
 	}
 }
 
@@ -71,9 +71,9 @@ func (model *User) FindUserByID(userID uint) helper.ReturnType {
 	err := db.Where("user_id = ?", userID).First(user).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: user}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: user}
 	}
 }
 
@@ -83,9 +83,9 @@ func (model *User) FindUserByNick(nick string) helper.ReturnType {
 	err := db.Where("nick = ?", nick).First(user).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: user}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: user}
 	}
 }
 
@@ -94,7 +94,7 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 	err := db.Where("nick = ? AND password = ?", data.Nick, data.Password).First(&user).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "用户名或密码错误", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "用户名或密码错误", Data: err.Error()}
 	} else {
 		userSubmitLog := UserSubmitLog{}
 		res := userSubmitLog.GetUserSubmitLog(user.UserID)
@@ -102,7 +102,7 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 		resp := make(map[string]interface{})
 		resp["userInfo"] = user
 		resp["submitLog"] = res.Data
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "登录验证成功", Data: resp}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "登录验证成功", Data: resp}
 	}
 }
 
@@ -111,9 +111,9 @@ func (model *User) UpdatePassword(user User) helper.ReturnType {
 	err := db.Model(&user).Where("mail = ?", user.Mail).Update("password", user.Password).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "修改密码失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "修改密码失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "修改密码成功", Data: ""}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "修改密码成功", Data: ""}
 }
 
 func (model *User) SearchUser(param string) helper.ReturnType {
@@ -124,9 +124,9 @@ func (model *User) SearchUser(param string) helper.ReturnType {
 		Find(&user).Error
 
 	if err == nil {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: user}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: user}
 	}
-	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
+	return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 
 }
 
@@ -134,22 +134,22 @@ func (model *User) AddUserAvatar(UserID int, avatar string) helper.ReturnType {
 	user := User{}
 	err := db.Where("user_id = ?", UserID).First(&user).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取用户信息失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取用户信息失败", Data: err.Error()}
 	}
 
 	if user.Avatar != "null" {
 		err := os.Remove(user.Avatar)
 		if err != nil {
-			return helper.ReturnType{Status: common.CodeError, Msg: "移除原头像失败", Data: err.Error()}
+			return helper.ReturnType{Status: constants.CodeError, Msg: "移除原头像失败", Data: err.Error()}
 		}
 	}
 	user.Avatar = avatar
 
 	err = db.Model(&user).Where("user_id = ?", UserID).Update(&user).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新用户信息失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新用户信息失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加头像成功", Data: ""}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加头像成功", Data: ""}
 
 }

@@ -2,8 +2,8 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"errors"
 	"fmt"
 	"github.com/gin-contrib/sessions"
@@ -31,7 +31,7 @@ func GetUserNickFromSession(c *gin.Context) string {
 
 func Check(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Status == common.CodeSuccess {
+	if res.Status == constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, gin.H{
 			"user_id": res.Data,
 		}))
@@ -45,9 +45,9 @@ func checkLogin(c *gin.Context) helper.ReturnType {
 	session := sessions.Default(c)
 	var id interface{}
 	if id = session.Get("user_id"); id == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "未登录，请先登录", Data: -1}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "未登录，请先登录", Data: -1}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "已登陆", Data: id}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "已登陆", Data: id}
 }
 
 // return begin, frozen, end
@@ -55,7 +55,7 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	contestModel := model.Contest{}
 	res := contestModel.GetContestById(strconv.FormatInt(int64(contestID), 10))
 	now := time.Now()
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		return now, now, now, errors.New(res.Msg)
 	}
 	beginTime := res.Data.(model.Contest).BeginTime

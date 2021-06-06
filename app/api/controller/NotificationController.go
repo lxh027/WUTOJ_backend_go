@@ -2,9 +2,9 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
@@ -22,14 +22,14 @@ func GetNotification(c *gin.Context) {
 	notificationValidate := validate.NotificationValidate
 
 	if err := c.ShouldBindQuery(&notificationJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定失败", err.Error()))
 		return
 	}
 
 	NotificationMap := helper.Struct2Map(notificationJson)
 
 	if res, err := notificationValidate.ValidateMap(NotificationMap, "get"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据校验失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据校验失败", err.Error()))
 		return
 	}
 

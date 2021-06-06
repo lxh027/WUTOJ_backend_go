@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -26,7 +26,7 @@ func GetAllUserSubmitStatus(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
@@ -45,6 +45,6 @@ func GetUserSubmitStatusByTime(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }

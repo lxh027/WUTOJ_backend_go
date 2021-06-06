@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,7 +26,7 @@ func GetAllTag(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
@@ -37,7 +37,7 @@ func FindTagsByName(c *gin.Context) {
 	var tagJson model.Tag
 
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -59,13 +59,13 @@ func GetTagByID(c *gin.Context) {
 	var tagJson model.Tag
 
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	tagMap := helper.Struct2Map(tagJson)
 	if res, err := tagValidate.ValidateMap(tagMap, "findByID"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -80,13 +80,13 @@ func AddTag(c *gin.Context) {
 
 	var tagJson model.Tag
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	tagMap := helper.Struct2Map(tagJson)
 	if res, err := tagValidate.ValidateMap(tagMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -101,13 +101,13 @@ func DeleteTag(c *gin.Context) {
 
 	var tagJson model.Tag
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	tagMap := helper.Struct2Map(tagJson)
 	if res, err := tagValidate.ValidateMap(tagMap, "delete"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -122,13 +122,13 @@ func UpdateTag(c *gin.Context) {
 
 	var tagJson model.Tag
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	tagMap := helper.Struct2Map(tagJson)
 	if res, err := tagValidate.ValidateMap(tagMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -143,13 +143,13 @@ func ChangeTagStatus(c *gin.Context) {
 
 	var tagJson model.Tag
 	if err := c.ShouldBind(&tagJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	tagMap := helper.Struct2Map(tagJson)
 	if res, err := tagValidate.ValidateMap(tagMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

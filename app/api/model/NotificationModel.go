@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"time"
 )
 
@@ -24,9 +24,9 @@ func (model *Notification) GetAllNotification() helper.ReturnType {
 	err := db.Find(&notifications).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: notifications}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: notifications}
 	}
 
 }
@@ -37,9 +37,9 @@ func (model *Notification) GetNotificationByID(id int) helper.ReturnType {
 	err := db.Where("id = ?", id).First(&notification).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: notification}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: notification}
 	}
 
 }
@@ -52,7 +52,7 @@ func (model *Notification) GetNotification(ContestID int, LastNotification int) 
 		Where("id > ?", LastNotification).
 		Find(&notifications).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}, LastNotification
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取失败", Data: err.Error()}, LastNotification
 	} else {
 		NotificationID := LastNotification
 		for _, notify := range notifications {
@@ -60,7 +60,7 @@ func (model *Notification) GetNotification(ContestID int, LastNotification int) 
 				NotificationID = notify.ID
 			}
 		}
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: notifications}, NotificationID
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: notifications}, NotificationID
 	}
 
 }

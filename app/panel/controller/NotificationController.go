@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -22,7 +22,7 @@ func GetAllNotification(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", nil))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", nil))
 	return
 }
 
@@ -32,7 +32,7 @@ func GetNotificationByID(c *gin.Context) {
 	var noticeJson model.Notification
 
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -49,7 +49,7 @@ func AddNotification(c *gin.Context) {
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	noticeJson.SubmitTime = time.Now()
@@ -66,7 +66,7 @@ func DeleteNotification(c *gin.Context) {
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -81,7 +81,7 @@ func UpdateNotification(c *gin.Context) {
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	noticeJson.ModifyTime = time.Now()
@@ -97,7 +97,7 @@ func ChangeNotificationStatus(c *gin.Context) {
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 

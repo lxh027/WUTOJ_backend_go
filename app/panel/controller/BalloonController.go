@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"encoding/json"
 	"fmt"
@@ -21,19 +21,19 @@ func GetContestBalloon(c *gin.Context)  {
 	}{}
 
 	if err := c.ShouldBind(&contestIDJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	contestRes := contestModel.GetContestById(contestIDJson.ContestID)
-	if contestRes.Status != common.CodeSuccess {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, contestRes.Msg, contestRes.Data))
+	if contestRes.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, contestRes.Msg, contestRes.Data))
 		return
 	}
 
 	submitRes := SubmitModel.GetContestACSubmitsWithExtraName(contestIDJson.ContestID)
-	if submitRes.Status != common.CodeSuccess {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, submitRes.Msg, submitRes.Data))
+	if submitRes.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, submitRes.Msg, submitRes.Data))
 		return
 	}
 
@@ -82,14 +82,14 @@ func GetContestBalloon(c *gin.Context)  {
 		balloonMap[submitIdentity] = true
 		value, err := db_server.SIsNumberOfRedisSet("balloon"+strconv.Itoa(int(contestIDJson.ContestID)), submitIdentity)
 		if err != nil {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "Redis错误", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "Redis错误", err.Error()))
 			return
 		}
 		newBalloon.IsSent = value
 		balloons = append(balloons, newBalloon)
 	}
 
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "获取成功", balloons))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "获取成功", balloons))
 }
 
 func SentBalloon(c *gin.Context)  {
@@ -100,16 +100,16 @@ func SentBalloon(c *gin.Context)  {
 	}{}
 
 	if err := c.ShouldBind(&IDJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	submitIdentity := strconv.Itoa(int(IDJson.ContestID)) + strconv.Itoa(IDJson.ProblemID)+" "+strconv.Itoa(int(IDJson.UserID))
 
 	if err := db_server.SAddToRedisSet("balloon"+strconv.Itoa(int(IDJson.ContestID)), submitIdentity); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "设置失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "设置失败", err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "设置成功", nil))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "设置成功", nil))
 }

@@ -2,10 +2,10 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 func GetAllDiscuss(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -32,7 +32,7 @@ func GetAllDiscuss(c *gin.Context) {
 	Limit := ConfigMap["page_limit"].(int)
 
 	if err := c.ShouldBindUri(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定失败", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据绑定失败", ""))
 		return
 	}
 
@@ -41,7 +41,7 @@ func GetAllDiscuss(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 
 }
@@ -49,7 +49,7 @@ func GetAllDiscuss(c *gin.Context) {
 func GetDiscussionByID(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -63,13 +63,13 @@ func GetDiscussionByID(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "", err.Error()))
 		return
 	}
 
 	discussMap := helper.Struct2Map(discussJson)
 	if res, err := discussValidate.ValidateMap(discussMap, "findByID"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -81,7 +81,7 @@ func GetDiscussionByID(c *gin.Context) {
 func GetContestDiscussion(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -95,18 +95,18 @@ func GetContestDiscussion(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBindUri(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "", err.Error()))
 		return
 	}
 
 	if err := c.ShouldBindQuery(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "", err.Error()))
 		return
 	}
 	log.Print(discussJson)
 	discussMap := helper.Struct2Map(discussJson)
 	if res, err := discussValidate.ValidateMap(discussMap, "findByContestID"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -118,7 +118,7 @@ func GetContestDiscussion(c *gin.Context) {
 func GetProblemDiscussion(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -132,13 +132,13 @@ func GetProblemDiscussion(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "", err.Error()))
 		return
 	}
 
 	discussMap := helper.Struct2Map(discussJson)
 	if res, err := discussValidate.ValidateMap(discussMap, "findByProblemID"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 	}
 
 	res = discussModel.GetDiscussionByID(discussJson.ProblemId, discussJson.PageNumber)
@@ -149,7 +149,7 @@ func GetProblemDiscussion(c *gin.Context) {
 func AddDiscussion(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -162,13 +162,13 @@ func AddDiscussion(c *gin.Context) {
 
 	//log.Print(discussJson)
 	if err := c.ShouldBind(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	discussMap := helper.Struct2Map(discussJson)
 	if res, err := discussValidate.ValidateMap(discussMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -180,7 +180,7 @@ func AddDiscussion(c *gin.Context) {
 func AddReply(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -191,13 +191,13 @@ func AddReply(c *gin.Context) {
 	replyJson := model.Reply{}
 
 	if err := c.ShouldBind(&replyJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	replyJson.UserID = int(GetUserIdFromSession(c))
 	replyMap := helper.Struct2Map(replyJson)
 	if res, err := replyValidate.ValidateMap(replyMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据校验失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据校验失败", err.Error()))
 		return
 	}
 
@@ -208,7 +208,7 @@ func AddReply(c *gin.Context) {
 
 func GetUserDiscussion(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -219,7 +219,7 @@ func GetUserDiscussion(c *gin.Context) {
 	discussJson := model.Discuss{}
 	discussJson.UserID = int(GetUserIdFromSession(c))
 	if err := c.ShouldBind(&discussJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "", err.Error()))
 		return
 	}
 

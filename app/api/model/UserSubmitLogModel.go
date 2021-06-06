@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type UserSubmitLog struct {
@@ -25,15 +25,15 @@ func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnTyp
 	var user User
 	err := db.Where("nick = ?", UserNick).Find(&user).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
 	}
 	userSubmitLog.UserID = int(user.UserID)
 
 	err = db.Create(&userSubmitLog).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建用户成功", Data: 1}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建用户成功", Data: 1}
 }
 
 func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
@@ -42,5 +42,5 @@ func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
 	/*if err != nil {
 		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交数据失败", Data: err.Error()}
 	}*/
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交数据成功", Data: UserSubmitLog}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交数据成功", Data: UserSubmitLog}
 }

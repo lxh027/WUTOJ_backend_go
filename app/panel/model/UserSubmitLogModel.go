@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"fmt"
 	"time"
 )
@@ -43,14 +43,14 @@ func (model *UserSubmitLog) GetAllUserSubmitStatus(offset int, limit int, nick s
 			}
 			logs = append(logs, userLog)
 		}
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"statuses": logs,
 				"count": count,
 			},
 		}
 	}
-	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+	return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 }
 
 func (model *UserSubmitLog) GetUserSubmitStatusByTime(userId []int, startTime string, endTime string) helper.ReturnType {
@@ -73,13 +73,13 @@ func (model *UserSubmitLog) GetUserSubmitStatusByTime(userId []int, startTime st
 				result = append(result, userLog)
 			}
 		} else {
-			return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+			return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 		}
 		rows.Close()
 		logs = append(logs, result)
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 		Data: logs,
 	}
 }

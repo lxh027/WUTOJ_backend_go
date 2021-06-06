@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Role struct {
@@ -30,9 +30,9 @@ func (model *Role) GetAllRole(offset int, limit int, name string, desc string) h
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"roles": roles,
 				"count": count,
@@ -50,9 +50,9 @@ func (model *Role) GetUserRole(userID int) helper.ReturnType {
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: roles,
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: roles,
 		}
 	}
 }
@@ -92,9 +92,9 @@ func (model *Role) GetRoleNoRules() helper.ReturnType {
 	err := db.Find(&rolesTotal).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: rolesTotal,
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: rolesTotal,
 		}
 	}
 }
@@ -104,9 +104,9 @@ func (model *Role) GetRoleByID(rid int) helper.ReturnType {//jun
 
 	err := db.Select([]string{"name", "`desc`"}).Where("rid = ?", rid).First(&getRole).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: getRole}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getRole}
 	}
 }
 
@@ -114,15 +114,15 @@ func (model *Role) AddRole(newRole Role) helper.ReturnType {//jun
 	role :=Role{}
 
 	if err := db.Where("name = ? OR `desc` = ?", newRole.Name,newRole.Desc).First(&role).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "角色名或描述已存在",  Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "角色名或描述已存在",  Data: false}
 	}
 
 	err := db.Create(&newRole).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 	}
 }
 
@@ -130,9 +130,9 @@ func (model *Role) DeleteRole(roleID int) helper.ReturnType  {
 	err := db.Where("rid = ?", roleID).Delete(Role{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "删除成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
 }
 
@@ -140,8 +140,8 @@ func (model *Role) UpdateRole(roleID int, updateRole Role) helper.ReturnType  {
 	err := db.Model(&Role{}).Where("rid = ?", roleID).Update(updateRole).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }

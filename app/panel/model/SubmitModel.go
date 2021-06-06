@@ -2,8 +2,8 @@ package model
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"time"
 )
 
@@ -57,9 +57,9 @@ func (model *Submit) GetAllSubmit(offset int, limit int, whereData map[string]st
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"submits": submits,
 				"count": count,
@@ -88,9 +88,9 @@ func (model *Submit) GetSubmitGroup(whereData map[string]string, minSubmitTime, 
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: submits}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: submits}
 	}
 }
 
@@ -100,9 +100,9 @@ func (model *Submit) FindSubmitByID(id int) helper.ReturnType {
 	err := db.Where("id = ?", id).First(&submit).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: submit}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: submit}
 	}
 }
 
@@ -113,9 +113,9 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 		Updates(data).
 		Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: 0}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: 0}
 	}
 }
 
@@ -132,8 +132,8 @@ func (model *Submit) GetContestACSubmitsWithExtraName(contestID uint) helper.Ret
 		Find(&submits).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: submits}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: submits}
 
 }

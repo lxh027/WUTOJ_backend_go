@@ -2,9 +2,9 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"encoding/json"
 	"github.com/garyburd/redigo/redis"
@@ -21,7 +21,7 @@ func DoLogin(c *gin.Context) {
 	if session.Get("user_id") != nil {
 		data := make(map[string]interface{}, 0)
 		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "已登陆", data))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "已登陆", data))
 		return
 	}
 
@@ -31,13 +31,13 @@ func DoLogin(c *gin.Context) {
 	var userJson model.User
 
 	if err := c.ShouldBind(&userJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据绑定模型错误", err.Error()))
 		return
 	}
 
 	userMap := helper.Struct2Map(userJson)
 	if res, err := userValidate.ValidateMap(userMap, "login"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "输入信息不完整或有误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "输入信息不完整或有误", err.Error()))
 		return
 	}
 
@@ -45,7 +45,7 @@ func DoLogin(c *gin.Context) {
 
 	res := userModel.LoginCheck(userJson)
 
-	if res.Status == common.CodeSuccess {
+	if res.Status == constants.CodeSuccess {
 		userInfo := res.Data.(map[string]interface{})["userInfo"].(model.User)
 		submitLog := res.Data.(map[string]interface{})["submitLog"].(model.UserSubmitLog)
 		returnData := map[string]interface{}{
@@ -73,7 +73,7 @@ func DoLogout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "注销成功", session.Get("user_id")))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "注销成功", session.Get("user_id")))
 }
 
 func ForgetPassword(c *gin.Context) {
@@ -81,13 +81,13 @@ func ForgetPassword(c *gin.Context) {
 	userValidate := validate.UserValidate
 
 	if err := c.ShouldBindQuery(&userJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据绑定模型错误", err.Error()))
 		return
 	}
 
 	userMap := helper.Struct2Map(userJson)
 	if res, err := userValidate.ValidateMap(userMap, "forget"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "输入信息不完整或有误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "输入信息不完整或有误", err.Error()))
 		return
 	}
 
@@ -113,13 +113,13 @@ func UpdatePassword(c *gin.Context) {
 	userModel := model.User{}
 	userValidate := validate.UserValidate
 	if err := c.ShouldBind(&userJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 
 	userMap := helper.Struct2Map(userJson)
 	if res, err := userValidate.ValidateMap(userMap, "update_password"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "输入信息不完整或有误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "输入信息不完整或有误", err.Error()))
 		return
 	}
 
@@ -128,12 +128,12 @@ func UpdatePassword(c *gin.Context) {
 	VerifyCodeCorrect, err := redis.String(db_server.GetFromRedis(KeyValue))
 	db_server.DeleteFromRedis(KeyValue)
 	if err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "验证码已过期，请重新发送验证码", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "验证码已过期，请重新发送验证码", err.Error()))
 		return
 	}
 	log.Print(VerifyCodeCorrect)
 	if userJson.VerifyCode != VerifyCodeCorrect {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "验证码输入错误", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "验证码输入错误", ""))
 		return
 	}
 
@@ -142,6 +142,6 @@ func UpdatePassword(c *gin.Context) {
 	user.Password = helper.GetMd5(userJson.Password)
 
 	res := userModel.UpdatePassword(user)
-	c.JSON(common.CodeSuccess, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	c.JSON(constants.CodeSuccess, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

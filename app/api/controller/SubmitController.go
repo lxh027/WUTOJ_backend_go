@@ -2,10 +2,10 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"OnlineJudge/judger"
 	"encoding/json"
@@ -23,7 +23,7 @@ import (
 func Submit(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -34,7 +34,7 @@ func Submit(c *gin.Context) {
 	userID := session.Get("user_id")
 
 	if userID == nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "用户未登录", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "用户未登录", ""))
 		return
 	}
 
@@ -49,7 +49,7 @@ func Submit(c *gin.Context) {
 		fmt.Printf("now: %v, last: %v\n", now, last)
 
 		if now.Unix()-last.Unix() <= int64(interval) {
-			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "交题间隔过快，请五秒后再试", ""))
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "交题间隔过快，请五秒后再试", ""))
 			return
 		}
 	}
@@ -63,19 +63,19 @@ func Submit(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&submitJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据绑定模型错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据绑定模型错误", err.Error()))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
 
 	if res, err := submitValidate.ValidateMap(submitMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), ""))
 		return
 	}
 
 	if helper.LanguageID(submitJson.Language) == -1 {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "不支持的语言类型", nil))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "不支持的语言类型", nil))
 		return
 	}
 
@@ -172,7 +172,7 @@ func judge(submit model.Submit) {
 func GetSubmitInfo(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -194,7 +194,7 @@ func GetSubmitInfo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 
 }
 
@@ -206,7 +206,7 @@ func GetAllSubmitInfo(c *gin.Context) {
 // TODO
 func GetProblemSubmitInfo(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -215,7 +215,7 @@ func GetProblemSubmitInfo(c *gin.Context) {
 	submitJson := model.Submit{}
 
 	if c.ShouldBindQuery(&submitJson) != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 		return
 	}
 
@@ -228,7 +228,7 @@ func GetProblemSubmitInfo(c *gin.Context) {
 // TODO
 func GetUserContestSubmitInfo(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -243,7 +243,7 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 	}{}
 
 	if c.ShouldBindQuery(&submitJson) != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 		return
 	}
 
@@ -251,7 +251,7 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 
 	submitMap := helper.Struct2Map(submitJson)
 	if res, err := submitValidate.ValidateMap(submitMap, "contest_log"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -263,7 +263,7 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 func GetSubmitByID(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -273,13 +273,13 @@ func GetSubmitByID(c *gin.Context) {
 	submitValidate := validate.SubmitValidate
 
 	if c.ShouldBindQuery(&submitJson) != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", false))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
 	if res, err := submitValidate.ValidateMap(submitMap, "find"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

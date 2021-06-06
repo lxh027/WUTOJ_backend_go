@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -26,10 +26,10 @@ func (model *PrintLog) UpdateStatusAfterPrint(PrintLogID int, data PrintLog) hel
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新状态失败，数据库错误", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新状态失败，数据库错误", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新状态成功", Data: 0}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新状态成功", Data: 0}
 }
 
 func (model *PrintLog) GetAllPrintLog(Offset int, Limit int) helper.ReturnType {
@@ -43,9 +43,9 @@ func (model *PrintLog) GetAllPrintLog(Offset int, Limit int) helper.ReturnType {
 		Find(&printlogs).
 		Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: 0}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: 0}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: gin.H{
 			"data":  printlogs,
 			"count": Count,
 		},
@@ -60,7 +60,7 @@ func (model *PrintLog) GetPrintLogByID(id string) helper.ReturnType {
 		Find(&printLog).
 		Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败，数据库错误", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败，数据库错误", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: printLog}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: printLog}
 }

@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,7 +14,7 @@ func GetSamplesByProblemID(c *gin.Context) {
 	var sampleJson model.Sample
 
 	if err := c.ShouldBind(&sampleJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -28,7 +28,7 @@ func AddSample(c *gin.Context) {
 
 	var sampleJson model.Sample
 	if err := c.ShouldBind(&sampleJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -42,7 +42,7 @@ func DeleteSample(c *gin.Context) {
 
 	var sampleJson model.Sample
 	if err := c.ShouldBind(&sampleJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -56,7 +56,7 @@ func UpdateSample(c *gin.Context) {
 
 	var sampleJson model.Sample
 	if err := c.ShouldBind(&sampleJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 

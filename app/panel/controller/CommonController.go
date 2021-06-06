@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"container/list"
 	"encoding/json"
@@ -43,7 +43,7 @@ func GetUserAllAuth(userID int) ([]menuItem, []string, error) {
 
 	authModel := model.Auth{}
 
-	if res := authModel.GetUserAllAuth(userID); res.Status == common.CodeSuccess {
+	if res := authModel.GetUserAllAuth(userID); res.Status == constants.CodeSuccess {
 		auths := res.Data.([]model.Auth)
 		authsLeft := map[int]model.Auth{}
 		var authName []string
@@ -117,7 +117,7 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	contestModel := model.Contest{}
 	res := contestModel.GetContestById(contestID)
 	now := time.Now()
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		return now, now, now, errors.New(res.Msg)
 	}
 	beginTime := res.Data.(model.Contest).BeginTime

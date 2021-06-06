@@ -2,8 +2,8 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path"
@@ -40,14 +40,14 @@ import (
 func UploadAvatar(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
 
 	file, err := c.FormFile("avatar")
 	if err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "获取文件失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "获取文件失败", err.Error()))
 		return
 	}
 
@@ -59,7 +59,7 @@ func UploadAvatar(c *gin.Context) {
 	userModel := model.User{}
 
 	if err := c.SaveUploadedFile(file, dst); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "上传文件失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "上传文件失败", err.Error()))
 		return
 	}
 

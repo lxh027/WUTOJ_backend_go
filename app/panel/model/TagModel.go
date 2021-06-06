@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Tag struct {
@@ -28,9 +28,9 @@ func (model *Tag) GetAllTag(offset int, limit int, name string) helper.ReturnTyp
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"tags": tags,
 				"count": count,
@@ -50,9 +50,9 @@ func (model *Tag) GetAvailTag(name string) helper.ReturnType {
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: tags}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: tags}
 	}
 }
 
@@ -62,9 +62,9 @@ func (model *Tag) FindTagByID(id int) helper.ReturnType {
 	err := db.Where("id = ?", id).First(&tag).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: tag}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: tag}
 	}
 }
 
@@ -72,15 +72,15 @@ func (model *Tag) AddTag(newTag Tag) helper.ReturnType {//jun
 	tag :=Tag{}
 
 	if err := db.Where("name = ?", newTag.Name).First(&tag).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "标签已存在",  Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "标签已存在",  Data: false}
 	}
 
 	err := db.Create(&newTag).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 	}
 }
 
@@ -88,9 +88,9 @@ func (model *Tag) DeleteTag(tagID int) helper.ReturnType  {
 	err := db.Where("id = ?", tagID).Delete(Tag{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "删除成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
 }
 
@@ -98,9 +98,9 @@ func (model *Tag) UpdateTag(tagID int, updateTag Tag) helper.ReturnType  {
 	err := db.Model(&Tag{}).Where("id = ?", tagID).Update(updateTag).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
 
@@ -108,8 +108,8 @@ func (model *Tag) ChangeTagStatus(tagID int, status int) helper.ReturnType  {
 	err := db.Model(&Tag{}).Where("id = ?", tagID).Update("status", status).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
