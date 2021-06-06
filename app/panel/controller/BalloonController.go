@@ -13,11 +13,6 @@ import (
 )
 
 func GetContestBalloon(c *gin.Context)  {
-	if res := haveAuth(c, "getBalloonStatus"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	contestModel := model.Contest{}
 	SubmitModel := model.Submit{}
 
@@ -98,10 +93,6 @@ func GetContestBalloon(c *gin.Context)  {
 }
 
 func SentBalloon(c *gin.Context)  {
-	if res := haveAuth(c, "setBalloonStatus"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	IDJson := struct {
 		ContestID 	uint 	`json:"contest_id" form:"contest_id"`
 		ProblemID 	int 	`json:"problem_id" form:"problem_id"`

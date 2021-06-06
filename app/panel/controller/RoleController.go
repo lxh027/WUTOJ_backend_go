@@ -11,10 +11,6 @@ import (
 
 // TODO 注册权限
 func GetAllRole(c *gin.Context) { //??
-	if res := haveAuth(c, "getAllRole"); res != common.Authed { //getAllUser怎么改？
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleModel := model.Role{}
 
 	roleJson := struct {
@@ -37,10 +33,6 @@ func GetAllRole(c *gin.Context) { //??
 }
 
 func GetRoleByID(c *gin.Context) { //jun
-	if res := haveAuth(c, "getAllRole"); res != common.Authed { //getAllUser怎么改？
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleValidate := validate.RoleValidate
 	roleModel := model.Role{}
 
@@ -64,10 +56,6 @@ func GetRoleByID(c *gin.Context) { //jun
 }
 
 func AddRole(c *gin.Context) { //jun
-	if res := haveAuth(c, "addRole"); res != common.Authed { //getAllUser怎么改？
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleValidate := validate.RoleValidate
 	roleModel := model.Role{}
 
@@ -90,10 +78,6 @@ func AddRole(c *gin.Context) { //jun
 }
 
 func DeleteRole(c *gin.Context) {
-	if res := haveAuth(c, "deleteRole"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleValidate := validate.RoleValidate
 	roleModel := model.Role{}
 
@@ -118,10 +102,6 @@ func DeleteRole(c *gin.Context) {
 }
 
 func UpdateRole(c *gin.Context) {
-	if res := haveAuth(c, "updateRole"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleValidate := validate.RoleValidate
 	roleModel := model.Role{}
 

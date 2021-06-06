@@ -12,10 +12,6 @@ import (
 )
 
 func GetRoleAuthsList(c *gin.Context) {
-	if res := haveAuth(c, "authAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleAuthValidate := validate.RoleAuthValidate //jun
 	authModel := model.Auth{}
 
@@ -54,10 +50,6 @@ func GetRoleAuthsList(c *gin.Context) {
 }
 
 func AddRoleAuths(c *gin.Context) {
-	if res := haveAuth(c, "authAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleAuthValidate := validate.RoleAuthValidate
 	roleAuthModel := model.RoleAuth{}
 
@@ -92,10 +84,6 @@ func AddRoleAuths(c *gin.Context) {
 }
 
 func DeleteRoleAuths(c *gin.Context) {
-	if res := haveAuth(c, "authAssign"); res != common.Authed { //jun
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	roleAuthValidate := validate.RoleAuthValidate
 	roleAuthModel := model.RoleAuth{}
 

@@ -11,10 +11,6 @@ import (
 )
 
 func GetAllNotification(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	noticeJson := struct {
@@ -31,10 +27,6 @@ func GetAllNotification(c *gin.Context) {
 }
 
 func GetNotificationByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
@@ -53,10 +45,6 @@ func GetNotificationByID(c *gin.Context) {
 func AddNotification(c *gin.Context) {
 	session := sessions.Default(c)
 
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
@@ -74,10 +62,6 @@ func AddNotification(c *gin.Context) {
 }
 
 func DeleteNotification(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
@@ -92,10 +76,6 @@ func DeleteNotification(c *gin.Context) {
 }
 
 func UpdateNotification(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 
 	noticeModel := model.Notification{}
 
@@ -112,10 +92,6 @@ func UpdateNotification(c *gin.Context) {
 }
 
 func ChangeNotificationStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 
 	noticeModel := model.Notification{}
 

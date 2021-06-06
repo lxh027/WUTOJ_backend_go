@@ -36,10 +36,6 @@ func (a userSort) Less(i, j int) bool {
 }
 
 func GetAllSubmit(c *gin.Context) {
-	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
@@ -72,10 +68,6 @@ func GetAllSubmit(c *gin.Context) {
 }
 
 func GetSubmitByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitValidate := validate.SubmitValidate
 	submitModel := model.Submit{}
 
@@ -98,10 +90,6 @@ func GetSubmitByID(c *gin.Context) {
 }
 
 func RejudgeGroupSubmits(c *gin.Context) {
-	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
@@ -135,10 +123,6 @@ func RejudgeGroupSubmits(c *gin.Context) {
 }
 
 func RejudgeSubmitByID(c *gin.Context) {
-	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitValidate := validate.SubmitValidate
 	submitModel := model.Submit{}
 

@@ -10,10 +10,6 @@ import (
 )
 
 func GetAllUserSubmitStatus(c *gin.Context) {
-	if res := haveAuth(c, "getUserSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userLogModel := model.UserSubmitLog{}
 
 	userLogJson := struct {
@@ -35,10 +31,6 @@ func GetAllUserSubmitStatus(c *gin.Context) {
 }
 
 func GetUserSubmitStatusByTime(c *gin.Context) {
-	if res := haveAuth(c, "getUserSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userLogModel := model.UserSubmitLog{}
 
 	userLogJson := struct {

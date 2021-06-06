@@ -11,11 +11,6 @@ import (
 )
 
 func PrintRequest(c *gin.Context) {
-	if res := haveAuth(c, "getPrintRequest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	printLogModel := model.PrintLog{}
 	submitModel := model.Submit{}
 	userModel := model.User{}
@@ -54,11 +49,6 @@ func PrintRequest(c *gin.Context) {
 }
 
 func GetAllPrintRequest(c *gin.Context) {
-	if res := haveAuth(c, "getPrintRequest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	printRequestModel := model.PrintLog{}
 
 	PrintRequestJson := struct {

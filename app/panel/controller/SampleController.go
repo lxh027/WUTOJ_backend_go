@@ -9,10 +9,6 @@ import (
 )
 
 func GetSamplesByProblemID(c *gin.Context) {
-	if res := haveAuth(c, "getAllProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	sampleModel := model.Sample{}
 
 	var sampleJson model.Sample
@@ -28,10 +24,6 @@ func GetSamplesByProblemID(c *gin.Context) {
 }
 
 func AddSample(c *gin.Context) {
-	if res := haveAuth(c, "addProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	sampleModel := model.Sample{}
 
 	var sampleJson model.Sample
@@ -46,10 +38,6 @@ func AddSample(c *gin.Context) {
 }
 
 func DeleteSample(c *gin.Context) {
-	if res := haveAuth(c, "deleteProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	sampleModel := model.Sample{}
 
 	var sampleJson model.Sample
@@ -64,10 +52,6 @@ func DeleteSample(c *gin.Context) {
 }
 
 func UpdateSample(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	sampleModel := model.Sample{}
 
 	var sampleJson model.Sample

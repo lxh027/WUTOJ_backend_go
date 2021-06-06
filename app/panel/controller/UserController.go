@@ -13,10 +13,6 @@ import (
 )
 
 func UpdateUser(c *gin.Context) {
-	if res := haveAuth(c, "updateUser"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userValidate := validate.UserValidate
 	userModel := model.User{}
 
@@ -39,10 +35,6 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUsers(c *gin.Context) {
-	if res := haveAuth(c, "deleteUser"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userValidate := validate.UserValidate
 	userModel := model.User{}
 
@@ -73,10 +65,6 @@ func DeleteUsers(c *gin.Context) {
 }
 
 func SetUserAdmin(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userValidate := validate.UserValidate
 	userModel := model.User{}
 
@@ -102,10 +90,6 @@ func SetUserAdmin(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	if res := haveAuth(c, "deleteUser"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userValidate := validate.UserValidate
 	userModel := model.User{}
 
@@ -130,10 +114,6 @@ func DeleteUser(c *gin.Context) {
 }
 
 func GetAllUser(c *gin.Context) {
-	if res := haveAuth(c, "getAllUser"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userModel := model.User{}
 
 	userJson := struct {
@@ -156,10 +136,6 @@ func GetAllUser(c *gin.Context) {
 }
 
 func GetUserByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllUser"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userValidate := validate.UserValidate
 	userModel := model.User{}
 
@@ -282,7 +258,7 @@ func GetUserInfo(c *gin.Context) {
 	if id := session.Get("userId"); id != nil {
 		data := make(map[string]interface{}, 0)
 		_ = json.Unmarshal([]byte(session.Get("data").(string)), &data)
-		if menu, auths, err := getUserAllAuth(id.(int)); err == nil {
+		if menu, auths, err := GetUserAllAuth(id.(int)); err == nil {
 			data["auths"] = auths
 			data["menu"] = menu
 		} else {

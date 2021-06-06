@@ -10,10 +10,6 @@ import (
 )
 
 func GetAllTag(c *gin.Context) {
-	if res := haveAuth(c, "getAllTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagModel := model.Tag{}
 
 	tagJson := struct {
@@ -35,10 +31,6 @@ func GetAllTag(c *gin.Context) {
 }
 
 func FindTagsByName(c *gin.Context) {
-	if res := haveAuth(c, "getAllTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	//tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
@@ -61,10 +53,6 @@ func FindTagsByName(c *gin.Context) {
 }
 
 func GetTagByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
@@ -87,10 +75,6 @@ func GetTagByID(c *gin.Context) {
 }
 
 func AddTag(c *gin.Context) {
-	if res := haveAuth(c, "addTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
@@ -112,10 +96,6 @@ func AddTag(c *gin.Context) {
 }
 
 func DeleteTag(c *gin.Context) {
-	if res := haveAuth(c, "deleteTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
@@ -137,10 +117,6 @@ func DeleteTag(c *gin.Context) {
 }
 
 func UpdateTag(c *gin.Context) {
-	if res := haveAuth(c, "updateTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 
@@ -162,10 +138,6 @@ func UpdateTag(c *gin.Context) {
 }
 
 func ChangeTagStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateTag"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	tagValidate := validate.TagValidate
 	tagModel := model.Tag{}
 

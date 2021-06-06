@@ -10,10 +10,6 @@ import (
 )
 
 func GetAllAuth(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authModel := model.Auth{}
 
 	authJson := struct {
@@ -35,10 +31,6 @@ func GetAllAuth(c *gin.Context) {
 }
 
 func GetParentAuth(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authModel := model.Auth{}
 
 	authJson := struct {
@@ -58,10 +50,6 @@ func GetParentAuth(c *gin.Context) {
 }
 
 func AddAuth(c *gin.Context) {
-	if res := haveAuth(c, "addAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
@@ -88,10 +76,6 @@ func AddAuth(c *gin.Context) {
 }
 
 func DeleteAuth(c *gin.Context) {
-	if res := haveAuth(c, "deleteAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
@@ -116,10 +100,6 @@ func DeleteAuth(c *gin.Context) {
 }
 
 func UpdateAuth(c *gin.Context) {
-	if res := haveAuth(c, "updateAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
@@ -142,10 +122,6 @@ func UpdateAuth(c *gin.Context) {
 }
 
 func GetAuthByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed { //getAllUser怎么改？
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 

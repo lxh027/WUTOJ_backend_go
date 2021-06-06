@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"strconv"
 	"time"
 )
@@ -28,27 +26,6 @@ type redisData struct {
 	Auth []string   `json:"auth"`
 }
 
-func haveAuth(c *gin.Context, authQuery string) int {
-	session := sessions.Default(c)
-	id := session.Get("userId")
-	if id == nil {
-		return common.UnLoggedIn
-	} else if session.Get("identity").(uint) == 0 {
-		return common.UnAuthed
-	}
-	_, auths, err := getUserAllAuth(id.(int))
-	if err != nil {
-		return common.AuthError
-	} else {
-		for _, auth := range auths {
-			if auth == authQuery {
-				return common.Authed
-			}
-		}
-		return common.UnAuthed
-	}
-}
-
 func ClearAuthRedis(userID int) {
 	err := db_server.DeleteFromRedis(strconv.Itoa(userID) + "auth_info")
 	if err != nil {
@@ -56,7 +33,7 @@ func ClearAuthRedis(userID int) {
 	}
 }
 
-func getUserAllAuth(userID int) ([]menuItem, []string, error) {
+func GetUserAllAuth(userID int) ([]menuItem, []string, error) {
 	if info, err := db_server.GetFromRedis(strconv.Itoa(userID) + "auth_info"); err == nil && info != nil {
 		var authInfo redisData
 		bytes, _ := redis.Bytes(info, err)

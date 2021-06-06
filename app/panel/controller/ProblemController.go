@@ -18,10 +18,6 @@ import (
 )
 
 func GetAllProblem(c *gin.Context) {
-	if res := haveAuth(c, "getAllProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemModel := model.Problem{}
 
 	problemJson := struct {
@@ -43,10 +39,6 @@ func GetAllProblem(c *gin.Context) {
 }
 
 func GetProblemByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -69,10 +61,6 @@ func GetProblemByID(c *gin.Context) {
 }
 
 func AddProblem(c *gin.Context) {
-	if res := haveAuth(c, "addProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -95,10 +83,6 @@ func AddProblem(c *gin.Context) {
 }
 
 func DeleteProblem(c *gin.Context) {
-	if res := haveAuth(c, "deleteProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -120,10 +104,6 @@ func DeleteProblem(c *gin.Context) {
 }
 
 func UpdateProblem(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -145,10 +125,6 @@ func UpdateProblem(c *gin.Context) {
 }
 
 func ChangeProblemStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -170,10 +146,6 @@ func ChangeProblemStatus(c *gin.Context) {
 }
 
 func ChangeProblemPublic(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
@@ -204,10 +176,6 @@ type tomlData struct {
 }
 
 func SetProblemTimeAndSpace(c *gin.Context) {
-	if res := haveAuth(c, "uploadData"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemModel := model.Problem{}
 
 	problemJson := struct {
@@ -245,11 +213,6 @@ func SetProblemTimeAndSpace(c *gin.Context) {
 
 
 func UploadData(c *gin.Context) {
-	if res := haveAuth(c, "uploadData"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	//var problemModel model.Problem
 
 	form, _ := c.MultipartForm()

@@ -14,10 +14,6 @@ import (
 )
 
 func GetAllContest(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestModel := model.Contest{}
 
 	contestJson := struct {
@@ -40,10 +36,6 @@ func GetAllContest(c *gin.Context) {
 }
 
 func GetContestByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 
@@ -66,10 +58,6 @@ func GetContestByID(c *gin.Context) {
 }
 
 func AddContest(c *gin.Context) {
-	if res := haveAuth(c, "addContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 	problemModel := model.Problem{}
@@ -101,10 +89,6 @@ func AddContest(c *gin.Context) {
 }
 
 func DeleteContest(c *gin.Context) {
-	if res := haveAuth(c, "deleteContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 
@@ -126,10 +110,6 @@ func DeleteContest(c *gin.Context) {
 }
 
 func UpdateContest(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 	problemModel := model.Problem{}
@@ -161,10 +141,6 @@ func UpdateContest(c *gin.Context) {
 }
 
 func ChangeContestStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 
@@ -186,10 +162,6 @@ func ChangeContestStatus(c *gin.Context) {
 }
 
 func ClearContestRedis(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	contestValidate := validate.ContestValidate
 
 	var contestJson model.Contest

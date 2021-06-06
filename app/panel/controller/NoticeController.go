@@ -11,10 +11,6 @@ import (
 )
 
 func GetAllNotice(c *gin.Context) {
-	if res := haveAuth(c, "getAllNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notice{}
 
 	noticeJson := struct {
@@ -37,10 +33,6 @@ func GetAllNotice(c *gin.Context) {
 }
 
 func GetNoticeByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
@@ -63,10 +55,6 @@ func GetNoticeByID(c *gin.Context) {
 }
 
 func AddNotice(c *gin.Context) {
-	if res := haveAuth(c, "addNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
@@ -88,10 +76,6 @@ func AddNotice(c *gin.Context) {
 }
 
 func DeleteNotice(c *gin.Context) {
-	if res := haveAuth(c, "deleteNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
@@ -113,10 +97,6 @@ func DeleteNotice(c *gin.Context) {
 }
 
 func UpdateNotice(c *gin.Context) {
-	if res := haveAuth(c, "updateNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 

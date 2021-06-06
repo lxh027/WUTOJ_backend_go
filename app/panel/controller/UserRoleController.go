@@ -13,10 +13,6 @@ import (
 
 // TODO
 func AddUserRoles(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	userRoleModel := model.UserRole{}
 
@@ -51,10 +47,6 @@ func AddUserRoles(c *gin.Context) {
 }
 
 func DeleteUserRoles(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	userRoleModel := model.UserRole{}
 
@@ -90,10 +82,6 @@ func DeleteUserRoles(c *gin.Context) {
 }
 
 func GetUserRolesList(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	roleModel := model.Role{}
 
