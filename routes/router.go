@@ -64,7 +64,7 @@ func Routes(router *gin.Engine) {
 		{
 			problem.GET("", apiController.GetAllProblems)
 			problem.GET("/contest/:contest_id", apiController.GetContestProblems)
-			problem.GET("/problem/:param", apiController.SearchProblem)
+			problem.GET("/problem/:problem_id", apiController.GetProblemByID)
 
 		}
 
