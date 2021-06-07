@@ -45,7 +45,7 @@ func Routes(router *gin.Engine) {
 		contest := api.Group("/contests")
 		{
 			contest.GET("", apiController.GetAllContest)
-			contest.GET("/contest/:param", apiController.SearchContest)
+			contest.GET("/contest/:contest_id", apiController.GetContest)
 			contest.GET("/user", apiController.GetUserContest)
 			contest.GET("/user/:contest_id", apiController.CheckContest)
 			contest.POST("/user/:contest_id", apiController.JoinContest)
