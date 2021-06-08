@@ -216,6 +216,7 @@ func Routes(router *gin.Engine) {
 			problem.POST("/findSamplesByProblemID", panelController.GetSamplesByProblemID)
 			problem.POST("/uploadData", panelController.UploadData)
 			problem.POST("/updateJudgeInfo", panelController.SetProblemTimeAndSpace)
+			problem.POST("/uploadXML",panelController.UploadXML)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))

@@ -106,5 +106,6 @@ var auths = map[string]string {
 	"/panel/problem/findSamplesByProblemID": "getAllProblem",
 	"/panel/problem/uploadData": "uploadData",
 	"/panel/problem/updateJudgeInfo": "uploadData",
+	"/panel/problem/uploadXML": "uploadData",
 }
 

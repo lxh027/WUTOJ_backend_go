@@ -15,6 +15,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"encoding/xml"
+	"io/ioutil"
+	"regexp"
 )
 
 func GetAllProblem(c *gin.Context) {
@@ -380,3 +383,147 @@ func updateToml(c *gin.Context, problemDataJson tomlData, isRebuild bool) {
 		}
 	}
 }
+
+func UploadXML(c *gin.Context) {
+	form, _ := c.MultipartForm()
+	files := form.File["file[]"]
+	problemValidate := validate.ProblemValidate
+	var problemJson model.Problem
+
+	for _,fileheader := range files{
+		f,err := fileheader.Open()
+		if err != nil{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开XML文件失败", err.Error()))
+			return
+		}
+		problemItem, err := parseProblemXml(&f)
+		if err != nil{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "解析XML文件失败", err.Error()))
+			return
+		}
+
+		problemJson.Title = problemItem.Title
+		problemJson.Describe = problemItem.Description
+		problemJson.InputFormat = problemItem.InputFormat
+		problemJson.OutputFormat = problemItem.OutputFormat
+		problemJson.Hint = problemItem.Hint
+		problemJson.Public = 1
+		problemJson.Source = problemItem.Source
+		problemJson.Time = problemItem.TimeLimit
+		problemJson.Memory = problemItem.MemoryLimit
+		problemJson.Type = "Normal"
+		problemJson.Status = 1
+		problemJson.Path = config.GetJudgeConfig()["base_dir"].(string) + "/tmp/0"
+
+		problemMap := helper.Struct2Map(problemJson)
+		if res, err := problemValidate.ValidateMap(problemMap, "add"); !res {
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
+			return
+		}
+
+		problemModel := model.Problem{}
+		res := problemModel.AddProblem(problemJson)
+		if res.Status == constants.CodeError{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+			return
+		}
+		problemID := res.Data.(int)
+
+		problemDataJson := tomlData{}
+		problemDataJson.ProblemID = problemID
+		problemDataJson.Time = float64(problemItem.TimeLimit)
+		problemDataJson.Memory = float64(problemItem.MemoryLimit)
+		problemDataJson.Spj = false
+
+		updateToml(c, problemDataJson, true)
+
+		judgeConfig := config.GetJudgeConfig()
+
+		dataPath := judgeConfig["base_dir"].(string) + "/" + judgeConfig["env"].(string) + "/" + strconv.Itoa(problemDataJson.ProblemID) + "/problem"
+
+		if len(problemItem.TestInput) != len(problemItem.TestOutput){
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "输入输出数量不一致", err.Error()))
+			return
+		}
+		if len(problemItem.SampleInput) != len(problemItem.SampleOutput){
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "样例输入输出数量不一致", err.Error()))
+			return
+		}
+		for index,_ := range problemItem.SampleInput{
+			sampleModel := model.Sample{}
+			var sampleJson model.Sample
+			sampleJson.ProblemID = problemID
+			sampleJson.Input = problemItem.SampleInput[index]
+			sampleJson.Output = problemItem.SampleOutput[index]
+			res := sampleModel.AddSample(sampleJson)
+			if res.Status == constants.CodeError{
+				c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+				return
+			}
+		}
+		for index,_ := range problemItem.TestInput{
+			dataPairPath := dataPath + "/" + strconv.Itoa(index)
+			if err := os.MkdirAll(dataPairPath, 755); err != nil {
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "创建路径失败", err.Error()))
+				return
+			}
+			err1 := ioutil.WriteFile(dataPairPath+"/input",[]byte(problemItem.TestInput[index]),0666)
+			err2 := ioutil.WriteFile(dataPairPath+"/answer",[]byte(problemItem.TestOutput[index]),0666)
+			if err1 != nil || err2 != nil {
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "保存输入/输出文件失败", 1))
+				return
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "解析XML成功", "OK"))
+}
+
+type ProblemItem struct {
+	Title        string   `xml:"title"`
+	TimeLimit    float32  `xml:"time_limit"`
+	MemoryLimit  int      `xml:"memory_limit"`
+	Description  string   `xml:"description"`
+	InputFormat  string   `xml:"input"`
+	OutputFormat string   `xml:"output"`
+	SampleInput  []string `xml:"sample_input"`
+	SampleOutput []string `xml:"sample_output"`
+	TestInput    []string `xml:"test_input"`
+	TestOutput   []string `xml:"test_output"`
+	Hint         string   `xml:"hint"`
+	Source       string   `xml:"source"`
+}
+
+type ProblemXml struct {
+	XMLName xml.Name    `xml:"fps"`
+	Item    ProblemItem `xml:"item"`
+}
+
+func parseProblemXml(file *multipart.File) (ProblemItem, error) {
+	v := ProblemXml{}
+	data, err := ioutil.ReadAll(*file)
+	if err != nil {
+		return v.Item, fmt.Errorf("read file error:%v", err)
+	}
+	err = xml.Unmarshal(data, &v)
+	if err != nil {
+		return v.Item, fmt.Errorf("unmarshal error:%v", err)
+	}
+	reg1 := regexp.MustCompile(`class=".*"`)
+	reg2 := regexp.MustCompile(`id=".*"`)
+
+	v.Item.Description = reg1.ReplaceAllString(v.Item.Description, "")
+	v.Item.Hint = reg1.ReplaceAllString(v.Item.Hint, "")
+	v.Item.InputFormat = reg1.ReplaceAllString(v.Item.InputFormat, "")
+	v.Item.OutputFormat = reg1.ReplaceAllString(v.Item.OutputFormat, "")
+	v.Item.Source = reg1.ReplaceAllString(v.Item.Source, "")
+
+	v.Item.Description = reg2.ReplaceAllString(v.Item.Description, "")
+	v.Item.Hint = reg2.ReplaceAllString(v.Item.Hint, "")
+	v.Item.InputFormat = reg2.ReplaceAllString(v.Item.InputFormat, "")
+	v.Item.OutputFormat = reg2.ReplaceAllString(v.Item.OutputFormat, "")
+	v.Item.Source = reg2.ReplaceAllString(v.Item.Source, "")
+
+	return v.Item, nil
+}
+
