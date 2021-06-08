@@ -71,13 +71,20 @@ func (model *Problem) GetProblemFieldsByIDList(ids []uint, fields[]string) helpe
 
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
+	sampleModel := Sample{}
+	problemSubmitLog := ProblemSubmitLog{}
 
 	err := db.Where("problem_id = ?", id).First(&problem).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problem}
+		problemData := map[string]interface{}{
+			"problem":            problem,
+			"problem_sample":     sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+			"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
+		}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problemData}
 	}
 }
 
