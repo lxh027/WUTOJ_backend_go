@@ -31,7 +31,7 @@ func GetAllContest(c *gin.Context) {
 
 }
 
-func GetContest(c *gin.Context) {
+func GetContestByID(c *gin.Context) {
 
 	res := checkLogin(c)
 	if res.Status == constants.CodeError {
@@ -48,8 +48,7 @@ func GetContest(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
-		res = contestModel.GetContestByName(ContestID)
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "数据查找失败", res.Msg))
 	}
 
 }

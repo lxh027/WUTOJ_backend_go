@@ -71,3 +71,29 @@ func SearchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
+
+func GetUserByID(c *gin.Context) {
+
+	res := checkLogin(c)
+	if res.Status == constants.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
+	userJson := struct {
+		UserID uint `json:"user_id" form:"user_id" uri:"user_id"`
+	}{}
+	userModel := model.User{}
+
+	if err := c.ShouldBindUri(&userJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
+		return
+	}
+	log.Print("-----")
+	log.Print(userJson)
+	res = userModel.FindUserByID(userJson.UserID)
+
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
+	
+}

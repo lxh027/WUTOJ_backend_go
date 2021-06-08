@@ -38,14 +38,14 @@ func Routes(router *gin.Engine) {
 
 		users := api.Group("/users")
 		{
-			users.GET("/:param", apiController.SearchUser)
+			users.GET("/:user_id", apiController.GetUserByID)
 			users.PUT("/:user_id", apiController.UpdateUserInfo)
 		}
 
 		contest := api.Group("/contests")
 		{
 			contest.GET("", apiController.GetAllContest)
-			contest.GET("/contest/:param", apiController.SearchContest)
+			contest.GET("/contest/:contest_id", apiController.GetContestByID)
 			contest.GET("/user", apiController.GetUserContest)
 			contest.GET("/user/:contest_id", apiController.CheckContest)
 			contest.POST("/user/:contest_id", apiController.JoinContest)
@@ -64,7 +64,7 @@ func Routes(router *gin.Engine) {
 		{
 			problem.GET("", apiController.GetAllProblems)
 			problem.GET("/contest/:contest_id", apiController.GetContestProblems)
-			problem.GET("/problem/:param", apiController.SearchProblem)
+			problem.GET("/problem/:problem_id", apiController.GetProblemByID)
 
 		}
 

@@ -68,7 +68,10 @@ func (model *User) EditUserByNick(nick string, data User) helper.ReturnType {
 // 通过ID查询用户
 func (model *User) FindUserByID(userID uint) helper.ReturnType {
 	user := User{}
-	err := db.Where("user_id = ?", userID).First(user).Error
+	err := db.Model(&User{}).
+	Select([]string{"user_id", "nick", "realname", "avatar", "school", "major", "class", "contact", "identity"}).
+	Where("user_id = ?", userID).
+	First(&user).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -80,7 +83,7 @@ func (model *User) FindUserByID(userID uint) helper.ReturnType {
 // 通过nick查询用户
 func (model *User) FindUserByNick(nick string) helper.ReturnType {
 	user := User{}
-	err := db.Where("nick = ?", nick).First(user).Error
+	err := db.Where("nick = ?", nick).First(&user).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}

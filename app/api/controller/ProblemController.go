@@ -25,8 +25,15 @@ func GetProblemByID(c *gin.Context) {
 	problemModel := model.Problem{}
 	contestModel := model.Contest{}
 
-	var problemJson model.Problem
-
+	problemJson := struct {
+		ProblemID int `json:"problem_id"`
+	}{}
+	if problemID,err := strconv.Atoi(c.Param("problem_id"));err != nil{
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "参数错误", err.Error()))
+		return
+	}else{
+		problemJson.ProblemID = problemID
+	}
 	if err := c.ShouldBind(&problemJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
