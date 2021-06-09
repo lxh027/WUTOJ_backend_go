@@ -27,9 +27,9 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 	var Problems []Problem
 	var count int
 
-	db.Model(&Problem{}).Count(&count)
+	db.Model(&Problem{}).Where("public = ?", constants.ProblemPublic).Count(&count)
 
-	err := db.Where("public = ?", 1).Find(&Problems).Error
+	err := db.Where("public = ?", constants.ProblemPublic).Order("problem_id").Find(&Problems).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -91,7 +91,7 @@ func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 	var problem Problem
 
-	err := db.Where("title = ? AND public = ?", title, 1).First(&problem).Error
+	err := db.Where("title = ? AND public = ?", title, constants.ProblemPublic).First(&problem).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
