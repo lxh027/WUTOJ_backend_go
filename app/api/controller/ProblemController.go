@@ -14,7 +14,14 @@ import (
 func GetAllProblems(c *gin.Context) {
 
 	problemModel := model.Problem{}
-	res := problemModel.GetAllProblems()
+	problemJson := struct {
+		PageNumber int `json:"page_number" form:"page_number"`
+	}{}
+	if err := c.ShouldBind(&problemJson);err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "页码参数错误", err.Error()))
+		return
+	}
+	res := problemModel.GetAllProblems((problemJson.PageNumber-1)*constants.PageLimit,constants.PageLimit)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 

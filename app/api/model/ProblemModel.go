@@ -23,13 +23,17 @@ type Problem struct {
 	Status       int     `json:"status" form:"status"`
 }
 
-func (model *Problem) GetAllProblems() helper.ReturnType {
+func (model *Problem) GetAllProblems(offset int,limit int) helper.ReturnType {
 	var Problems []Problem
 	var count int
 
 	db.Model(&Problem{}).Where("public = ?", constants.ProblemPublic).Count(&count)
 
-	err := db.Where("public = ?", constants.ProblemPublic).Order("problem_id").Find(&Problems).Error
+	err := db.Offset(offset).
+		Limit(limit).
+		Where("public = ?", constants.ProblemPublic).
+		Order("problem_id").
+		Find(&Problems).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
