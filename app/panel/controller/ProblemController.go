@@ -396,13 +396,13 @@ func UploadXML(c *gin.Context) {
 			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开XML文件失败", err.Error()))
 			return
 		}
-		problemItem, err := parseProblemXml(&f)
+		problemItems, err := parseProblemXml(&f)
 		if err != nil{
 			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "解析XML文件失败", err.Error()))
 			return
 		}
-
-		problemJson.Title = problemItem.Title
+		for _, problemItem := range problemItems{
+			problemJson.Title = problemItem.Title
 		problemJson.Describe = problemItem.Description
 		problemJson.InputFormat = problemItem.InputFormat
 		problemJson.OutputFormat = problemItem.OutputFormat
@@ -474,6 +474,8 @@ func UploadXML(c *gin.Context) {
 				return
 			}
 		}
+		}
+		
 	}
 
 	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "解析XML成功", "OK"))
@@ -496,10 +498,10 @@ type ProblemItem struct {
 
 type ProblemXml struct {
 	XMLName xml.Name    `xml:"fps"`
-	Item    ProblemItem `xml:"item"`
+	Item    []ProblemItem `xml:"item"`
 }
 
-func parseProblemXml(file *multipart.File) (ProblemItem, error) {
+func parseProblemXml(file *multipart.File) ([]ProblemItem, error) {
 	v := ProblemXml{}
 	data, err := ioutil.ReadAll(*file)
 	if err != nil {
@@ -512,17 +514,20 @@ func parseProblemXml(file *multipart.File) (ProblemItem, error) {
 	reg1 := regexp.MustCompile(`class=".*"`)
 	reg2 := regexp.MustCompile(`id=".*"`)
 
-	v.Item.Description = reg1.ReplaceAllString(v.Item.Description, "")
-	v.Item.Hint = reg1.ReplaceAllString(v.Item.Hint, "")
-	v.Item.InputFormat = reg1.ReplaceAllString(v.Item.InputFormat, "")
-	v.Item.OutputFormat = reg1.ReplaceAllString(v.Item.OutputFormat, "")
-	v.Item.Source = reg1.ReplaceAllString(v.Item.Source, "")
+	for index,_ := range v.Item{
+	v.Item[index].Description = reg1.ReplaceAllString(v.Item[index].Description, "")
+	v.Item[index].Hint = reg1.ReplaceAllString(v.Item[index].Hint, "")
+	v.Item[index].InputFormat = reg1.ReplaceAllString(v.Item[index].InputFormat, "")
+	v.Item[index].OutputFormat = reg1.ReplaceAllString(v.Item[index].OutputFormat, "")
+	v.Item[index].Source = reg1.ReplaceAllString(v.Item[index].Source, "")
 
-	v.Item.Description = reg2.ReplaceAllString(v.Item.Description, "")
-	v.Item.Hint = reg2.ReplaceAllString(v.Item.Hint, "")
-	v.Item.InputFormat = reg2.ReplaceAllString(v.Item.InputFormat, "")
-	v.Item.OutputFormat = reg2.ReplaceAllString(v.Item.OutputFormat, "")
-	v.Item.Source = reg2.ReplaceAllString(v.Item.Source, "")
+	v.Item[index].Description = reg2.ReplaceAllString(v.Item[index].Description, "")
+	v.Item[index].Hint = reg2.ReplaceAllString(v.Item[index].Hint, "")
+	v.Item[index].InputFormat = reg2.ReplaceAllString(v.Item[index].InputFormat, "")
+	v.Item[index].OutputFormat = reg2.ReplaceAllString(v.Item[index].OutputFormat, "")
+	v.Item[index].Source = reg2.ReplaceAllString(v.Item[index].Source, "")
+	}
+
 
 	return v.Item, nil
 }
