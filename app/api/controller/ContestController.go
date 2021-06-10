@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	_ "strconv"
+	"strconv"
 )
 
 func GetAllContest(c *gin.Context) {
@@ -32,19 +32,30 @@ func GetAllContest(c *gin.Context) {
 }
 
 func GetContestByID(c *gin.Context) {
-
 	res := checkLogin(c)
 	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
+	userIDRaw := res.Data.(uint)
+	userID := int(userIDRaw)
 
-	ContestID := c.Param("contest_id")
+	ContestIDRaw := c.Param("contest_id")
+	ContestID , err := strconv.Atoi(ContestIDRaw)
+	if err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛ID错误", 0))
+		return
+	}
 	fmt.Println(ContestID)
 	contestModel := model.Contest{}
 
 	res = contestModel.GetContestById(ContestID)
 	if res.Status != constants.CodeError {
+		contestUserModel := model.ContestUser{}
+		if participation := contestUserModel.CheckUserContest(userID,ContestID); participation.Status != constants.CodeSuccess{
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
+			return
+		}
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
@@ -125,6 +136,8 @@ func GetContestProblems(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
+	userIDRaw := res.Data.(uint)
+	userID := int(userIDRaw)
 
 	var ContestJson model.Contest
 	contestModel := model.Contest{}
@@ -133,6 +146,14 @@ func GetContestProblems(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", ""))
 		return
 	}
+	
+	contestID := ContestJson.ContestID
+	contestUserModel := model.ContestUser{}
+	if participation := contestUserModel.CheckUserContest(userID,contestID); participation.Status != constants.CodeSuccess{
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
+		return
+	}
+
 	contestValidate := validate.ContestValidate
 	contestMap := helper.Struct2Map(ContestJson)
 

@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -53,7 +52,7 @@ func checkLogin(c *gin.Context) helper.ReturnType {
 // return begin, frozen, end
 func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	contestModel := model.Contest{}
-	res := contestModel.GetContestById(strconv.FormatInt(int64(contestID), 10))
+	res := contestModel.GetContestById(int(contestID))
 	now := time.Now()
 	if res.Status != constants.CodeSuccess {
 		return now, now, now, errors.New(res.Msg)

@@ -56,17 +56,14 @@ func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 	return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: ""}
 }
 
-func (model *Contest) GetContestById(contestID string) helper.ReturnType {
+func (model *Contest) GetContestById(contestID int) helper.ReturnType {
 	contest := Contest{}
-	if contestID != "" {
-		err := db.Where("contest_id = ?", contestID).First(&contest).Error
-		if err != nil {
-			return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: err.Error()}
-		} else {
-			return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
-		}
+	err := db.Where("contest_id = ?", contestID).First(&contest).Error
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: ""}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
+	
 }
 
 func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
