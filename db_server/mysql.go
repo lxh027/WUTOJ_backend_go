@@ -28,6 +28,11 @@ func init()  {
 	// open connection
 	MySqlDb, MySqlError = gorm.Open("mysql", dbDSN)
 
+	db := MySqlDb.DB()
+
+	db.SetMaxIdleConns(dbConfig["maxIdleCoons"].(int))
+	db.SetMaxOpenConns(dbConfig["maxOpenConns"].(int))
+
 	// 禁用默认复数表名
 	MySqlDb.SingularTable(true)
 
