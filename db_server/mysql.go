@@ -30,7 +30,7 @@ func init()  {
 
 	db := MySqlDb.DB()
 
-	db.SetMaxIdleConns(dbConfig["maxIdleCoons"].(int))
+	db.SetMaxIdleConns(dbConfig["maxIdleConns"].(int))
 	db.SetMaxOpenConns(dbConfig["maxOpenConns"].(int))
 
 	// 禁用默认复数表名
