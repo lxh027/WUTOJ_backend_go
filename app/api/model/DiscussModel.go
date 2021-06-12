@@ -45,7 +45,7 @@ func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnTyp
 	replyModel := Reply{}
 
 	err := db.Where("id = ?", id).First(&discuss).Error
-	res := replyModel.GetReplyByProblemID(id, (PageNumber-1)*constants.PageLimit, constants.PageLimit)
+	res := replyModel.GetReplyByDiscussID(id, (PageNumber-1)*constants.PageLimit, constants.PageLimit)
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}

@@ -29,7 +29,7 @@ func (model *Reply) AddReply(data Reply) helper.ReturnType {
 
 }
 
-func (model *Reply) GetReplyByProblemID(DiscussID int, Offset int, Limit int) helper.ReturnType {
+func (model *Reply) GetReplyByDiscussID(DiscussID int, Offset int, Limit int) helper.ReturnType {
 	var reply []Reply
 	var count int
 
