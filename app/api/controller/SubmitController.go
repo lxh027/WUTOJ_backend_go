@@ -28,6 +28,8 @@ func Submit(c *gin.Context) {
 		return
 	}
 
+	//TODO: auth participation and contest time
+
 	submitModel := model.Submit{}
 	submitValidate := validate.SubmitValidate
 	session := sessions.Default(c)

@@ -86,6 +86,8 @@ func GetContestDiscussion(c *gin.Context) {
 		return
 	}
 
+	//TODO : Auth participation and contest time
+
 	discussModel := model.Discuss{}
 	discussValidate := validate.DiscussValidate
 
