@@ -101,6 +101,10 @@ func DeleteProblem(c *gin.Context) {
 		return
 	}
 
+	if err := deleteProblemData(problemJson.ProblemID) ; err != nil{
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
+		return
+	}
 	res := problemModel.DeleteProblem(problemJson.ProblemID)
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
@@ -530,5 +534,14 @@ func parseProblemXml(file *multipart.File) ([]ProblemItem, error) {
 
 
 	return v.Item, nil
+}
+
+func deleteProblemData(ProblemID int) error {
+	judgeConfig := config.GetJudgeConfig()
+	dataPath := judgeConfig["base_dir"].(string) + "/" + judgeConfig["env"].(string) + "/" + strconv.Itoa(ProblemID) 
+	if err := os.Remove(dataPath); err != nil{
+		return fmt.Errorf("DeleteProblemData error:"+err.Error())
+	}
+	return nil
 }
 
