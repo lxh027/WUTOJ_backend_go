@@ -100,12 +100,15 @@ func DeleteProblem(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
-
+	res := problemModel.DeleteProblem(problemJson.ProblemID)
+	if res.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
 	if err := deleteProblemData(problemJson.ProblemID) ; err != nil{
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
-	res := problemModel.DeleteProblem(problemJson.ProblemID)
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
