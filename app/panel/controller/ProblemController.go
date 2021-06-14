@@ -542,9 +542,26 @@ func parseProblemXml(file *multipart.File) ([]ProblemItem, error) {
 func deleteProblemData(ProblemID int) error {
 	judgeConfig := config.GetJudgeConfig()
 	dataPath := judgeConfig["base_dir"].(string) + "/" + judgeConfig["env"].(string) + "/" + strconv.Itoa(ProblemID) 
+	if isExist(dataPath) == false {
+		return fmt.Errorf("DeleteProblemData error: No data exists")
+	}
 	if err := os.Remove(dataPath); err != nil{
 		return fmt.Errorf("DeleteProblemData error:"+err.Error())
 	}
 	return nil
 }
 
+
+func isExist(path string)(bool){
+    _, err := os.Stat(path)
+    if err != nil{
+        if os.IsExist(err){
+            return true
+        }
+        if os.IsNotExist(err){
+            return false
+        }
+        return false
+    }
+    return true
+}
