@@ -545,7 +545,7 @@ func deleteProblemData(ProblemID int) error {
 	if isExist(dataPath) == false {
 		return fmt.Errorf("DeleteProblemData error: No data exists")
 	}
-	if err := os.Remove(dataPath); err != nil{
+	if err := os.RemoveAll(dataPath); err != nil{
 		return fmt.Errorf("DeleteProblemData error:"+err.Error())
 	}
 	return nil
