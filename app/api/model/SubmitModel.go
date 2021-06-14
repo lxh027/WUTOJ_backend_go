@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -55,9 +55,9 @@ func (model *Submit) GetUserSubmits(userID uint) helper.ReturnType {
 		Where("user_id = ?", userID).
 		Find(&submits).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submits}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取提交记录成功", Data: submits}
 	}
 }
 
@@ -66,10 +66,10 @@ func (model *Submit) AddSubmit(submit *Submit) helper.ReturnType {
 	err := db.Omit("time").Create(submit).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "添加提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "添加提交记录失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加提交记录成功", Data: ""}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加提交记录成功", Data: ""}
 }
 
 func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}) helper.ReturnType {
@@ -79,9 +79,9 @@ func (model *Submit) UpdateStatusAfterSubmit(id int, data map[string]interface{}
 		Updates(data).
 		Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: 0}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: 0}
 	}
 }
 
@@ -92,12 +92,12 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int, UserId uint) helper.Ret
 	err := db.Model(&Submit{}).Where("user_id = ?", UserId).Count(&count).Limit(Limit).Offset(Offset).Order("id desc").Find(&submits).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
 
 	submitsData := model.GetReturnData(submits)
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
 		"data":  submitsData,
 		"count": count,
 	}}
@@ -113,17 +113,17 @@ func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber in
 		Order("id desc").
 		Where("contest_id = ? AND user_id = ?", ContestID, UserID).
 		Count(&count).
-		Offset((PageNumber - 1) * common.PageSubmitLogLimit).
-		Limit(common.PageSubmitLogLimit).
+		Offset((PageNumber - 1) * constants.PageSubmitLogLimit).
+		Limit(constants.PageSubmitLogLimit).
 		Find(&submits).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
 
 	submitsData := model.GetReturnData(submits)
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交记录成功", Data: gin.H{
 		"data":  submitsData,
 		"count": count,
 	}}
@@ -135,11 +135,11 @@ func (model *Submit) GetProblemSubmit(submit Submit) helper.ReturnType {
 	err := db.Order("id desc").Where("problem_id = ? and user_id = ?", submit.ProblemID, submit.UserID).Last(&data).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交记录失败", Data: err.Error()}
 	}
 
 	submitData := model.GetReturnData(append([]Submit{}, data))
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询提交记录成功", Data: submitData[0]}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交记录成功", Data: submitData[0]}
 }
 
 func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime time.Time) helper.ReturnType {
@@ -148,9 +148,9 @@ func (model *Submit) GetContestSubmitsByTime(contestID uint, beginTime, endTime 
 	err := db.Where("contest_id = ? AND submit_time BETWEEN ? AND ?", contestID, beginTime, endTime).Order("id").Find(&submits).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取比赛提交失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取比赛提交失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取比赛提交成功", Data: submits}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取比赛提交成功", Data: submits}
 }
 
 func (model *Submit) GetSubmitByID(id uint, UserID uint) helper.ReturnType {
@@ -181,10 +181,10 @@ func (model *Submit) GetSubmitByID(id uint, UserID uint) helper.ReturnType {
 	}
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submitData}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取提交记录成功", Data: submitData}
 }
 
 func (model *Submit) GetSubmitInPrintRequest(id uint, UserID uint) helper.ReturnType {
@@ -196,8 +196,8 @@ func (model *Submit) GetSubmitInPrintRequest(id uint, UserID uint) helper.Return
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取提交记录失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取提交记录成功", Data: submit}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取提交记录成功", Data: submit}
 }

@@ -1,6 +1,8 @@
 package model
 
-import "OnlineJudge/app/common"
+import (
+	"OnlineJudge/constants"
+)
 import "OnlineJudge/app/helper"
 
 type Auth struct {
@@ -29,7 +31,7 @@ func (model *Auth) GetUserAllAuth(userID int) helper.ReturnType  {
 		}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "OK", Data: returnAuths}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "OK", Data: returnAuths}
 }
 
 func (model *Auth) GetAllAuth(offset int, limit int, title string) helper.ReturnType {
@@ -46,9 +48,9 @@ func (model *Auth) GetAllAuth(offset int, limit int, title string) helper.Return
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"auths": auths,
 				"count": count,
@@ -69,9 +71,9 @@ func (model *Auth) GetParentAuth(tp int) helper.ReturnType {
 
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: auths}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: auths}
 	}
 }
 
@@ -79,7 +81,7 @@ func (model *Auth) AddAuth(newAuth Auth) helper.ReturnType {
 	auth :=Auth{}
 
 	if err := db.Where("type = ? AND title = ?", newAuth.Type,newAuth.Title).First(&auth).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "此类型权限名已存在",  Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "此类型权限名已存在",  Data: false}
 	}
 
 	var err error
@@ -92,9 +94,9 @@ func (model *Auth) AddAuth(newAuth Auth) helper.ReturnType {
 
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 	}
 
 }
@@ -103,9 +105,9 @@ func (model *Auth) DeleteAuth(authID int) helper.ReturnType  {
 	err := db.Where("aid = ?", authID).Delete(Auth{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "删除成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
 }
 
@@ -118,9 +120,9 @@ func (model *Auth) UpdateAuth(authID int, updateAuth Auth) helper.ReturnType  {
 	err := db.Model(&Auth{}).Select(fields[updateAuth.Type]).Where("aid = ?", authID).Update(updateAuth).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
 
@@ -133,9 +135,9 @@ func (model *Auth) GetRoleAuth(rid int) helper.ReturnType {
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: auths,
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: auths,
 		}
 	}
 }
@@ -146,9 +148,9 @@ func (model *Auth) GetAuthNoRules() helper.ReturnType {
 	err := db.Find(&authsTotal).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: authsTotal,
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: authsTotal,
 		}
 	}
 }
@@ -162,8 +164,8 @@ func (model *Auth) GetAuthByID(aid int) helper.ReturnType {//jun
 		Where("aid = ?", aid).First(&getAuth).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: getAuth}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getAuth}
 	}
 }

@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -28,15 +28,15 @@ func (model *Discuss) GetAllDiscuss(ContestID int, ProblemID int, Offset int, Li
 	if ContestID != 0 {
 		err := db.Offset(Offset).Limit(Limit).Where("contest_id = ?", ContestID).Find(&discussions).Error
 		if err != nil {
-			return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+			return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 		}
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: discussions}
 	} else {
 		err := db.Offset(Offset).Limit(Limit).Where("problem_id = ?", ProblemID).Find(&discussions).Error
 		if err != nil {
-			return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+			return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 		}
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: discussions}
 	}
 }
 
@@ -45,12 +45,12 @@ func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnTyp
 	replyModel := Reply{}
 
 	err := db.Where("id = ?", id).First(&discuss).Error
-	res := replyModel.GetReplyByProblemID(id, (PageNumber-1)*common.PageLimit, common.PageLimit)
+	res := replyModel.GetReplyByProblemID(id, (PageNumber-1)*constants.PageLimit, constants.PageLimit)
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: gin.H{
 			"discuss": discuss,
 			"reply":   res.Data,
 		}}
@@ -63,9 +63,9 @@ func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
 	err := db.Omit("time").Create(&newDiscussion).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "添加失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "添加失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "添加成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加成功", Data: true}
 	}
 }
 
@@ -75,13 +75,13 @@ func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper
 	err := db.Model(&Discuss{}).
 		Where("contest_id = ?", ContestID).
 		Count(&DiscussCount).
-		Offset((PageNumber - 1) * (common.PageDiscussLimit)).
-		Limit(common.PageDiscussLimit).
+		Offset((PageNumber - 1) * (constants.PageDiscussLimit)).
+		Limit(constants.PageDiscussLimit).
 		Find(&discussions).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: gin.H{"data": discussions, "count": DiscussCount}}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: gin.H{"data": discussions, "count": DiscussCount}}
 	}
 
 }
@@ -92,9 +92,9 @@ func (model *Discuss) GetProblemDiscussion(ProblemID int, PageNumber int) helper
 	err := db.Where("problem_id = ?", ProblemID).Find(&discussions).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: discussions}
 	}
 }
 
@@ -104,8 +104,8 @@ func (model *Discuss) GetUserDiscussion(UserID int) helper.ReturnType {
 	err := db.Where("user_id = ?", UserID).Find(&discussions).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: discussions}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: discussions}
 	}
 }

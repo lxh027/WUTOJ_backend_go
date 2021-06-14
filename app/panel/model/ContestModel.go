@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"time"
 )
 
@@ -35,9 +35,9 @@ func (model *Contest) GetAllContest(offset int, limit int, title string, time ti
 		Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"contests": contests,
 				"count": count,
@@ -52,24 +52,24 @@ func (model *Contest) FindContestByID(id int) helper.ReturnType {
 	err := db.Where("contest_id = ?", id).First(&contest).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: contest}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: contest}
 	}
 }
 
 func (model *Contest) AddContest(newContest Contest) helper.ReturnType {//jun
 	var contest Contest
 	if err := db.Where("contest_name = ?", newContest.ContestName).First(&contest).Error; err == nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "比赛已存在",  Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "比赛已存在",  Data: false}
 	}
 
 	err := db.Create(&newContest).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 	}
 }
 
@@ -77,9 +77,9 @@ func (model *Contest) DeleteContest(contestID int) helper.ReturnType  {
 	err := db.Where("contest_id = ?", contestID).Delete(Contest{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "删除成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
 }
 
@@ -87,9 +87,9 @@ func (model *Contest) UpdateContest(contestID int, updateContest Contest) helper
 	err := db.Model(&Contest{}).Where("contest_id = ?", contestID).Update(updateContest).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
 
@@ -97,9 +97,9 @@ func (model *Contest) ChangeContestStatus(contestID int, status int) helper.Retu
 	err := db.Model(&Contest{}).Where("contest_id = ?", contestID).Update("status", status).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
 
@@ -107,7 +107,7 @@ func (model *Contest) GetContestById(contestID uint) helper.ReturnType {
 	contest := Contest{}
 	err := db.Where("contest_id = ?", contestID).First(&contest).Error
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "未找到数据", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查找成功", Data: contest}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
 }

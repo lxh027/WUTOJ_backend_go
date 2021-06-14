@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Sample struct {
@@ -18,8 +18,8 @@ func (model *Sample) FindSamplesByProblemID(id int) helper.ReturnType {
 	err := db.Where("problem_id = ?", id).Find(&samples).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: samples}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: samples}
 	}
 }

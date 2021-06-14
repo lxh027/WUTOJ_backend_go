@@ -1,19 +1,15 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func GetAllAuth(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authModel := model.Auth{}
 
 	authJson := struct {
@@ -30,15 +26,11 @@ func GetAllAuth(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
 func GetParentAuth(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authModel := model.Auth{}
 
 	authJson := struct {
@@ -46,7 +38,7 @@ func GetParentAuth(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -58,23 +50,19 @@ func GetParentAuth(c *gin.Context) {
 }
 
 func AddAuth(c *gin.Context) {
-	if res := haveAuth(c, "addAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -88,10 +76,6 @@ func AddAuth(c *gin.Context) {
 }
 
 func DeleteAuth(c *gin.Context) {
-	if res := haveAuth(c, "deleteAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
@@ -100,13 +84,13 @@ func DeleteAuth(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&authIDJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authIDMap := helper.Struct2Map(authIDJson)
 	if res, err := authValidate.ValidateMap(authIDMap, "delete"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 	res := authModel.DeleteAuth(authIDJson.Aid)
@@ -116,23 +100,19 @@ func DeleteAuth(c *gin.Context) {
 }
 
 func UpdateAuth(c *gin.Context) {
-	if res := haveAuth(c, "updateAuth"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -142,23 +122,19 @@ func UpdateAuth(c *gin.Context) {
 }
 
 func GetAuthByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllAuth"); res != common.Authed { //getAllUser怎么改？
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	authValidate := validate.AuthValidate
 	authModel := model.Auth{}
 
 	var authJson model.Auth
 
 	if err := c.ShouldBind(&authJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	authMap := helper.Struct2Map(authJson)
 	if res, err := authValidate.ValidateMap(authMap, "find"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

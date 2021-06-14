@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"OnlineJudge/judger"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -36,10 +36,6 @@ func (a userSort) Less(i, j int) bool {
 }
 
 func GetAllSubmit(c *gin.Context) {
-	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
@@ -67,28 +63,24 @@ func GetAllSubmit(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), false))
 	return
 }
 
 func GetSubmitByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllSubmit"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitValidate := validate.SubmitValidate
 	submitModel := model.Submit{}
 
 	var submitJson model.Submit
 
 	if err := c.ShouldBind(&submitJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
 	if res, err := submitValidate.ValidateMap(submitMap, "find"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -98,10 +90,6 @@ func GetSubmitByID(c *gin.Context) {
 }
 
 func RejudgeGroupSubmits(c *gin.Context) {
-	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitModel := model.Submit{}
 
 	submitJson := struct {
@@ -127,31 +115,27 @@ func RejudgeGroupSubmits(c *gin.Context) {
 				rejudge(submitData)
 			}(submit)
 		}
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "发送重测成功", true))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "发送重测成功", true))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
 func RejudgeSubmitByID(c *gin.Context) {
-	if res := haveAuth(c, "rejudge"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	submitValidate := validate.SubmitValidate
 	submitModel := model.Submit{}
 
 	var submitJson model.Submit
 
 	if err := c.ShouldBind(&submitJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	submitMap := helper.Struct2Map(submitJson)
 	if res, err := submitValidate.ValidateMap(submitMap, "rejudge"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -160,7 +144,7 @@ func RejudgeSubmitByID(c *gin.Context) {
 	go func(submitData model.Submit) {
 		rejudge(submitData)
 	}(submit)
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "发送重测成功", true))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "发送重测成功", true))
 	return
 }
 

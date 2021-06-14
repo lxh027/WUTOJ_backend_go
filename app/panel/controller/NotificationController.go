@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,10 +11,6 @@ import (
 )
 
 func GetAllNotification(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	noticeJson := struct {
@@ -26,21 +22,17 @@ func GetAllNotification(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", nil))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", nil))
 	return
 }
 
 func GetNotificationByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
 
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -53,15 +45,11 @@ func GetNotificationByID(c *gin.Context) {
 func AddNotification(c *gin.Context) {
 	session := sessions.Default(c)
 
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	noticeJson.SubmitTime = time.Now()
@@ -74,15 +62,11 @@ func AddNotification(c *gin.Context) {
 }
 
 func DeleteNotification(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -92,16 +76,12 @@ func DeleteNotification(c *gin.Context) {
 }
 
 func UpdateNotification(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	noticeJson.ModifyTime = time.Now()
@@ -112,16 +92,12 @@ func UpdateNotification(c *gin.Context) {
 }
 
 func ChangeNotificationStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateContest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 
 	noticeModel := model.Notification{}
 
 	var noticeJson model.Notification
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 

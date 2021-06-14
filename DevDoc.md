@@ -10,6 +10,8 @@
     │  │     └─IndexValidate.go
     │  └─common
     ├─config
+    ├─constants
+    ├─middleware
     ├─db_server
     ├─judger
     ├─log
@@ -59,6 +61,8 @@ k, err := GetFromRedis("m")
 mpBytes, _ := redis.String(k, err)
 ```
 
+请使用`db_server/redis`中定义的方法，如需另外使用请额外定义再使用
+
 ## Validate
 
 使用`gookit/validate`库，使用方法如下：
@@ -90,6 +94,31 @@ if res, err := userValidate.ValidateMap(userMap, "login"); !res {
 	return
 }
 ```
+
+## middleware
+
+中间件应定义在`middleware`目录下，一个中间件一个go文件，定义方式如下：
+```go
+func BackendAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println(c.FullPath())
+		requestPath := c.FullPath()
+
+		auth := constants.GetBackendRouterAuth(requestPath)
+		fmt.Println(auth)
+		if auth != constants.Pass {
+			if res := haveAuth(c, auth); res != common.Authed {
+				c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
+				c.Abort()
+			}
+		}
+	}
+}
+```
+使用方式为在`router.go`中在相应的Group下使用`xxx.Use(xxxMiddleware())`
+
+## Constant
+使用到的常量应尽量定义在`/constants`下
 
 ## Panel
 

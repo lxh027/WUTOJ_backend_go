@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
@@ -15,13 +15,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"encoding/xml"
+	"io/ioutil"
+	"regexp"
 )
 
 func GetAllProblem(c *gin.Context) {
-	if res := haveAuth(c, "getAllProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemModel := model.Problem{}
 
 	problemJson := struct {
@@ -38,28 +37,24 @@ func GetAllProblem(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
 func GetProblemByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "findByID"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -69,23 +64,19 @@ func GetProblemByID(c *gin.Context) {
 }
 
 func AddProblem(c *gin.Context) {
-	if res := haveAuth(c, "addProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 	problemJson.Path = config.GetJudgeConfig()["base_dir"].(string) + "/tmp/0"
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -95,22 +86,18 @@ func AddProblem(c *gin.Context) {
 }
 
 func DeleteProblem(c *gin.Context) {
-	if res := haveAuth(c, "deleteProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "delete"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -120,22 +107,18 @@ func DeleteProblem(c *gin.Context) {
 }
 
 func UpdateProblem(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -145,22 +128,18 @@ func UpdateProblem(c *gin.Context) {
 }
 
 func ChangeProblemStatus(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -170,22 +149,18 @@ func ChangeProblemStatus(c *gin.Context) {
 }
 
 func ChangeProblemPublic(c *gin.Context) {
-	if res := haveAuth(c, "updateProblem"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 
 	var problemJson model.Problem
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	problemMap := helper.Struct2Map(problemJson)
 	if res, err := problemValidate.ValidateMap(problemMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -204,10 +179,6 @@ type tomlData struct {
 }
 
 func SetProblemTimeAndSpace(c *gin.Context) {
-	if res := haveAuth(c, "uploadData"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	problemModel := model.Problem{}
 
 	problemJson := struct {
@@ -219,7 +190,7 @@ func SetProblemTimeAndSpace(c *gin.Context) {
 		Code      string  `json:"code" form:"code"`
 	}{}
 	if err := c.ShouldBind(&problemJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -245,11 +216,6 @@ func SetProblemTimeAndSpace(c *gin.Context) {
 
 
 func UploadData(c *gin.Context) {
-	if res := haveAuth(c, "uploadData"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	//var problemModel model.Problem
 
 	form, _ := c.MultipartForm()
@@ -257,7 +223,7 @@ func UploadData(c *gin.Context) {
 	problemDataJson := tomlData{}
 	// 绑定数据
 	if err := c.ShouldBind(&problemDataJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
@@ -284,7 +250,7 @@ func UploadData(c *gin.Context) {
 	problemModel := model.Problem{}
 
 	res := problemModel.UpdateProblem(problemDataJson.ProblemID, problemData)
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data) )
 	}
 	// 保存数据文件
@@ -303,7 +269,7 @@ func UploadData(c *gin.Context) {
 		dataPairPath := dataPath + "/" + strconv.Itoa(index)
 		index++
 		if err := os.MkdirAll(dataPairPath, 755); err != nil {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "创建路径失败", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "创建路径失败", err.Error()))
 			return
 		}
 		/*inputFile, err1 := os.Create(dataPath+"/input")
@@ -315,12 +281,12 @@ func UploadData(c *gin.Context) {
 		err1 := c.SaveUploadedFile(filePair["in"], dataPairPath+"/input")
 		err2 := c.SaveUploadedFile(filePair["out"], dataPairPath+"/answer")
 		if err1 != nil || err2 != nil {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "保存输入/输出文件失败", 1))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "保存输入/输出文件失败", 1))
 			return
 		}
 	}
 	//problemModel.SaveProblemPath(problemDataJson.ProblemID, dataPath)
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "上传成功", "OK"))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "上传成功", "OK"))
 }
 
 
@@ -343,7 +309,7 @@ func updateToml(c *gin.Context, problemDataJson tomlData, isRebuild bool) {
 	if isRebuild {
 		_ = os.RemoveAll(dataPath)
 		if err := os.MkdirAll(dataPath, 755); err != nil {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "创建路径失败", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "创建路径失败", err.Error()))
 			return
 		}
 	}
@@ -370,11 +336,11 @@ func updateToml(c *gin.Context, problemDataJson tomlData, isRebuild bool) {
 		}
 		err = tomlEncode.Encode(tomlMap)
 		if err != nil {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "保存配置文件失败", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "保存配置文件失败", err.Error()))
 			return
 		}
 	} else {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "打开配置文件失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开配置文件失败", err.Error()))
 		return
 	}
 
@@ -385,7 +351,7 @@ func updateToml(c *gin.Context, problemDataJson tomlData, isRebuild bool) {
 		spjPath := dataPath + "/extern_program"
 		if isRebuild {
 			if err := os.MkdirAll(spjPath, 755); err != nil {
-				c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "创建路径失败", err.Error()))
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "创建路径失败", err.Error()))
 				return
 			}
 		}
@@ -398,22 +364,171 @@ func updateToml(c *gin.Context, problemDataJson tomlData, isRebuild bool) {
 				"timeout":  timeType,
 			}
 			if err = tomlEncode.Encode(spjToml); err != nil {
-				c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "保存SPJ配置文件失败", err.Error()))
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "保存SPJ配置文件失败", err.Error()))
 				return
 			}
 		} else {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "打开SPJ配置文件失败", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开SPJ配置文件失败", err.Error()))
 			return
 		}
 		if spjFile, err := os.Create(spjPath + "/" + spjFileName); err == nil {
 			defer spjFile.Close()
 			if _, err = spjFile.WriteString(problemDataJson.Code); err != nil {
-				c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "写入spj失败", err.Error()))
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "写入spj失败", err.Error()))
 				return
 			}
 		} else {
-			c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "打开SPJ配置文件失败", err.Error()))
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开SPJ配置文件失败", err.Error()))
 			return
 		}
 	}
 }
+
+func UploadXML(c *gin.Context) {
+	form, _ := c.MultipartForm()
+	files := form.File["file[]"]
+	problemValidate := validate.ProblemValidate
+	var problemJson model.Problem
+
+	for _,fileheader := range files{
+		f,err := fileheader.Open()
+		if err != nil{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "打开XML文件失败", err.Error()))
+			return
+		}
+		problemItems, err := parseProblemXml(&f)
+		if err != nil{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "解析XML文件失败", err.Error()))
+			return
+		}
+		for _, problemItem := range problemItems{
+			problemJson.Title = problemItem.Title
+		problemJson.Describe = problemItem.Description
+		problemJson.InputFormat = problemItem.InputFormat
+		problemJson.OutputFormat = problemItem.OutputFormat
+		problemJson.Hint = problemItem.Hint
+		problemJson.Public = 1
+		problemJson.Source = problemItem.Source
+		problemJson.Time = problemItem.TimeLimit
+		problemJson.Memory = problemItem.MemoryLimit
+		problemJson.Type = "Normal"
+		problemJson.Status = 1
+		problemJson.Path = config.GetJudgeConfig()["base_dir"].(string) + "/tmp/0"
+
+		problemMap := helper.Struct2Map(problemJson)
+		if res, err := problemValidate.ValidateMap(problemMap, "add"); !res {
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
+			return
+		}
+
+		problemModel := model.Problem{}
+		res := problemModel.AddProblem(problemJson)
+		if res.Status == constants.CodeError{
+			c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+			return
+		}
+		problemID := res.Data.(int)
+
+		problemDataJson := tomlData{}
+		problemDataJson.ProblemID = problemID
+		problemDataJson.Time = float64(problemItem.TimeLimit)
+		problemDataJson.Memory = float64(problemItem.MemoryLimit)
+		problemDataJson.Spj = false
+
+		updateToml(c, problemDataJson, true)
+
+		judgeConfig := config.GetJudgeConfig()
+
+		dataPath := judgeConfig["base_dir"].(string) + "/" + judgeConfig["env"].(string) + "/" + strconv.Itoa(problemDataJson.ProblemID) + "/problem"
+
+		if len(problemItem.TestInput) != len(problemItem.TestOutput){
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "输入输出数量不一致", err.Error()))
+			return
+		}
+		if len(problemItem.SampleInput) != len(problemItem.SampleOutput){
+			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "样例输入输出数量不一致", err.Error()))
+			return
+		}
+		for index,_ := range problemItem.SampleInput{
+			sampleModel := model.Sample{}
+			var sampleJson model.Sample
+			sampleJson.ProblemID = problemID
+			sampleJson.Input = problemItem.SampleInput[index]
+			sampleJson.Output = problemItem.SampleOutput[index]
+			res := sampleModel.AddSample(sampleJson)
+			if res.Status == constants.CodeError{
+				c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+				return
+			}
+		}
+		for index,_ := range problemItem.TestInput{
+			dataPairPath := dataPath + "/" + strconv.Itoa(index)
+			if err := os.MkdirAll(dataPairPath, 755); err != nil {
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "创建路径失败", err.Error()))
+				return
+			}
+			err1 := ioutil.WriteFile(dataPairPath+"/input",[]byte(problemItem.TestInput[index]),0666)
+			err2 := ioutil.WriteFile(dataPairPath+"/answer",[]byte(problemItem.TestOutput[index]),0666)
+			if err1 != nil || err2 != nil {
+				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "保存输入/输出文件失败", 1))
+				return
+			}
+		}
+		}
+		
+	}
+
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "解析XML成功", "OK"))
+}
+
+type ProblemItem struct {
+	Title        string   `xml:"title"`
+	TimeLimit    float32  `xml:"time_limit"`
+	MemoryLimit  int      `xml:"memory_limit"`
+	Description  string   `xml:"description"`
+	InputFormat  string   `xml:"input"`
+	OutputFormat string   `xml:"output"`
+	SampleInput  []string `xml:"sample_input"`
+	SampleOutput []string `xml:"sample_output"`
+	TestInput    []string `xml:"test_input"`
+	TestOutput   []string `xml:"test_output"`
+	Hint         string   `xml:"hint"`
+	Source       string   `xml:"source"`
+}
+
+type ProblemXml struct {
+	XMLName xml.Name    `xml:"fps"`
+	Item    []ProblemItem `xml:"item"`
+}
+
+func parseProblemXml(file *multipart.File) ([]ProblemItem, error) {
+	v := ProblemXml{}
+	data, err := ioutil.ReadAll(*file)
+	if err != nil {
+		return v.Item, fmt.Errorf("read file error:%v", err)
+	}
+	err = xml.Unmarshal(data, &v)
+	if err != nil {
+		return v.Item, fmt.Errorf("unmarshal error:%v", err)
+	}
+	reg1 := regexp.MustCompile(`class=".*"`)
+	reg2 := regexp.MustCompile(`id=".*"`)
+
+	for index,_ := range v.Item{
+	v.Item[index].Description = reg1.ReplaceAllString(v.Item[index].Description, "")
+	v.Item[index].Hint = reg1.ReplaceAllString(v.Item[index].Hint, "")
+	v.Item[index].InputFormat = reg1.ReplaceAllString(v.Item[index].InputFormat, "")
+	v.Item[index].OutputFormat = reg1.ReplaceAllString(v.Item[index].OutputFormat, "")
+	v.Item[index].Source = reg1.ReplaceAllString(v.Item[index].Source, "")
+
+	v.Item[index].Description = reg2.ReplaceAllString(v.Item[index].Description, "")
+	v.Item[index].Hint = reg2.ReplaceAllString(v.Item[index].Hint, "")
+	v.Item[index].InputFormat = reg2.ReplaceAllString(v.Item[index].InputFormat, "")
+	v.Item[index].OutputFormat = reg2.ReplaceAllString(v.Item[index].OutputFormat, "")
+	v.Item[index].Source = reg2.ReplaceAllString(v.Item[index].Source, "")
+	}
+
+
+	return v.Item, nil
+}
+

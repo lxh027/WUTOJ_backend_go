@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Sample struct {
@@ -16,9 +16,9 @@ func (model *Sample) AddSample(newSample Sample) helper.ReturnType {//jun
 	err := db.Create(&newSample).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "创建失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "创建成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 	}
 }
 
@@ -26,9 +26,9 @@ func (model *Sample) DeleteSample(sampleID int) helper.ReturnType  {
 	err := db.Where("sample_id = ?", sampleID).Delete(Sample{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "删除成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
 }
 
@@ -36,9 +36,9 @@ func (model *Sample) UpdateSample(sampleID int, updateSample Sample) helper.Retu
 	err := db.Model(&Sample{}).Where("sample_id = ?", sampleID).Update(updateSample).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "更新失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "更新成功", Data: true}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
 
@@ -48,8 +48,8 @@ func (model *Sample) FindSamplesByProblemID(id int) helper.ReturnType {
 	err := db.Where("problem_id = ?", id).Find(&samples).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: samples}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: samples}
 	}
 }

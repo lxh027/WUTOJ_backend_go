@@ -1,8 +1,8 @@
 package helper
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"fmt"
 	"gopkg.in/gomail.v2"
@@ -45,7 +45,7 @@ func SendMail(EmailAddress string) (ReturnType, error) {
 	dia := gomail.NewDialer(mailConfig["host"].(string), mailConfig["port"].(int), mailConfig["username"].(string), mailConfig["password"].(string))
 
 	if err := dia.DialAndSend(message); err != nil {
-		return ReturnType{Status: common.CodeError, Msg: "邮件发送失败", Data: err.Error()}, err
+		return ReturnType{Status: constants.CodeError, Msg: "邮件发送失败", Data: err.Error()}, err
 	}
-	return ReturnType{Status: common.CodeSuccess, Msg: "邮件发送成功，请注意查收", Data: ""}, nil
+	return ReturnType{Status: constants.CodeSuccess, Msg: "邮件发送成功，请注意查收", Data: ""}, nil
 }

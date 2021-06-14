@@ -2,9 +2,9 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"encoding/json"
 	"fmt"
@@ -47,19 +47,19 @@ func GetUserRank(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBindUri(&rankJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	rankMap := helper.Struct2Map(rankJson)
 	if res, err := rankValidate.ValidateMap(rankMap, "getContestRank"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
 	beginTime, endTime, frozenTime, err := getContestTime(rankJson.ContestID)
 	if err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), nil))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), nil))
 		return
 	}
 
@@ -70,7 +70,7 @@ func GetUserRank(c *gin.Context) {
 	begin = beginTime
 	fmt.Println(now.String(), beginTime.String(), frozenTime.String(), endTime.String())
 	if now.Unix() < beginTime.Unix() {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "比赛未开始", nil))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", nil))
 		return
 	} else if now.Unix() < frozenTime.Unix() {
 		end = now
@@ -99,7 +99,7 @@ func GetUserRank(c *gin.Context) {
 			_ = json.Unmarshal([]byte(itemStr), &item)
 			rankBoard = append(rankBoard, item)
 		}
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "获取排行榜成功", rankBoard))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "获取排行榜成功", rankBoard))
 		return
 	}
 	// get from DB
@@ -112,7 +112,7 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 	submitModel := model.Submit{}
 
 	res := submitModel.GetContestSubmitsByTime(contestID, beginTime, endTime)
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -152,7 +152,7 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 	}
 
 	sort.Sort(userSort(users))
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "获取排行榜成功", users))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "获取排行榜成功", users))
 
 	for _, user := range users {
 		itemStr, _ := json.Marshal(user)

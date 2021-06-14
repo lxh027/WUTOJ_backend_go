@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,10 +13,6 @@ import (
 
 // TODO
 func AddUserRoles(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	userRoleModel := model.UserRole{}
 
@@ -26,13 +22,13 @@ func AddUserRoles(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&userRolesJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	userRolesMap := helper.Struct2Map(userRolesJson)
 	if res, err := userRoleValidate.ValidateMap(userRolesMap, "addGroup"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -41,20 +37,16 @@ func AddUserRoles(c *gin.Context) {
 	fmt.Println(rids)
 	for _, rid := range rids {
 		res := userRoleModel.AddUserRole(model.UserRole{UserID: userRolesJson.UserID, Rid: rid})
-		if res.Status != common.CodeSuccess {
+		if res.Status != constants.CodeSuccess {
 			c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, "编号为"+string(rune(rid))+"的角色添加失败", res.Data))
 			return
 		}
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "添加成功", true))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "添加成功", true))
 	return
 }
 
 func DeleteUserRoles(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	userRoleModel := model.UserRole{}
 
@@ -64,13 +56,13 @@ func DeleteUserRoles(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&userRolesJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 		return
 	}
 
 	userRolesMap := helper.Struct2Map(userRolesJson)
 	if res, err := userRoleValidate.ValidateMap(userRolesMap, "deleteGroup"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -79,21 +71,17 @@ func DeleteUserRoles(c *gin.Context) {
 	fmt.Println(rids)
 	for _, rid := range rids {
 		res := userRoleModel.DeleteUserRole(model.UserRole{UserID: userRolesJson.UserID, Rid: rid})
-		if res.Status != common.CodeSuccess {
+		if res.Status != constants.CodeSuccess {
 			c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, "编号为"+string(rune(rid))+"的权限删除失败", res.Data))
 			return
 		}
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeSuccess, "删除成功", true))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "删除成功", true))
 	return
 
 }
 
 func GetUserRolesList(c *gin.Context) {
-	if res := haveAuth(c, "roleAssign"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	userRoleValidate := validate.UserRoleValidate
 	roleModel := model.Role{}
 
@@ -102,13 +90,13 @@ func GetUserRolesList(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&roleJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	roleMap := helper.Struct2Map(roleJson)
 	if res, err := userRoleValidate.ValidateMap(roleMap, "getUserRole"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

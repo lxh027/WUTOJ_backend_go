@@ -2,16 +2,16 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	_ "strconv"
+	"strconv"
 )
 
 func GetAllContest(c *gin.Context) {
@@ -21,35 +21,45 @@ func GetAllContest(c *gin.Context) {
 	contestModel := model.Contest{}
 
 	if err := c.ShouldBind(&contestJson); err == nil {
-		res := contestModel.GetAllContest(common.PageLimit*(contestJson.PageNumber-1), common.PageLimit)
+		res := contestModel.GetAllContest(constants.PageLimit*(contestJson.PageNumber-1), constants.PageLimit)
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 
 }
 
-func GetContest(c *gin.Context) {
-
+func GetContestByID(c *gin.Context) {
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
+	userIDRaw := res.Data.(uint)
+	userID := int(userIDRaw)
 
-	ContestID := c.Param("contest_id")
+	ContestIDRaw := c.Param("contest_id")
+	ContestID , err := strconv.Atoi(ContestIDRaw)
+	if err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛ID错误", 0))
+		return
+	}
 	fmt.Println(ContestID)
 	contestModel := model.Contest{}
 
 	res = contestModel.GetContestById(ContestID)
-	if res.Status != common.CodeError {
+	if res.Status != constants.CodeError {
+		contestUserModel := model.ContestUser{}
+		if participation := contestUserModel.CheckUserContest(userID,ContestID); participation.Status != constants.CodeSuccess{
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
+			return
+		}
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
-		res = contestModel.GetContestByName(ContestID)
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, "数据查找失败", res.Msg))
 	}
 
 }
@@ -57,7 +67,7 @@ func GetContest(c *gin.Context) {
 func JoinContest(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -66,12 +76,12 @@ func JoinContest(c *gin.Context) {
 	var contestUserJson model.ContestUser
 
 	if err := c.ShouldBindQuery(&contestUserJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 
 	if err := c.ShouldBindUri(&contestUserJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 
@@ -83,7 +93,7 @@ func JoinContest(c *gin.Context) {
 func GetContestStatus(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -93,7 +103,7 @@ func GetContestStatus(c *gin.Context) {
 		ID int `form:"contest_id"`
 	}
 	if err := c.ShouldBind(&ContestID); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 	res = contestModel.GetContestStatus(ContestID.ID)
@@ -103,7 +113,7 @@ func GetContestStatus(c *gin.Context) {
 func GetUserContest(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -112,7 +122,7 @@ func GetUserContest(c *gin.Context) {
 	log.Print(UserID)
 	contestUserModel := model.ContestUser{}
 	if UserID == 0 {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "请先登陆", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "请先登陆", ""))
 		return
 	}
 	res = contestUserModel.GetUserContest(int(UserID))
@@ -122,28 +132,38 @@ func GetUserContest(c *gin.Context) {
 func GetContestProblems(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
+	userIDRaw := res.Data.(uint)
+	userID := int(userIDRaw)
 
 	var ContestJson model.Contest
 	contestModel := model.Contest{}
 	problemModel := model.Problem{}
 	if err := c.ShouldBindUri(&ContestJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", ""))
 		return
 	}
+	
+	contestID := ContestJson.ContestID
+	contestUserModel := model.ContestUser{}
+	if participation := contestUserModel.CheckUserContest(userID,contestID); participation.Status != constants.CodeSuccess{
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
+		return
+	}
+
 	contestValidate := validate.ContestValidate
 	contestMap := helper.Struct2Map(ContestJson)
 
 	if res, err := contestValidate.ValidateMap(contestMap, "getProblems"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 	res = contestModel.GetContestProblems(ContestJson.ContestID)
 
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -157,7 +177,7 @@ func GetContestProblems(c *gin.Context) {
 	var problemIDs []uint
 
 	if err := json.Unmarshal([]byte(problemIDsStr), &problemIDs); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "题目设置格式出错，请联系管理员", nil))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "题目设置格式出错，请联系管理员", nil))
 		return
 	}
 
@@ -166,13 +186,13 @@ func GetContestProblems(c *gin.Context) {
 
 	// init result
 	result := make([]problemInfo, 0)
-	if res.Status != common.CodeSuccess {
+	if res.Status != constants.CodeSuccess {
 		// 查询题目数据失败
 		for _, problemID := range problemIDs {
 			item := problemInfo{ID: problemID, Info: make(map[string]interface{})}
 			result =  append(result, item)
 		}
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "获取题目信息失败", result))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "获取题目信息失败", result))
 		return
 	}
 
@@ -186,7 +206,7 @@ func GetContestProblems(c *gin.Context) {
 		item := problemInfo{ID: info.ProblemID, Info: extraMap}
 		result =  append(result, item)
 	}
-	c.JSON(http.StatusOK, helper.ApiReturn(common.CodeSuccess, "获取比赛题目信息成功", result))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "获取比赛题目信息成功", result))
 
 	return
 }
@@ -194,7 +214,7 @@ func GetContestProblems(c *gin.Context) {
 func SearchContest(c *gin.Context) {
 
 	res := checkLogin(c)
-	if res.Status == common.CodeError {
+	if res.Status == constants.CodeError {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
@@ -211,7 +231,7 @@ func SearchContest(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 }
@@ -224,13 +244,13 @@ func CheckContest(c *gin.Context) {
 
 	var contestJson model.Contest
 	if err := c.ShouldBindUri(&contestJson); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "数据模型绑定错误", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", err.Error()))
 		return
 	}
 
 	contestMap := helper.Struct2Map(contestJson)
 	if res, err := contestValidate.ValidateMap(contestMap, "join"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 

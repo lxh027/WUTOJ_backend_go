@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Authority struct {
@@ -17,9 +17,9 @@ func (model *Authority) GetAllAuthority() helper.ReturnType {
 	err := db.Find(&authorities).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: authorities}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: authorities}
 }
 
 func (model *Authority) GetAuthorityByID(id uint64) helper.ReturnType {
@@ -27,9 +27,9 @@ func (model *Authority) GetAuthorityByID(id uint64) helper.ReturnType {
 	err := db.Where("id = ?", id).First(&authority).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "获取失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "获取失败", Data: err.Error()}
 	}
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "获取成功", Data: authority}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: authority}
 }
 
 

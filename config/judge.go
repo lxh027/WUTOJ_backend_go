@@ -16,7 +16,7 @@ func init() {
 
 	// 初始化 judge config
 
-	judgeConfig["env"] = "dev"
+	judgeConfig["env"] = os.Getenv("env")
 	judgeConfig["address"] = os.Getenv("ana_addr")
 	judgeConfig["base_dir"] = os.Getenv("data")
 	judgeConfig["tmp_dir"] = "/home/ana_tmpdir"

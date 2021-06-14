@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -11,11 +11,6 @@ import (
 )
 
 func PrintRequest(c *gin.Context) {
-	if res := haveAuth(c, "getPrintRequest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	printLogModel := model.PrintLog{}
 	submitModel := model.Submit{}
 	userModel := model.User{}
@@ -26,7 +21,7 @@ func PrintRequest(c *gin.Context) {
 
 	if err := c.ShouldBind(&PrintRequestJson); err != nil {
 		log.Print(PrintRequestJson)
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "数据模型绑定失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "数据模型绑定失败", err.Error()))
 		return
 	}
 	log.Print(PrintRequestJson)
@@ -54,11 +49,6 @@ func PrintRequest(c *gin.Context) {
 }
 
 func GetAllPrintRequest(c *gin.Context) {
-	if res := haveAuth(c, "getPrintRequest"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
-
 	printRequestModel := model.PrintLog{}
 
 	PrintRequestJson := struct {
@@ -67,7 +57,7 @@ func GetAllPrintRequest(c *gin.Context) {
 	}{}
 
 	if err := c.ShouldBind(&PrintRequestJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "数据模型绑定失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "数据模型绑定失败", err.Error()))
 		return
 	}
 

@@ -2,10 +2,10 @@ package controller
 
 import (
 	"OnlineJudge/app/api/model"
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
+	"OnlineJudge/constants"
 	"OnlineJudge/db_server"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
@@ -21,7 +21,7 @@ func PrintRequest(c *gin.Context) {
 	PrintLogValidate := validate.PrintLogValidate
 	userID := GetUserIdFromSession(c)
 	if userID == 0 {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "用户未登录", ""))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "用户未登录", ""))
 		return
 	}
 
@@ -33,36 +33,36 @@ func PrintRequest(c *gin.Context) {
 		fmt.Printf("now: %v, last: %v\n", now, last)
 
 		if now-last <= int64(interval) {
-			c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "打印申请间隔过短，请10秒后再试", ""))
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "打印申请间隔过短，请10秒后再试", ""))
 			return
 		}
 	}
 	_ = db_server.PutToRedis(redisStr, now, 3600)
 
 	if err := c.ShouldBindJSON(&PrintLog); err != nil {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	printLogMap := helper.Struct2Map(PrintLog)
 
 	if res, err := PrintLogValidate.ValidateMap(printLogMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
 	SubmitLogModel := model.Submit{}
 	res := SubmitLogModel.GetSubmitInPrintRequest(uint(PrintLog.SubmitID), userID)
 
-	if res.Status == common.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, res.Msg, 0))
+	if res.Status == constants.CodeError {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, res.Msg, 0))
 		return
 	}
 
 	submit := res.Data.(model.Submit)
 
 	if submit.UserID != userID {
-		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "同学别打印了，这题你把握不住", 0))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "同学别打印了，这题你把握不住", 0))
 		return
 	}
 

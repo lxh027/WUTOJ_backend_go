@@ -1,8 +1,8 @@
 package model
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/helper"
+	"OnlineJudge/constants"
 )
 
 type Problem struct {
@@ -23,16 +23,20 @@ type Problem struct {
 	Status       int     `json:"status" form:"status"`
 }
 
-func (model *Problem) GetAllProblems() helper.ReturnType {
+func (model *Problem) GetAllProblems(offset int,limit int) helper.ReturnType {
 	var Problems []Problem
 	var count int
 
-	db.Model(&Problem{}).Count(&count)
+	db.Model(&Problem{}).Where("public = ?", constants.ProblemPublic).Count(&count)
 
-	err := db.Where("public = ?", 1).Find(&Problems).Error
+	err := db.Offset(offset).
+		Limit(limit).
+		Where("public = ?", constants.ProblemPublic).
+		Order("problem_id").
+		Find(&Problems).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
 
 		var problemData []map[string]interface{}
@@ -47,7 +51,7 @@ func (model *Problem) GetAllProblems() helper.ReturnType {
 			})
 		}
 
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功",
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"data":  problemData,
 				"count": count,
@@ -63,33 +67,40 @@ func (model *Problem) GetProblemFieldsByIDList(ids []uint, fields[]string) helpe
 	err := db.Select(fields).Where("problem_id in (?)", ids).Find(&problems).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	}
 
-	return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problems}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problems}
 }
 
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
+	sampleModel := Sample{}
+	problemSubmitLog := ProblemSubmitLog{}
 
 	err := db.Where("problem_id = ?", id).First(&problem).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problem}
+		problemData := map[string]interface{}{
+			"problem":            problem,
+			"problem_sample":     sampleModel.FindSamplesByProblemID(int(problem.ProblemID)).Data,
+			"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
+		}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problemData}
 	}
 }
 
 func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 	var problem Problem
 
-	err := db.Where("title = ? AND public = ?", title, 1).First(&problem).Error
+	err := db.Where("title = ? AND public = ?", title, constants.ProblemPublic).First(&problem).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problem}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problem}
 	}
 }
 
@@ -107,8 +118,8 @@ func (model *Problem) SearchProblem(param string) helper.ReturnType {
 			"problem_submit_log": problemSubmitLog.GetProblemSubmitLog(problem.ProblemID).Data,
 		}
 
-		return helper.ReturnType{Status: common.CodeSuccess, Msg: "查询成功", Data: problemData}
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problemData}
 	}
 
-	return helper.ReturnType{Status: common.CodeError, Msg: "查询失败", Data: ""}
+	return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 }

@@ -1,20 +1,16 @@
 package controller
 
 import (
-	"OnlineJudge/app/common"
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
+	"OnlineJudge/constants"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 )
 
 func GetAllNotice(c *gin.Context) {
-	if res := haveAuth(c, "getAllNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeModel := model.Notice{}
 
 	noticeJson := struct {
@@ -32,28 +28,24 @@ func GetAllNotice(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}
-	c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", false))
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
 }
 
 func GetNoticeByID(c *gin.Context) {
-	if res := haveAuth(c, "getAllNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
 	var noticeJson model.Notice
 
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	noticeMap := helper.Struct2Map(noticeJson)
 	if res, err := noticeValidate.ValidateMap(noticeMap, "findByID"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -63,22 +55,18 @@ func GetNoticeByID(c *gin.Context) {
 }
 
 func AddNotice(c *gin.Context) {
-	if res := haveAuth(c, "addNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
 	var noticeJson model.Notice
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	noticeMap := helper.Struct2Map(noticeJson)
 	if res, err := noticeValidate.ValidateMap(noticeMap, "add"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -88,22 +76,18 @@ func AddNotice(c *gin.Context) {
 }
 
 func DeleteNotice(c *gin.Context) {
-	if res := haveAuth(c, "deleteNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
 	var noticeJson model.Notice
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	noticeMap := helper.Struct2Map(noticeJson)
 	if res, err := noticeValidate.ValidateMap(noticeMap, "delete"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
@@ -113,22 +97,18 @@ func DeleteNotice(c *gin.Context) {
 }
 
 func UpdateNotice(c *gin.Context) {
-	if res := haveAuth(c, "updateNotice"); res != common.Authed {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "权限不足", res))
-		return
-	}
 	noticeValidate := validate.NoticeValidate
 	noticeModel := model.Notice{}
 
 	var noticeJson model.Notice
 	if err := c.ShouldBind(&noticeJson); err != nil {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, "绑定数据模型失败", err.Error()))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
 
 	noticeMap := helper.Struct2Map(noticeJson)
 	if res, err := noticeValidate.ValidateMap(noticeMap, "update"); !res {
-		c.JSON(http.StatusOK, helper.BackendApiReturn(common.CodeError, err.Error(), 0))
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
 
