@@ -15,6 +15,12 @@ func init() {
 	dbConfig["password"] = os.Getenv("database_passwd")
 	dbConfig["charset"] = "utf8"
 	dbConfig["parseTime"] = "True"
+
+	dbConfig["maxIdleConns"] = 20
+	dbConfig["maxOpenConns"] = 100
+	/*dbConfig["connMaxIdleTime"] = 10000
+	dbConfig["connMaxLifetime"] = 600000*/
+
 }
 
 func GetDbConfig() map[string]interface{} {
