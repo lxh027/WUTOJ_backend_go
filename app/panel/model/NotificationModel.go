@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+//Notification 在比赛期间的公告
 type Notification struct {
 	ID         int       `json:"id" form:"id"`
 	Title      string    `json:"title" form:"title"`
@@ -30,7 +31,7 @@ func (model *Notification) GetAllNotification(contestID int) helper.ReturnType {
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"notifications": notifications,
-				"count": count,
+				"count":         count,
 			},
 		}
 	}
@@ -49,7 +50,7 @@ func (model *Notification) GetNotificationByID(id int) helper.ReturnType {
 
 }
 
-func (model *Notification) AddNotification(newNotice Notification) helper.ReturnType {//jun
+func (model *Notification) AddNotification(newNotice Notification) helper.ReturnType { //jun
 	err := db.Create(&newNotice).Error
 
 	if err != nil {
@@ -59,7 +60,7 @@ func (model *Notification) AddNotification(newNotice Notification) helper.Return
 	}
 }
 
-func (model *Notification) DeleteNotification(noticeID int) helper.ReturnType  {
+func (model *Notification) DeleteNotification(noticeID int) helper.ReturnType {
 	err := db.Where("id = ?", noticeID).Delete(Notification{}).Error
 
 	if err != nil {
@@ -69,7 +70,7 @@ func (model *Notification) DeleteNotification(noticeID int) helper.ReturnType  {
 	}
 }
 
-func (model *Notification) UpdateNotification(noticeID int, updateNotice Notification) helper.ReturnType  {
+func (model *Notification) UpdateNotification(noticeID int, updateNotice Notification) helper.ReturnType {
 	err := db.Model(&Notification{}).Where("id = ?", noticeID).Update(updateNotice).Error
 
 	if err != nil {
@@ -79,7 +80,7 @@ func (model *Notification) UpdateNotification(noticeID int, updateNotice Notific
 	}
 }
 
-func (model *Notification) ChangeNotificationStatus(noticeID int, status int) helper.ReturnType  {
+func (model *Notification) ChangeNotificationStatus(noticeID int, status int) helper.ReturnType {
 	err := db.Model(&Notification{}).Where("id = ?", noticeID).Update("status", status).Error
 
 	if err != nil {
@@ -88,5 +89,3 @@ func (model *Notification) ChangeNotificationStatus(noticeID int, status int) he
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
 	}
 }
-
-

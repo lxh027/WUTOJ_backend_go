@@ -6,22 +6,22 @@ import (
 )
 
 type User struct {
-	UserID	int 	`json:"user_id" form:"user_id"`
-	Nick	string 	`json:"nick" form:"nick"`
-	Password string	`json:"password" form:"password"`
-	Realname	string	`json:"realname" form:"realname" gorm:"column:realname"`
-	Avatar		string 	`json:"avatar" form:"avatar"`
-	School		string	`json:"school" form:"school"`
-	Major		string	`json:"major" form:"major"`
-	Class       string  `json:"class" form:"class"`
-	Contact		string	`json:"contact" form:"contact"`
-	Identity 	uint	`json:"identity" form:"identity"`
-	Desc    	string 	`json:"desc" form:"desc"`
-	Mail 		string 	`json:"mail" form:"mail"`
-	Status 		int 	`json:"status" form:"status"`
+	UserID   int    `json:"user_id" form:"user_id"`
+	Nick     string `json:"nick" form:"nick"`
+	Password string `json:"password" form:"password"`
+	Realname string `json:"realname" form:"realname" gorm:"column:realname"`
+	Avatar   string `json:"avatar" form:"avatar"`
+	School   string `json:"school" form:"school"`
+	Major    string `json:"major" form:"major"`
+	Class    string `json:"class" form:"class"`
+	Contact  string `json:"contact" form:"contact"`
+	Identity uint   `json:"identity" form:"identity"`
+	Desc     string `json:"desc" form:"desc"`
+	Mail     string `json:"mail" form:"mail"`
+	Status   int    `json:"status" form:"status"`
 }
 
-// 设定表名
+//TableName 设定表名
 func (User) TableName() string {
 	return "users"
 }
@@ -36,7 +36,7 @@ func (model *User) SetAdmin(userID int, isAdmin int) helper.ReturnType {
 	}
 }
 
-func (model *User) UpdateUser(userID int, updateUser User) helper.ReturnType  {
+func (model *User) UpdateUser(userID int, updateUser User) helper.ReturnType {
 	err := db.Model(&User{}).Where("user_id = ?", userID).Update(updateUser).Error
 
 	if err != nil {
@@ -46,7 +46,7 @@ func (model *User) UpdateUser(userID int, updateUser User) helper.ReturnType  {
 	}
 }
 
-func (model *User) DeleteUser(userID int) helper.ReturnType  {
+func (model *User) DeleteUser(userID int) helper.ReturnType {
 	err := db.Where("user_id = ?", userID).Delete(User{}).Error
 
 	if err != nil {
@@ -57,10 +57,10 @@ func (model *User) DeleteUser(userID int) helper.ReturnType  {
 }
 
 func (model *User) AddUser(newUser User) helper.ReturnType {
-	user :=User{}
+	user := User{}
 
 	if err := db.Where("nick = ? OR mail = ?", newUser.Nick, newUser.Mail).First(&user).Error; err == nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称或邮箱已存在",  Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称或邮箱已存在", Data: false}
 	}
 
 	err := db.Create(&newUser).Error

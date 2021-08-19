@@ -6,13 +6,14 @@ import (
 	"time"
 )
 
+//Notice 公告
 type Notice struct {
-	ID		int 	`json:"id" form:"id"`
-	Title 	string 	`json:"title" form:"title"`
-	Content string 	`json:"content" form:"content"`
-	Link 	string 	`json:"link" form:"link"`
+	ID        int       `json:"id" form:"id"`
+	Title     string    `json:"title" form:"title"`
+	Content   string    `json:"content" form:"content"`
+	Link      string    `json:"link" form:"link"`
 	Begintime time.Time `json:"begintime" form:"begintime" gorm:"column:begintime"`
-	Endtime time.Time `json:"endtime" form:"endtime" gorm:"column:endtime"`
+	Endtime   time.Time `json:"endtime" form:"endtime" gorm:"column:endtime"`
 }
 
 func (model *Notice) GetAllNotice(offset int, limit int, title string, time time.Time) helper.ReturnType {
@@ -21,7 +22,6 @@ func (model *Notice) GetAllNotice(offset int, limit int, title string, time time
 	var count int
 
 	db.Model(&Notice{}).Where(where, "%"+title+"%", time).Count(&count)
-
 
 	err := db.Offset(offset).
 		Limit(limit).
@@ -35,7 +35,7 @@ func (model *Notice) GetAllNotice(offset int, limit int, title string, time time
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"notices": notices,
-				"count": count,
+				"count":   count,
 			},
 		}
 	}
@@ -53,7 +53,7 @@ func (model *Notice) FindNoticeByID(id int) helper.ReturnType {
 	}
 }
 
-func (model *Notice) AddNotice(newNotice Notice) helper.ReturnType {//jun
+func (model *Notice) AddNotice(newNotice Notice) helper.ReturnType { //jun
 	err := db.Create(&newNotice).Error
 
 	if err != nil {
@@ -63,7 +63,7 @@ func (model *Notice) AddNotice(newNotice Notice) helper.ReturnType {//jun
 	}
 }
 
-func (model *Notice) DeleteNotice(noticeID int) helper.ReturnType  {
+func (model *Notice) DeleteNotice(noticeID int) helper.ReturnType {
 	err := db.Where("id = ?", noticeID).Delete(Notice{}).Error
 
 	if err != nil {
@@ -73,7 +73,7 @@ func (model *Notice) DeleteNotice(noticeID int) helper.ReturnType  {
 	}
 }
 
-func (model *Notice) UpdateNotice(noticeID int, updateNotice Notice) helper.ReturnType  {
+func (model *Notice) UpdateNotice(noticeID int, updateNotice Notice) helper.ReturnType {
 	err := db.Model(&Notice{}).Where("id = ?", noticeID).Update(updateNotice).Error
 
 	if err != nil {

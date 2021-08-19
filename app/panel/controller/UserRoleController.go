@@ -7,11 +7,11 @@ import (
 	"OnlineJudge/constants"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-// TODO
 func AddUserRoles(c *gin.Context) {
 	userRoleValidate := validate.UserRoleValidate
 	userRoleModel := model.UserRole{}

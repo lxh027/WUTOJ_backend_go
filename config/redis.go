@@ -11,6 +11,7 @@ func init() {
 	redisConfig = make(map[string]interface{})
 
 	redisConfig["env"] = os.Getenv("env")
+	// redisConfig["env"] = "dev"
 	redisConfig["rank_cache_time"] = 5
 	redisConfig["host"] = os.Getenv("redis_host")
 	redisConfig["auth"] = ""
