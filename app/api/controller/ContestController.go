@@ -63,7 +63,7 @@ func GetContestByID(c *gin.Context) {
 	}
 
 }
-
+//TODO:抄一下这里
 func JoinContest(c *gin.Context) {
 
 	res := checkLogin(c)
