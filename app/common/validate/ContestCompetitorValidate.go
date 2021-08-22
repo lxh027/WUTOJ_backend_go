@@ -12,11 +12,11 @@ func init() {
 	}
 
 	scenes := map[string][]string{
-		"add":         {"user_id", "rid"},
-		"addGroup":    {"user_id", "rids"},
-		"deleteGroup": {"user_id", "rids"},
-		"delete":      {"user_id", "rid"},
-		"getUserRole": {"user_id"},
+		"add":         {"contest_id", "rid"},
+		"addGroup":    {"contest_id", "rids"},
+		"deleteGroup": {"contest_id", "rids"},
+		"delete":      {"contest_id", "rid"},
+		"getUserRole": {"contest_id"},
 	}
 
 	ContestCompetitorValidate.Rules = rules

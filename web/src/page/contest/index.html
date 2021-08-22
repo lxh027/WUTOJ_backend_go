@@ -67,6 +67,7 @@
                 success: function (return_data) {
                     const data = return_data.data
                     auths = data.auths
+                    console.log(auths)
                     if (auths.indexOf("getAllContest") === -1) {
                         layer.msg("权限不足", () => {
                             window.location.href = "../404.html"
@@ -77,6 +78,9 @@
                         $("#currentTableBar").append(getButton(2, 'notification', '公告'))
                         $("#currentTableBar").append(getButton(4, 'status', '状态'))
                         $("#currentTableBar").append(getButton(4, 'rank', '榜单'))
+                        //自建
+                        //TODO:查询参赛选手
+                        $("#currentTableBar").append(getButton(5, 'checkAll', '查询参赛选手'))
                     }
                     if (auths.indexOf("deleteContest") !== -1) {
                         $("#currentTableBar").append(getButton(3, 'delete', '删除'))
@@ -239,6 +243,30 @@
                 layer.confirm('确认刷新', function (index) {
                     $.ajax({
                         url: getPort()+'contest/flushRank',
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "contest_id": data.contest_id,
+                        },
+                        success: function (data) {
+                            table.reload('currentTableId', {
+                                page: {
+                                    curr: 1
+                                }
+                                , where: {
+                                    "where": data.field
+                                }
+                            }, 'data');
+                        }
+                    })
+                    layer.close(index);
+                });
+            } 
+            //TODO:添加在这里
+            else if (obj.event === 'checkAll') {
+                layer.confirm('查询参赛选手', function (index) {
+                    $.ajax({
+                        url: getPort() + 'contest/getAllContestUsers',
                         type: "post",
                         dataType: "json",
                         data: {

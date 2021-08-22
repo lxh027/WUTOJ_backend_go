@@ -4,8 +4,9 @@ import (
 	apiController "OnlineJudge/app/api/controller"
 	panelController "OnlineJudge/app/panel/controller"
 	"OnlineJudge/middleware"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Routes(router *gin.Engine) {
@@ -170,6 +171,8 @@ func Routes(router *gin.Engine) {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
+			//自建
+			contest.POST("/getAllContestUsers", panelController.GetAllContestUsers)
 			notification := contest.Group("/notification")
 			{
 				notification.POST("/getAllNotification", panelController.GetAllNotification)
@@ -180,6 +183,12 @@ func Routes(router *gin.Engine) {
 				notification.POST("/changeNotificationStatus", panelController.ChangeNotificationStatus)
 			}
 			//TODO:添加在这里
+			// competitor := contest.Group("/competitor")
+			// {
+			// 	competitor.POST("/addContestCompetitors", panelController.AddContestCompetitors)
+			// 	competitor.POST("/deleteContestCompetitors", panelController.DeleteContestCompetitors)
+			// 	competitor.POST("/getContestCompetitorsList", panelController.GetContestCompetitorsList)
+			// }
 		}
 
 		submit := panel.Group("/submit")
@@ -217,7 +226,7 @@ func Routes(router *gin.Engine) {
 			problem.POST("/findSamplesByProblemID", panelController.GetSamplesByProblemID)
 			problem.POST("/uploadData", panelController.UploadData)
 			problem.POST("/updateJudgeInfo", panelController.SetProblemTimeAndSpace)
-			problem.POST("/uploadXML",panelController.UploadXML)
+			problem.POST("/uploadXML", panelController.UploadXML)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))
