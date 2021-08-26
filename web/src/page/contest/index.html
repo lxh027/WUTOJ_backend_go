@@ -51,7 +51,7 @@
 <script src="../../js/template.js"></script>
 
 <script>
-    layui.use(['form', 'table', 'laydate'], function () {
+    layui.use(['form', 'table', 'laydate', 'upload', 'element', 'layer'], function () {
         var $ = layui.jquery,
             form = layui.form,
             laydate = layui.laydate,
@@ -67,20 +67,22 @@
                 success: function (return_data) {
                     const data = return_data.data
                     auths = data.auths
-                    console.log(auths)
+                    // console.log(auths)
                     if (auths.indexOf("getAllContest") === -1) {
                         layer.msg("权限不足", () => {
                             window.location.href = "../404.html"
                         })
                     }
                     if (auths.indexOf("updateContest") !== -1) {
-                        $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
-                        $("#currentTableBar").append(getButton(2, 'notification', '公告'))
+                        // $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        // $("#currentTableBar").append(getButton(2, 'notification', '公告'))
                         $("#currentTableBar").append(getButton(4, 'status', '状态'))
                         $("#currentTableBar").append(getButton(4, 'rank', '榜单'))
                         //自建
                         //TODO:查询参赛选手
-                        $("#currentTableBar").append(getButton(5, 'checkAll', '查询参赛选手'))
+                        $("#currentTableBar").append(getButton(4, 'checkAll', '查询'))
+                        //TODO:批量添加选手
+                        $("#currentTableBar").append(getButton(4, 'addCompe', '添加'))
                     }
                     if (auths.indexOf("deleteContest") !== -1) {
                         $("#currentTableBar").append(getButton(3, 'delete', '删除'))
@@ -286,8 +288,43 @@
                     layer.close(index);
                 });
             }
+            // else if(obj.event === 'addCompe'){
+            //     // console.log("ljw")
+            //     var $ = layui.jquery
+            //         , upload = layui.upload
+            //         , element = layui.element
+            //         , layer = layui.layer;
+            //     upload.render({ //允许上传的文件后缀
+            //         elem: '#addCompe'
+            //         , url: '#' //TODO:改成您自己的上传接口
+            //         , accept: 'file' //普通文件
+            //         , exts: 'csv' //只允许上传md文件
+            //         , done: function (res) {
+            //             layer.open(res)
+            //             console.log(res)
+            //         }
+            //     })
+            // }
         });
+        var $ = layui.jquery
+            , upload = layui.upload
+            , element = layui.element
+            , layer = layui.layer;
 
+
+        //指定允许上传的文件类型
+
+        upload.render({ //允许上传的文件后缀
+            elem: '#addCompe'
+            , url: '#' //改成您自己的上传接口
+            , accept: 'file' //普通文件
+            , exts: 'md' //只允许上传md文件
+            , done: function (res) {
+                // layer.msg('上传成功');
+                layer.open(res)
+                console.log(res)
+            }
+        });
     });
 </script>
 
