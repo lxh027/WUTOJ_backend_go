@@ -15,11 +15,12 @@ jobs:
     - name: commit
       run: |
         # git checkout dev
-        git log --after="yesterday" -1
+        git log --after="yesterday" -1 > commit.log
         cd pythonFile
         ls
         less run.py
-        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.WRONG_URL }}
+        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }} > commit2.log
+        less commit2.log
         cd ..
         ls
         
