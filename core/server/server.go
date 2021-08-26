@@ -53,7 +53,8 @@ func Run(httpServer *gin.Engine)  {
 	}()
 
 	// 注册路由
-	routes.Routes(httpServer)
+	routes.ApiRoutes(httpServer)
+	routes.BackendRoutes(httpServer)
 
 	serverError := httpServer.Run(serverConfig["host"].(string)+":"+serverConfig["port"].(string))
 
