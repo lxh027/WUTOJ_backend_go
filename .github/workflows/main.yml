@@ -19,7 +19,7 @@ jobs:
         cd pythonFile
         ls
         less run.py
-        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }} > commit2.log
+        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }} 2>&1
         less commit2.log
         cd ..
         ls
