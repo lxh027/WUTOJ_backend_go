@@ -14,7 +14,7 @@ jobs:
         python-version: 3.7
     - name: commit
       run: |
-        git checkout -b dev origin/dev
+        git checkout dev
         git log --after="yesterday" -1 > commit.log
         cd pythonFile
         python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
