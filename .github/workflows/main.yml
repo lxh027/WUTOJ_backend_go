@@ -19,7 +19,7 @@ jobs:
         cd pythonFile
         ls
         less run.py
-        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
+        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.WRONG_URL }}
         cd ..
         ls
         
