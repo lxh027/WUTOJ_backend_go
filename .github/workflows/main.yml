@@ -15,11 +15,19 @@ jobs:
     - name: commit
       run: |
         # git checkout dev
-        git log --after="yesterday" -1 > commit.log
-        cd pythonFile
-        ls
-        less run.py
-        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
-        cd ..
-        ls
+        # git log --after="yesterday" -1 > commit.log
+        # cd pythonFile
+        # ls
+        # less run.py
+        # python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
+        # cd ..
+        # ls
+        curl --location --request POST 'http://121.40.124.19:8888/v1/LuaApiCaller?qq=1004619265&funcname=SendMsgV2&timeout=1000' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+	          "ToUserUid": 776223056,
+	          "SendToType": 2,
+	          "SendMsgType": "TextMsg",
+	          "Content": "测试"
+          }'
         
