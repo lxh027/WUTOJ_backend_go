@@ -1,4 +1,4 @@
-package db_server
+package db
 
 import (
 	"OnlineJudge/config"

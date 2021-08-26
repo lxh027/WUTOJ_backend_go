@@ -6,7 +6,7 @@ import (
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
-	"OnlineJudge/judger"
+	"OnlineJudge/core/judger"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"

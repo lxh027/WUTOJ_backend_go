@@ -2,8 +2,8 @@ package server
 
 import (
 	"OnlineJudge/config"
-	"OnlineJudge/judger"
-	"OnlineJudge/routes"
+	"OnlineJudge/core/judger"
+	"OnlineJudge/core/routes"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -53,7 +53,8 @@ func Run(httpServer *gin.Engine)  {
 	}()
 
 	// 注册路由
-	routes.Routes(httpServer)
+	routes.ApiRoutes(httpServer)
+	routes.BackendRoutes(httpServer)
 
 	serverError := httpServer.Run(serverConfig["host"].(string)+":"+serverConfig["port"].(string))
 
