@@ -1,19 +1,19 @@
 name: 'GitHub Actions Mirror'
 
-on: [push, delete]
+on: [push]
 
 jobs:
   to_bot:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout actions
-        uses: actions/checkout@v1
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-      - name: commit
-        run: |
-          git log --after="yesterday" -1 > commit.log
-          cd pythonFile
-          python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
+    - name: checkout actions
+      uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: commit
+      run: |
+        git log --after="yesterday" -1 > commit.log
+        cd pythonFile
+        python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
