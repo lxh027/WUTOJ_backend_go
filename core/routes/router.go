@@ -2,8 +2,8 @@ package routes
 
 import (
 	apiController "OnlineJudge/app/api/controller"
+	"OnlineJudge/app/middleware"
 	panelController "OnlineJudge/app/panel/controller"
-	"OnlineJudge/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -87,6 +87,7 @@ func Routes(router *gin.Engine) {
 	}
 
 	panel := router.Group("/panel")
+	// Use MiddleWare to auth backend
 	panel.Use(middleware.BackendAuth())
 	{
 		user := panel.Group("/user")
