@@ -35,4 +35,4 @@ print(json.dumps(data))
 print(json.dumps(data).encode())
 request = urllib.request.Request(
 	url=wqy[2], headers=headers, data=json.dumps(data).encode())
-response = urllib.request.urlopen(request)
+# response = urllib.request.urlopen(request)
