@@ -14,5 +14,5 @@ jobs:
         python-version: 3.7
     - name: commit
       run: |
-        curl -X POST -k '${{ secrets.URL_SECRET }}' -d '{"ToUserUid": "${{ secrets.JSON_SECRET }}","SendToType": 2,"SendMsgType": "TextMsg","Content": "测试"}' 
+        curl -X POST -k '${{ secrets.URL_SECRET }}' -d '{"ToUserUid": ${{ secrets.JSON_SECRET }},"SendToType": 2,"SendMsgType": "TextMsg","Content": "测试"}' 
         
