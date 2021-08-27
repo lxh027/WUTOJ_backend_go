@@ -123,7 +123,7 @@ func (model *Submit) GetContestACSubmitsWithExtraName(contestID uint) helper.Ret
 	var submits []SubmitBalloon
 	fields := []string{"submit.user_id as user_id", "submit.nick as nick", "submit.problem_id as problem_id", "submit.id as id", "users.realname as realname"}
 
-	//err := db.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
+	//err := database.Select(fields).Where("contest_id = ? AND status = 'AC'", contestID).Order("id desc").Find(&submits).Error
 
 	err := db.Table("submit").Joins("JOIN users ON submit.user_id = users.user_id").
 		Select(fields).

@@ -3,7 +3,7 @@ package controller
 import (
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/constants"
-	"OnlineJudge/core/db"
+	"OnlineJudge/core/database"
 	"container/list"
 	"encoding/json"
 	"errors"
@@ -27,14 +27,14 @@ type redisData struct {
 }
 
 func ClearAuthRedis(userID int) {
-	err := db.DeleteFromRedis(strconv.Itoa(userID) + "auth_info")
+	err := database.DeleteFromRedis(strconv.Itoa(userID) + "auth_info")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
 func GetUserAllAuth(userID int) ([]menuItem, []string, error) {
-	if info, err := db.GetFromRedis(strconv.Itoa(userID) + "auth_info"); err == nil && info != nil {
+	if info, err := database.GetFromRedis(strconv.Itoa(userID) + "auth_info"); err == nil && info != nil {
 		var authInfo redisData
 		bytes, _ := redis.Bytes(info, err)
 		_ = json.Unmarshal(bytes, &authInfo)
@@ -105,7 +105,7 @@ func GetUserAllAuth(userID int) ([]menuItem, []string, error) {
 		}
 		authInfo := redisData{menu, authName}
 		dataJson, _ := json.Marshal(authInfo)
-		_ = db.PutToRedis(strconv.Itoa(userID)+"auth_info", dataJson, 3600)
+		_ = database.PutToRedis(strconv.Itoa(userID)+"auth_info", dataJson, 3600)
 		return menu, authName, nil
 	} else {
 		return nil, nil, errors.New("获取权限列表错误")

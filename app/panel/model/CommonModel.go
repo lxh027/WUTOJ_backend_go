@@ -1,9 +1,9 @@
 package model
 
 import (
-	"OnlineJudge/core/db"
+	"OnlineJudge/core/database"
 	"github.com/jinzhu/gorm"
 )
 
-var db *gorm.DB = db.MySqlDb
+var db *gorm.DB = database.MySqlDb
 

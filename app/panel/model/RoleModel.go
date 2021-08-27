@@ -62,10 +62,10 @@ func (model *Role) GetRoleNoRules() helper.ReturnType {
 
 	var countTotal, countRole int
 
-	err1 := db.Order("rid").Find(&rolesTotal).
+	err1 := database.Order("rid").Find(&rolesTotal).
 		Count(&countTotal).Error
 
-	err2 := db.Joins("JOIN user_role ON role.rid = user_role.rid AND user_role.uid = ? ", uid).
+	err2 := database.Joins("JOIN user_role ON role.rid = user_role.rid AND user_role.uid = ? ", uid).
 		Order("rid").
 		Find(&roles).
 		Count(&countRole).Error

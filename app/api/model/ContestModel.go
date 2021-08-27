@@ -69,7 +69,7 @@ func (model *Contest) GetContestById(contestID int) helper.ReturnType {
 func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
 	var contests []Contest
 	//
-	//db.Model(&Contest{}).Find(&contests).Error
+	//database.Model(&Contest{}).Find(&contests).Error
 	//
 	err := db.Offset(Offset).Limit(Limit).Find(&contests).Error
 
@@ -108,13 +108,13 @@ func (model *Contest) AddContest(data Contest) helper.ReturnType {
 
 func (model *Contest) DeleteContest(contestID int) helper.ReturnType {
 	//contest := Contest{}
-	//err := db.Where("contest_id = ?", contestID).First(&contest).Error
+	//err := database.Where("contest_id = ?", contestID).First(&contest).Error
 	//if err != nil {
 	//	return helper.ReturnType{Status: common.CodeError, Msg: "数据库错误||删除比赛失败", Data: err.Error()}
 	//}
-	//err = db.Delete(&contest).Error
+	//err = database.Delete(&contest).Error
 	//contest.Status = 0
-	//err = db.Create(&contest).Error
+	//err = database.Create(&contest).Error
 	err := db.Model(model).Where("contest_id = ?", contestID).Update("status", 0).Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "删除比赛失败", Data: err.Error()}

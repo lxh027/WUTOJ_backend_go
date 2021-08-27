@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"OnlineJudge/config"
@@ -14,7 +14,7 @@ var MySqlError error
 func init()  {
 	dbConfig := config.GetDbConfig()
 
-	// set db dsn
+	// set database dsn
 	dbDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s",
 			dbConfig["username"],
 			dbConfig["password"],
