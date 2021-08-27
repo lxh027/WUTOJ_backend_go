@@ -14,13 +14,5 @@ jobs:
         python-version: 3.7
     - name: commit
       run: |
-        # git checkout dev
-        # git log --after="yesterday" -1 > commit.log
-        # cd pythonFile
-        # ls
-        # less run.py
-        # python run.py ${{ secrets.JSON_SECRET }} ${{ secrets.URL_SECRET }}
-        # cd ..
-        # ls
-        curl --location --request POST ${{ secrets.URL_SECRET }}  -d '{"ToUserUid": ${{ secrets.JSON_SECRET }},"SendToType": 2,"SendMsgType": "TextMsg","Content": "测试"}' 
+        curl -X POST -k ${{ secrets.URL_SECRET }} -d '{"ToUserUid": ${{ secrets.JSON_SECRET }},"SendToType": 2,"SendMsgType": "TextMsg","Content": "测试"}' 
         
