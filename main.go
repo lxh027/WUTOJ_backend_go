@@ -5,13 +5,13 @@ import (
 	"OnlineJudge/core/server"
 	"github.com/gin-gonic/gin"
 )
-import "OnlineJudge/core/db"
+import "OnlineJudge/core/database"
 
 var httpServer *gin.Engine
 
 func main()  {
 	defer func() {
-		db.MySqlDb.Close()
+		database.MySqlDb.Close()
 		judger.CloseInstance()
 	}()
 	

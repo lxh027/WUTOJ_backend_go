@@ -1,13 +1,13 @@
 package server
 
 import (
-	"OnlineJudge/core/db"
+	"OnlineJudge/core/database"
 )
 
 func addTimer() {
 	//start := time.Now()
 
-	db := db.MySqlDb
+	db := database.MySqlDb
 	update_user_sql := `INSERT IGNORE INTO user_submit_log(user_id,ac,wa,tle,mle,re,se,ce)
 		select t1.user_id AS user_id, ifnull(t2.ac,0) AS ac, 
 		t1.wa AS wa, t1.tle AS tle, t1.mle AS mle, t1.re AS re, t1.se AS se, t1.ce AS ce

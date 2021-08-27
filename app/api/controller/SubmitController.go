@@ -6,7 +6,7 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
-	"OnlineJudge/core/db"
+	"OnlineJudge/core/database"
 	"OnlineJudge/core/judger"
 	"encoding/json"
 	"fmt"
@@ -44,7 +44,7 @@ func Submit(c *gin.Context) {
 	now, _ := time.Parse(format, time.Now().Format(format))
 	interval := config.GetWutOjConfig()["interval_time"].(int)
 	redisStr := "user_last_submit" + strconv.Itoa(int(userID.(uint)))
-	if value, err := db.GetFromRedis(redisStr); err == nil {
+	if value, err := database.GetFromRedis(redisStr); err == nil {
 		defaultFormat := "2006-01-02 15:04:05 +0000 UTC"
 		lastStr, _ := redis.String(value, err)
 		last, _ := time.Parse(defaultFormat, lastStr)
@@ -55,7 +55,7 @@ func Submit(c *gin.Context) {
 			return
 		}
 	}
-	_ = db.PutToRedis(redisStr, now, 3600)
+	_ = database.PutToRedis(redisStr, now, 3600)
 
 	var submitJson struct {
 		Language   string `json:"language"`
@@ -139,7 +139,7 @@ func judge(submit model.Submit) {
 					return
 				}
 				user := user{UserID: submit.UserID, Nick: submit.Nick, Penalty: 0, ACNum: 0, ProblemID: make(map[uint]problem)}
-				if itemStr, err := redis.String(db.GetFromRedis("contest_rank" + strconv.Itoa(int(submit.ContestID)) + "user_id" + strconv.Itoa(int(submit.UserID)))); err == nil {
+				if itemStr, err := redis.String(database.GetFromRedis("contest_rank" + strconv.Itoa(int(submit.ContestID)) + "user_id" + strconv.Itoa(int(submit.UserID)))); err == nil {
 					_ = json.Unmarshal([]byte(itemStr), &user)
 				}
 				if _, ok := user.ProblemID[submit.ProblemID]; !ok {
@@ -157,9 +157,9 @@ func judge(submit model.Submit) {
 					}
 
 					itemStr, _ := json.Marshal(user)
-					_ = db.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
+					_ = database.PutToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
 					score := -int64(user.ACNum)*1000000000 + user.Penalty
-					_ = db.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
+					_ = database.ZAddToRedis("contest_rank"+strconv.Itoa(int(submit.ContestID)), score, user.UserID)
 
 				}
 			}
