@@ -3,8 +3,9 @@ package routes
 import (
 	"OnlineJudge/app/middleware"
 	panelController "OnlineJudge/app/panel/controller"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func BackendRoutes(router *gin.Engine) {
@@ -94,7 +95,10 @@ func BackendRoutes(router *gin.Engine) {
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
 			//自建
-			contest.POST("/getAllContestUsers", panelController.GetAllContestUsers)
+			contestUser := contest.Group("/contestUser")
+			{
+				contestUser.POST("/getAllContestUsers", panelController.GetAllContestUsers)
+			}
 			notification := contest.Group("/notification")
 			{
 				notification.POST("/getAllNotification", panelController.GetAllNotification)
@@ -104,13 +108,6 @@ func BackendRoutes(router *gin.Engine) {
 				notification.POST("/getNotificationByID", panelController.GetNotificationByID)
 				notification.POST("/changeNotificationStatus", panelController.ChangeNotificationStatus)
 			}
-			//TODO:添加在这里
-			// competitor := contest.Group("/competitor")
-			// {
-			// 	competitor.POST("/addContestCompetitors", panelController.AddContestCompetitors)
-			// 	competitor.POST("/deleteContestCompetitors", panelController.DeleteContestCompetitors)
-			// 	competitor.POST("/getContestCompetitorsList", panelController.GetContestCompetitorsList)
-			// }
 		}
 
 		submit := panel.Group("/submit")

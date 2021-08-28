@@ -74,12 +74,11 @@
                         })
                     }
                     if (auths.indexOf("updateContest") !== -1) {
-                        // $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
-                        // $("#currentTableBar").append(getButton(2, 'notification', '公告'))
-                        // $("#currentTableBar").append(getButton(4, 'status', '状态'))
+                        // console.log("ljw")
+                        $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                        $("#currentTableBar").append(getButton(2, 'notification', '公告'))
+                        $("#currentTableBar").append(getButton(4, 'status', '状态'))
                         $("#currentTableBar").append(getButton(4, 'rank', '榜单'))
-                        //自建
-                        //TODO:查询参赛选手
                         $("#currentTableBar").append(getButton(4, 'checkAll', '查询'))
                         //TODO:批量添加选手
                         $("#currentTableBar").append(getButton(4, 'addCompe', '添加'))
@@ -132,7 +131,8 @@
                 {field: 'begin_time', title: '开始时间', sort: true, minWidth: 180},
                 {field: 'end_time', title: '结束时间', sort: true, minWidth: 180},
                 {field: 'status', title: '状态', sort: true, templet: (d) => {if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>";}},
-                {title: '操作', minWidth: 250, toolbar: '#currentTableBar', align: "center"},
+                //修改此处以调整宽度容纳更多按钮
+                {title: '操作', minWidth: 350, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],
             limit: 25,
@@ -227,7 +227,8 @@
                     })
                     layer.close(index);
                 });
-            } else if (obj.event === 'notification') {
+            } 
+            else if (obj.event === 'notification') {
                 var index = layer.open({
                     title: '比赛公告',
                     type: 2,
@@ -241,7 +242,8 @@
                     layer.full(index);
                 });
                 return false;
-            }else if (obj.event === 'rank') {
+            }
+            else if (obj.event === 'rank') {
                 layer.confirm('确认刷新', function (index) {
                     $.ajax({
                         url: getPort()+'contest/flushRank',
@@ -264,29 +266,20 @@
                     layer.close(index);
                 });
             } 
-            //TODO:添加在这里
             else if (obj.event === 'checkAll') {
-                layer.confirm('查询参赛选手', function (index) {
-                    $.ajax({
-                        url: getPort() + 'contest/getAllContestUsers',
-                        type: "post",
-                        dataType: "json",
-                        data: {
-                            "contest_id": data.contest_id,
-                        },
-                        success: function (data) {
-                            table.reload('currentTableId', {
-                                page: {
-                                    curr: 1
-                                }
-                                , where: {
-                                    "where": data.field
-                                }
-                            }, 'data');
-                        }
-                    })
-                    layer.close(index);
+                var index = layer.open({
+                    title: '参赛选手列表',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../contestUser/index.html?id=' + data.contest_id,
                 });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
             }
             // else if(obj.event === 'addCompe'){
             //     // console.log("ljw")

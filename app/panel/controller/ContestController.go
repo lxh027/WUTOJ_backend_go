@@ -177,7 +177,6 @@ func ClearContestRedis(c *gin.Context) {
 		return
 	}
 
-
 	if err := database.DeleteFromRedis("contest_rank" + strconv.Itoa(int(contestJson.ContestID))); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "刷新排行榜失败", err.Error()))
 		return
@@ -186,28 +185,3 @@ func ClearContestRedis(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "刷新排行榜成功", 0))
 	return
 }
-
-//自建
-
-// //GetAllContestUsersByID 获取所有参赛选手
-// func GetAllContestUsersByID(c *gin.Context) {
-// 	contestValidate := validate.ContestValidate
-// 	contestModel := model.Contest{}
-// 	//TODO:获取参赛选手
-// 	var contestJson model.Contest
-
-// 	if err := c.ShouldBind(&contestJson); err != nil {
-// 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
-// 		return
-// 	}
-
-// 	contestMap := helper.Struct2Map(contestJson)
-// 	if res, err := contestValidate.ValidateMap(contestMap, "findByID"); !res {
-// 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
-// 		return
-// 	}
-
-// 	res := contestModel.FindContestByID(contestJson.ContestID)
-// 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
-// 	return
-// }

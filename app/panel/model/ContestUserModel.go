@@ -12,6 +12,10 @@ type ContestUser struct {
 	Status    int `json:"status" form:"status"`
 }
 
+func (ContestUser) TableName() string {
+	return "contest_users"
+}
+
 func (model *ContestUser) AddContestUser(data ContestUser) helper.ReturnType {
 	contestUser := ContestUser{}
 

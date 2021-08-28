@@ -5,11 +5,11 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-// TODO 注册权限
 func GetAllRole(c *gin.Context) { //??
 	roleModel := model.Role{}
 
