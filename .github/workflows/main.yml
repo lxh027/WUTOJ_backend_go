@@ -3,6 +3,18 @@ name: 'GitHub Actions Mirror'
 on: [push]
 
 jobs:
+  mirror_to_gitee:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v1
+      - name: 'Mirror to gitee'
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            git@gitee.com:lxh027/wut_backend_go.git
+          ssh_private_key:
+            ${{ secrets.GITEE }}
   to_bot:
     runs-on: ubuntu-latest
     steps:
