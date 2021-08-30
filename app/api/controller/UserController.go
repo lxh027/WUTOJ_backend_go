@@ -5,9 +5,10 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func UpdateUserInfo(c *gin.Context) {
@@ -95,5 +96,5 @@ func GetUserByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
-	
+
 }

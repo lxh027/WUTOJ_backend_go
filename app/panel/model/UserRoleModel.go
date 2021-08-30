@@ -6,10 +6,9 @@ import (
 )
 
 type UserRole struct {
-	UserID 	int 	`json:"user_id" form:"user_id"`
-	Rid		int 	`json:"rid" form:"rid"`
+	UserID int `json:"user_id" form:"user_id"`
+	Rid    int `json:"rid" form:"rid"`
 }
-
 
 func (model *UserRole) AddUserRole(newUserRole UserRole) helper.ReturnType {
 	err := db.Create(&newUserRole).Error

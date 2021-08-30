@@ -7,11 +7,12 @@ import (
 	"OnlineJudge/constants"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllContest(c *gin.Context) {
@@ -41,7 +42,7 @@ func GetContestByID(c *gin.Context) {
 	userID := int(userIDRaw)
 
 	ContestIDRaw := c.Param("contest_id")
-	ContestID , err := strconv.Atoi(ContestIDRaw)
+	ContestID, err := strconv.Atoi(ContestIDRaw)
 	if err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛ID错误", 0))
 		return
@@ -52,7 +53,7 @@ func GetContestByID(c *gin.Context) {
 	res = contestModel.GetContestById(ContestID)
 	if res.Status != constants.CodeError {
 		contestUserModel := model.ContestUser{}
-		if participation := contestUserModel.CheckUserContest(userID,ContestID); participation.Status != constants.CodeSuccess{
+		if participation := contestUserModel.CheckUserContest(userID, ContestID); participation.Status != constants.CodeSuccess {
 			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
 			return
 		}
@@ -63,7 +64,6 @@ func GetContestByID(c *gin.Context) {
 	}
 
 }
-
 func JoinContest(c *gin.Context) {
 
 	res := checkLogin(c)
@@ -146,10 +146,10 @@ func GetContestProblems(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据模型绑定错误", ""))
 		return
 	}
-	
+
 	contestID := ContestJson.ContestID
 	contestUserModel := model.ContestUser{}
-	if participation := contestUserModel.CheckUserContest(userID,contestID); participation.Status != constants.CodeSuccess{
+	if participation := contestUserModel.CheckUserContest(userID, contestID); participation.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
 		return
 	}
@@ -169,8 +169,8 @@ func GetContestProblems(c *gin.Context) {
 	}
 	// 获取题目id
 	type problemInfo struct {
-		ID	uint 	`json:"id"`
-		Info  map[string]interface{} `json:"info""`
+		ID   uint                   `json:"id"`
+		Info map[string]interface{} `json:"info""`
 	}
 
 	problemIDsStr := res.Data.(string)
@@ -190,7 +190,7 @@ func GetContestProblems(c *gin.Context) {
 		// 查询题目数据失败
 		for _, problemID := range problemIDs {
 			item := problemInfo{ID: problemID, Info: make(map[string]interface{})}
-			result =  append(result, item)
+			result = append(result, item)
 		}
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "获取题目信息失败", result))
 		return
@@ -199,12 +199,12 @@ func GetContestProblems(c *gin.Context) {
 	problemInfos := res.Data.([]model.Problem)
 	for _, info := range problemInfos {
 		// gen problem info
-		extraMap := map[string]interface{} {
+		extraMap := map[string]interface{}{
 			"title": info.Title,
 		}
 
 		item := problemInfo{ID: info.ProblemID, Info: extraMap}
-		result =  append(result, item)
+		result = append(result, item)
 	}
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "获取比赛题目信息成功", result))
 
