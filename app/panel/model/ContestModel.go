@@ -109,15 +109,3 @@ func (model *Contest) GetContestById(contestID uint) helper.ReturnType {
 	}
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
 }
-
-//自建
-
-//GetContestUsersById 获取参赛选手
-func (model *Contest) GetContestUsersById(contestID uint) helper.ReturnType {
-	contest := Contest{}
-	err := db.Where("contest_id = ?", contestID).First(&contest).Error
-	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: err.Error()}
-	}
-	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
-}
