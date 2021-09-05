@@ -3,8 +3,9 @@ package routes
 import (
 	"OnlineJudge/app/middleware"
 	panelController "OnlineJudge/app/panel/controller"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func BackendRoutes(router *gin.Engine) {
@@ -93,6 +94,11 @@ func BackendRoutes(router *gin.Engine) {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
+			//自建
+			contestUser := contest.Group("/contestUser")
+			{
+				contestUser.POST("/getAllContestUsers", panelController.GetAllContestUsers)
+			}
 			notification := contest.Group("/notification")
 			{
 				notification.POST("/getAllNotification", panelController.GetAllNotification)
@@ -139,7 +145,7 @@ func BackendRoutes(router *gin.Engine) {
 			problem.POST("/findSamplesByProblemID", panelController.GetSamplesByProblemID)
 			problem.POST("/uploadData", panelController.UploadData)
 			problem.POST("/updateJudgeInfo", panelController.SetProblemTimeAndSpace)
-			problem.POST("/uploadXML",panelController.UploadXML)
+			problem.POST("/uploadXML", panelController.UploadXML)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))

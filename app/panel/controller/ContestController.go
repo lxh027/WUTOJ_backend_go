@@ -7,10 +7,11 @@ import (
 	"OnlineJudge/constants"
 	"OnlineJudge/core/database"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllContest(c *gin.Context) {
@@ -201,7 +202,6 @@ func ClearContestRedis(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, err.Error(), 0))
 		return
 	}
-
 
 	if err := database.DeleteFromRedis("contest_rank" + strconv.Itoa(int(contestJson.ContestID))); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "刷新排行榜失败", err.Error()))
