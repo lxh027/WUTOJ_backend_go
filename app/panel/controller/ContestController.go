@@ -38,6 +38,7 @@ func GetAllContest(c *gin.Context) {
 func GetContestByID(c *gin.Context) {
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
+	contestProblemModel := model.ContestProblem{}
 
 	var contestJson model.Contest
 
@@ -53,7 +54,15 @@ func GetContestByID(c *gin.Context) {
 	}
 
 	res := contestModel.FindContestByID(contestJson.ContestID)
-	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+	if res.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	contestRes := res.Data.(model.Contest)
+	problemsRes := contestProblemModel.GetContestProblems(contestJson.ContestID)
+	problemStr, _ := json.Marshal(problemsRes.Data)
+	contestRes.Problems = string(problemStr)
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "get success", contestRes))
 	return
 }
 
@@ -61,7 +70,7 @@ func AddContest(c *gin.Context) {
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 	problemModel := model.Problem{}
-
+	contestProblemModel := model.ContestProblem{}
 	var contestJson model.Contest
 	if err := c.ShouldBind(&contestJson); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
@@ -84,6 +93,14 @@ func AddContest(c *gin.Context) {
 	}
 
 	res := contestModel.AddContest(contestJson)
+	if res.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	contestID := res.Data.(int)
+	for _, id := range problems {
+		_ = contestProblemModel.AddContestProblem(model.ContestProblem{ContestID: contestID, ProblemID: id})
+	}
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
@@ -91,7 +108,7 @@ func AddContest(c *gin.Context) {
 func DeleteContest(c *gin.Context) {
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
-
+	contestProblemModel := model.ContestProblem{}
 	var contestJson model.Contest
 	if err := c.ShouldBind(&contestJson); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
@@ -104,6 +121,7 @@ func DeleteContest(c *gin.Context) {
 		return
 	}
 
+	_ = contestProblemModel.DeleteContestProblem(contestJson.ContestID)
 	res := contestModel.DeleteContest(contestJson.ContestID)
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
@@ -113,7 +131,7 @@ func UpdateContest(c *gin.Context) {
 	contestValidate := validate.ContestValidate
 	contestModel := model.Contest{}
 	problemModel := model.Problem{}
-
+	contestProblemModel := model.ContestProblem{}
 	var contestJson model.Contest
 	if err := c.ShouldBind(&contestJson); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
@@ -136,6 +154,14 @@ func UpdateContest(c *gin.Context) {
 	}
 
 	res := contestModel.UpdateContest(contestJson.ContestID, contestJson)
+	if res.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	_ = contestProblemModel.DeleteContestProblem(contestJson.ContestID)
+	for _, id := range problems {
+		_ = contestProblemModel.AddContestProblem(model.ContestProblem{ContestID: contestJson.ContestID, ProblemID: id})
+	}
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

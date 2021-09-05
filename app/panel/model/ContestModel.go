@@ -69,15 +69,16 @@ func (model *Contest) AddContest(newContest Contest) helper.ReturnType {//jun
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
+		db.Where("contest_name = ?", newContest.ContestName).First(&contest)
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: contest.ContestID}
 	}
 }
 
 func (model *Contest) DeleteContest(contestID int) helper.ReturnType  {
-	err := db.Where("contest_id = ?", contestID).Delete(Contest{}).Error
+	err := db.Where("contest_id = ?", contestID).Delete(&Contest{}).Error
 
 	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: err.Error()}
 	} else {
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除成功", Data: true}
 	}
