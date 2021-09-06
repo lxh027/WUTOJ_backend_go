@@ -5,9 +5,7 @@ import (
 	_ "OnlineJudge/config"
 	"OnlineJudge/constants"
 	_ "debug/elf"
-	"encoding/json"
 	_ "github.com/go-playground/locales/mgh"
-	"log"
 	"time"
 )
 
@@ -144,7 +142,22 @@ func (model *Contest) GetContestProblems(ContestID int) helper.ReturnType {
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取题目成功", Data: contest.Problems}
 }
 
-func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
+func (model *Contest) GetContestsByProblemID(problemID int, fields []string) helper.ReturnType {
+	var contests []Contest
+
+	err := db.
+		Joins("JOIN contest_problem ON contest.contest_id = contest_problem.contest_id").
+		Select(fields).
+		Find(&contests).
+		Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "sql query error", Data: err.Error()}
+	}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "success", Data: contests}
+}
+
+/*func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
 	contestsJson := model.GetAllContestWithoutLimit()
 	if contestsJson.Status == constants.CodeSuccess {
 		contests := contestsJson.Data.([]Contest)
@@ -166,4 +179,4 @@ func (model *Contest) GetContestByProblemId(problemId int)  helper.ReturnType {
 	}
 
 	return helper.ReturnType{Status: constants.CodeError, Msg: "问题不属于任何contest", Data: nil}
-}
+}*/
