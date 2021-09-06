@@ -13,6 +13,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"encoding/xml"
@@ -218,6 +219,38 @@ func SetProblemTimeAndSpace(c *gin.Context) {
 	res := problemModel.UpdateProblem(problemJson.ProblemID, problemData)
 
 	c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
+	return
+}
+
+func UploadImg(c *gin.Context) {
+	file, err := c.FormFile("file")
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": constants.CodeError,
+			"msg": "upload img error",
+			"url":"",
+		})
+		return
+	}
+
+	FileNameMd5 := helper.GetMd5(file.Filename)
+
+	dst := "/uploads/image/" + FileNameMd5 + path.Ext(file.Filename)
+
+	if err := c.SaveUploadedFile(file, "web"+dst); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": constants.CodeError,
+			"msg": "upload img error "+err.Error(),
+			"url":"",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": constants.CodeSuccess,
+		"msg": "upload img success",
+		"url": "/admin"+dst,
+	})
 	return
 }
 

@@ -146,6 +146,7 @@ func BackendRoutes(router *gin.Engine) {
 			problem.POST("/uploadData", panelController.UploadData)
 			problem.POST("/updateJudgeInfo", panelController.SetProblemTimeAndSpace)
 			problem.POST("/uploadXML", panelController.UploadXML)
+			problem.POST("/uploadImg", panelController.UploadImg)
 		}
 	}
 	router.StaticFS("/admin/", http.Dir("./web"))

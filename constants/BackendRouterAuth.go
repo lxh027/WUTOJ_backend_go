@@ -111,4 +111,5 @@ var auths = map[string]string{
 	"/panel/problem/uploadData":             "uploadData",
 	"/panel/problem/updateJudgeInfo":        "uploadData",
 	"/panel/problem/uploadXML":              "uploadData",
+	"/panel/problem/uploadImg": 			 "uploadData",
 }
