@@ -93,14 +93,9 @@
                     icon: 'layui-icon-tips'
                 }],
                 cols: [[
-                    //TODO:修改此处
                     { type: "checkbox", },
                     { field: 'id', title: 'ID', sort: true },
-                    // { field: 'title', title: '名称', sort: true },
-                    // { field: 'content', title: '内容', sort: true, minWidth: 150, },
-                    // { field: 'end_time', title: '结束时间', sort: true },
                     { field: 'user_id', title: '用户ID', sort: true },
-                    // { field: 'modify_time', title: '修改时间', sort: true, minWidth: 180 },
                     { field: 'status', title: '状态', sort: true, templet: (d) => { if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>"; } },
                     { title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center" },
                 ]],
@@ -131,18 +126,18 @@
             });
 
             table.on('toolbar(currentTableFilter)', function (obj) {
-                // if (obj.event === 'add') {   // 监听添加操作
-                //     var index = layer.open({
-                //         title: '新增用户',
-                //         type: 2,
-                //         shade: 0.2,
-                //         maxmin: true,
-                //         shadeClose: true,
-                //         area: ['80%', '80%'],
-                //         content: './add.html?contest_id=' + id,
-                //     });
-                //     return false;
-                // }
+                if (obj.event === 'add') {   // 监听添加操作
+                    var index = layer.open({
+                        title: '新增用户',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['80%', '80%'],
+                        content: './add.html?contest_id=' + id,
+                    });
+                    return false;
+                }
             });
 
             table.on('tool(currentTableFilter)', function (obj) {

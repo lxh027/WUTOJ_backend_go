@@ -94,10 +94,10 @@ func BackendRoutes(router *gin.Engine) {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
-			//自建
 			contestUser := contest.Group("/contestUser")
 			{
 				contestUser.POST("/getAllContestUsers", panelController.GetAllContestUsers)
+				contestUser.POST("/addContestUsers", panelController.AddContestUsers)
 			}
 			notification := contest.Group("/notification")
 			{
