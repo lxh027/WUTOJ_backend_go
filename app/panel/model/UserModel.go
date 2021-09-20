@@ -119,3 +119,15 @@ func (model *User) GetUserByID(userID int) helper.ReturnType {
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getUser}
 	}
 }
+
+//GetUserByNick 由用户名获取用户
+func (model *User) GetUserByNick(userNick string) helper.ReturnType {
+	var getUser User
+
+	err := db.Select([]string{"user_id", "mail"}).Where("nick = ?", userNick).First(&getUser).Error
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
+	} else {
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getUser}
+	}
+}

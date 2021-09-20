@@ -60,9 +60,7 @@ func (model *ContestUser) GetUserContest(UserID int) helper.ReturnType {
 
 }
 
-//自建
-
-//GetAllContestUsersByID 获取参赛选手
+//GetAllContestUsersByID 由比赛ID获取参赛选手
 func (model *ContestUser) GetAllContestUsersByID(contestID int) helper.ReturnType {
 
 	var contestUsers []ContestUser

@@ -126,12 +126,33 @@
             // });
             upload.render({ //允许上传的文件后缀
                 elem: '#addComp'
-                , url: '#' //改成您自己的上传接口
+                , url: getPort() + 'contest/contestUser/addContestUsers'
                 , accept: 'file' //普通文件
                 , exts: 'csv' //只允许上传csv文件
-                , done: function (res) {
-                    layer.msg('上传成功')
-                    // console.log(res)
+                ,data:{
+                    "contest_id": 20,
+                }
+                , done: function (data) {
+                    // layer.msg('上传成功')
+                    // console.log(contest_id)
+                    // console.log(data)
+
+
+
+
+                    if (data.status == 0) {
+                        // 关闭弹出层
+                        layer.close(index);
+
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layui.table.reload('currentTableId', {
+                            where: {
+                                "contest_id": contest_id,
+                            },
+                        }, 'data');
+                        parent.layer.close(iframeIndex);
+                        layer.msg('上传成功')
+                    }
                 }
             });
         });

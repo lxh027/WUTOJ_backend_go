@@ -71,8 +71,9 @@ var auths = map[string]string{
 	"/panel/contest/changeContestStatus": "updateContest",
 	"/panel/contest/flushRank":           "updateContest",
 
-	//contestUser/getAllContestUsers
+	//contest/contestUser
 	"/panel/contest/contestUser/getAllContestUsers": "getAllContest",
+	"/panel/contest/contestUser/addContestUsers":    "getAllContest",
 
 	// contest/notification
 	"/panel/contest/notification/getAllNotification":       "getAllContest",
@@ -111,5 +112,5 @@ var auths = map[string]string{
 	"/panel/problem/uploadData":             "uploadData",
 	"/panel/problem/updateJudgeInfo":        "uploadData",
 	"/panel/problem/uploadXML":              "uploadData",
-	"/panel/problem/uploadImg": 			 "uploadData",
+	"/panel/problem/uploadImg":              "uploadData",
 }
