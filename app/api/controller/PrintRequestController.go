@@ -8,11 +8,12 @@ import (
 	"OnlineJudge/constants"
 	"OnlineJudge/core/database"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func PrintRequest(c *gin.Context) {

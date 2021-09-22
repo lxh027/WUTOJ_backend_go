@@ -5,9 +5,10 @@ import (
 	"OnlineJudge/app/panel/controller"
 	"OnlineJudge/constants"
 	"fmt"
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func BackendAuth() gin.HandlerFunc {

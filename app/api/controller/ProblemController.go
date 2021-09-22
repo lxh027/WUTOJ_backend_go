@@ -5,10 +5,11 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllProblems(c *gin.Context) {
@@ -17,23 +18,18 @@ func GetAllProblems(c *gin.Context) {
 	problemJson := struct {
 		PageNumber int `json:"page_number" form:"page_number"`
 	}{}
-	if err := c.ShouldBind(&problemJson);err != nil {
+	if err := c.ShouldBind(&problemJson); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "页码参数错误", err.Error()))
 		return
 	}
-	res := problemModel.GetAllProblems((problemJson.PageNumber-1)*constants.PageLimit,constants.PageLimit)
+	res := problemModel.GetAllProblems((problemJson.PageNumber-1)*constants.PageLimit, constants.PageLimit)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 
 }
 
 func GetProblemByID(c *gin.Context) {
-	userJson := checkLogin(c)
-	if userJson.Status != constants.CodeSuccess{
-		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "未登录", 0))
-		return
-	}
-	userIDRaw := userJson.Data.(uint)
+	userIDRaw := GetUserIdFromSession(c)
 
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
@@ -43,10 +39,10 @@ func GetProblemByID(c *gin.Context) {
 	problemJson := struct {
 		ProblemID int `json:"problem_id"`
 	}{}
-	if problemID,err := strconv.Atoi(c.Param("problem_id"));err != nil{
+	if problemID, err := strconv.Atoi(c.Param("problem_id")); err != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "参数错误", err.Error()))
 		return
-	}else{
+	} else {
 		problemJson.ProblemID = problemID
 	}
 	if err := c.ShouldBind(&problemJson); err != nil {
@@ -63,8 +59,8 @@ func GetProblemByID(c *gin.Context) {
 	// judge if problem in contests
 	contestsBeginTime := contestModel.GetContestsByProblemID(
 		problemJson.ProblemID,
-		[]string{"contest_id", "begin_time"},
-		)
+		[]string{"contest.contest_id", "begin_time"},
+	)
 
 	if contestsBeginTime.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(contestsBeginTime.Status, contestsBeginTime.Msg, contestsBeginTime.Msg))
@@ -89,37 +85,35 @@ func GetProblemByID(c *gin.Context) {
 	return
 
 	/*
-	//
-	contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
-	if contestJson.Status == constants.CodeSuccess {
+		//
+		contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
+		if contestJson.Status == constants.CodeSuccess {
 
-		contest := contestJson.Data.(model.Contest)
-		userID := int(userIDRaw)
-		contestID := contest.ContestID
-		if participation := contestUserModel.CheckUserContest(userID,contestID); participation.Status != constants.CodeSuccess{
-			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
-			return
-		}
+			contest := contestJson.Data.(model.Contest)
+			userID := int(userIDRaw)
+			contestID := contest.ContestID
+			if participation := contestUserModel.CheckUserContest(userID,contestID); participation.Status != constants.CodeSuccess{
+				c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "尚未参赛，请参赛", 0))
+				return
+			}
 
-		format := "2006-01-02 15:04:05"
-		now, _ := time.Parse(format, time.Now().Format(format))
-		if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
-			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
-			return
-		}
-	}*/
-
+			format := "2006-01-02 15:04:05"
+			now, _ := time.Parse(format, time.Now().Format(format))
+			if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
+				c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
+				return
+			}
+		}*/
 
 }
 
 func SearchProblem(c *gin.Context) {
 	userJson := checkLogin(c)
-	if userJson.Status != constants.CodeSuccess{
+	if userJson.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "未登录", 0))
 		return
 	}
 	userIDRaw := userJson.Data.(uint)
-
 
 	problemJson := struct {
 		Param string `uri:"param" json:"param"`
@@ -137,7 +131,7 @@ func SearchProblem(c *gin.Context) {
 		problemId, _ := strconv.Atoi(problemJson.Param)
 		contestsBeginTime := contestModel.GetContestsByProblemID(
 			problemId,
-			[]string{"contest_id", "begin_time"},
+			[]string{"contest.contest_id", "begin_time"},
 		)
 
 		if contestsBeginTime.Status != constants.CodeSuccess {
