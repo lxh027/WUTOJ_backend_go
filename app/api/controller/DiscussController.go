@@ -6,9 +6,10 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllDiscuss(c *gin.Context) {
@@ -43,17 +44,9 @@ func GetAllDiscuss(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", false))
 	return
-
 }
 
 func GetDiscussionByID(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	discussModel := model.Discuss{}
 	discussValidate := validate.DiscussValidate
 
@@ -73,19 +66,12 @@ func GetDiscussionByID(c *gin.Context) {
 		return
 	}
 
-	res = discussModel.GetDiscussionByID(discussJson.DiscussID, discussJson.PageNumber)
+	res := discussModel.GetDiscussionByID(discussJson.DiscussID, discussJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
 func GetContestDiscussion(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	//TODO : Auth participation and contest time
 
 	discussModel := model.Discuss{}
@@ -112,19 +98,12 @@ func GetContestDiscussion(c *gin.Context) {
 		return
 	}
 
-	res = discussModel.GetContestDiscussion(discussJson.ContestId, discussJson.PageNumber)
+	res := discussModel.GetContestDiscussion(discussJson.ContestId, discussJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
 func GetProblemDiscussion(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	discussModel := model.Discuss{}
 	discussValidate := validate.DiscussValidate
 
@@ -143,19 +122,12 @@ func GetProblemDiscussion(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), 0))
 	}
 
-	res = discussModel.GetDiscussionByID(discussJson.ProblemId, discussJson.PageNumber)
+	res := discussModel.GetDiscussionByID(discussJson.ProblemId, discussJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
 func AddDiscussion(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	discussModel := model.Discuss{}
 	discussValidate := validate.DiscussValidate
 
@@ -174,22 +146,16 @@ func AddDiscussion(c *gin.Context) {
 		return
 	}
 
-	res = discussModel.AddDiscussion(discussJson)
+	res := discussModel.AddDiscussion(discussJson)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
 func AddReply(c *gin.Context) {
 
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	replyModel := model.Reply{}
 	replyValidate := validate.ReplyValidate
-
+	userModel := model.User{}
 	replyJson := model.Reply{}
 
 	if err := c.ShouldBind(&replyJson); err != nil {
@@ -203,7 +169,12 @@ func AddReply(c *gin.Context) {
 		return
 	}
 
-	res = replyModel.AddReply(replyJson)
+	userID := GetUserIdFromSession(c)
+	userInfo := userModel.FindUserByID(userID).Data.(model.User)
+
+	replyJson.Identity = userInfo.Identity
+
+	res := replyModel.AddReply(replyJson)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

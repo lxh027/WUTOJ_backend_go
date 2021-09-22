@@ -3,8 +3,9 @@ package model
 import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Reply struct {
@@ -12,6 +13,7 @@ type Reply struct {
 	DiscussID int       `json:"discuss_id" form:"discuss_id"`
 	UserID    int       `json:"user_id" form:"user_id"`
 	Content   string    `json:"content" form:"content"`
+	Identity  uint      `gorm:"identity"`
 	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
 }
 
