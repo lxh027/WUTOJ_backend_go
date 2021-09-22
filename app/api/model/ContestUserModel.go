@@ -18,12 +18,16 @@ func (ContestUser) TableName() string {
 
 func (model *ContestUser) AddContestUser(data ContestUser) helper.ReturnType {
 	contestUser := ContestUser{}
-
-	if err := db.Where("contest_id = ?", data.ContestID).Where("user_id = ?", data.UserID).Find(&contestUser).Error; err == nil {
+	err := db.
+		Select([]string{"contestUser_id", "user_id"}).
+		Where("contest_id = ? AND user_id = ?", data.ContestID, data.UserID).
+		Find(&contestUser).
+		Error
+	if err == nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "已经参加比赛，请勿重复参赛", Data: ""}
 	}
 
-	err := db.Create(&data).Error
+	err = db.Create(&data).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "参加比赛失败", Data: ""}
@@ -36,7 +40,11 @@ func (model *ContestUser) CheckUserContest(UserID int, ContestID int) helper.Ret
 
 	contestUser := ContestUser{}
 
-	err := db.Where("user_id = ?", UserID).Where("contest_id = ?", ContestID).Find(&contestUser).Error
+	err := db.
+		Select([]string{"contest_id", "user_id"}).
+		Where("user_id = ? AND contest_id = ?", UserID, ContestID).
+		Find(&contestUser).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "还未参加比赛，请参加比赛", Data: err.Error()}
@@ -50,7 +58,11 @@ func (model *ContestUser) GetUserContest(UserID int) helper.ReturnType {
 
 	var contestUser []ContestUser
 
-	err := db.Where("user_id = ?", UserID).Find(&contestUser).Error
+	err := db.
+		Select([]string{"user_id"}).
+		Where("user_id = ?", UserID).
+		Find(&contestUser).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}

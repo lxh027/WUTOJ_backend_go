@@ -3,19 +3,20 @@ package model
 import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Discuss struct {
-	ID        int       `json:"id" form:"id"`
-	ContestID int       `json:"contest_id" form:"contest_id" uri:"contest_id"`
-	ProblemID int       `json:"problem_id" form:"problem_id" uri:"problem_id"`
-	UserID    int       `json:"user_id" form:"user_id"`
-	Title     string    `json:"title" form:"title"`
-	Content   string    `json:"content" form:"content"`
-	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
-	Status    int       `json:"status" form:"status"`
+	ID        int       `json:"id,omitempty" form:"id"`
+	ContestID int       `json:"contest_id,omitempty" form:"contest_id" uri:"contest_id"`
+	ProblemID int       `json:"problem_id,omitempty" form:"problem_id" uri:"problem_id"`
+	UserID    int       `json:"user_id,omitempty" form:"user_id"`
+	Title     string    `json:"title,omitempty" form:"title"`
+	Content   string    `json:"content,omitempty" form:"content"`
+	Time      time.Time `json:"time,omitempty" form:"time" gorm:"omitempty"`
+	Status    int       `json:"status,omitempty" form:"status"`
 }
 
 func (Discuss) TableName() string {
@@ -44,7 +45,11 @@ func (model *Discuss) GetDiscussionByID(id int, PageNumber int) helper.ReturnTyp
 	var discuss Discuss
 	replyModel := Reply{}
 
-	err := db.Where("id = ?", id).First(&discuss).Error
+	err := db.
+		Select([]string{"id", "time", "status", "content", "title", "contest_id", "problem_id"}).
+		Where("id = ?", id).
+		First(&discuss).
+		Error
 	res := replyModel.GetReplyByDiscussID(id, (PageNumber-1)*constants.PageLimit, constants.PageLimit)
 
 	if err != nil {
@@ -72,7 +77,9 @@ func (model *Discuss) AddDiscussion(newDiscussion Discuss) helper.ReturnType {
 func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper.ReturnType {
 	var discussions []Discuss
 	var DiscussCount int
-	err := db.Model(&Discuss{}).
+	err := db.
+		Model(&Discuss{}).
+		Select([]string{"id", "title", "content", "problem_id", "time"}).
 		Where("contest_id = ?", ContestID).
 		Count(&DiscussCount).
 		Offset((PageNumber - 1) * (constants.PageDiscussLimit)).
@@ -86,6 +93,7 @@ func (model *Discuss) GetContestDiscussion(ContestID int, PageNumber int) helper
 
 }
 
+// MARK: 此接口没用
 func (model *Discuss) GetProblemDiscussion(ProblemID int, PageNumber int) helper.ReturnType {
 	var discussions []Discuss
 
@@ -101,7 +109,10 @@ func (model *Discuss) GetProblemDiscussion(ProblemID int, PageNumber int) helper
 func (model *Discuss) GetUserDiscussion(UserID int) helper.ReturnType {
 	var discussions []Discuss
 
-	err := db.Where("user_id = ?", UserID).Find(&discussions).Error
+	err := db.
+		Select([]string{"id", "title", "content", "problem_id", "time"}).
+		Where("user_id = ?", UserID).
+		Find(&discussions).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"OnlineJudge/core/database"
+
 	"github.com/jinzhu/gorm"
 )
 

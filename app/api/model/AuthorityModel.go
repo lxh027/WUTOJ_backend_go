@@ -6,9 +6,9 @@ import (
 )
 
 type Authority struct {
-	ID uint64		`json:"id"`
-	Name string		`json:"name"`
-	Enabled uint8	`json:"enabled"`
+	ID      uint64 `json:"id"`
+	Name    string `json:"name"`
+	Enabled uint8  `json:"enabled"`
 }
 
 func (model *Authority) GetAllAuthority() helper.ReturnType {
@@ -31,5 +31,3 @@ func (model *Authority) GetAuthorityByID(id uint64) helper.ReturnType {
 	}
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "获取成功", Data: authority}
 }
-
-

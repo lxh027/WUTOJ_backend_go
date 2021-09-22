@@ -15,7 +15,11 @@ type Sample struct {
 func (model *Sample) FindSamplesByProblemID(id int) helper.ReturnType {
 	var samples []Sample
 
-	err := db.Where("problem_id = ?", id).Find(&samples).Error
+	err := db.
+		Select([]string{"sample_id", "problem_id", "input", "output"}).
+		Where("problem_id = ?", id).
+		Find(&samples).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}

@@ -31,11 +31,15 @@ func (User) TableName() string {
 func (model *User) AddUser(data User) helper.ReturnType {
 	user := User{}
 	// 判断昵称是否已存在
-	if err := db.Where("nick = ?", data.Nick).First(&user).Error; err == nil {
+	err := db.
+		Where("nick = ?", data.Nick).
+		First(&user).
+		Error
+	if err == nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: user}
 	}
 	// 创建记录
-	err := db.Create(&data).Error
+	err = db.Create(&data).Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
 	} else {
@@ -45,7 +49,11 @@ func (model *User) AddUser(data User) helper.ReturnType {
 
 // 通过ID编辑用户
 func (model *User) EditUserByID(userId uint, data User) helper.ReturnType {
-	err := db.Model(&data).Where("user_id = ?", userId).Update(data).Error
+	err := db.
+		Select([]string{"user_id", "nick", "realname", "school", "major", "class", "contact"}).
+		Model(&data).
+		Where("user_id = ?", userId).
+		Update(data).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: err.Error()}
@@ -55,6 +63,7 @@ func (model *User) EditUserByID(userId uint, data User) helper.ReturnType {
 }
 
 // 通过nick编辑用户
+// MARK: 此接口没有被使用过
 func (model *User) EditUserByNick(nick string, data User) helper.ReturnType {
 	err := db.Model(model).Where("nick = ?", nick).Update(data).Error
 
@@ -66,12 +75,14 @@ func (model *User) EditUserByNick(nick string, data User) helper.ReturnType {
 }
 
 // 通过ID查询用户
+// MARK:此处使用该方法查询用户身份
 func (model *User) FindUserByID(userID uint) helper.ReturnType {
 	user := User{}
 	err := db.Model(&User{}).
-	Select([]string{"user_id", "nick", "realname", "avatar", "school", "major", "class", "contact", "identity"}).
-	Where("user_id = ?", userID).
-	First(&user).Error
+		Select([]string{"user_id", "nick", "realname", "avatar", "school", "major", "class", "contact", "identity"}).
+		Where("user_id = ?", userID).
+		First(&user).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
@@ -81,6 +92,7 @@ func (model *User) FindUserByID(userID uint) helper.ReturnType {
 }
 
 // 通过nick查询用户
+// MARK: 此接口没有被使用过
 func (model *User) FindUserByNick(nick string) helper.ReturnType {
 	user := User{}
 	err := db.Where("nick = ?", nick).First(&user).Error
@@ -94,7 +106,11 @@ func (model *User) FindUserByNick(nick string) helper.ReturnType {
 
 func (model *User) LoginCheck(data User) helper.ReturnType {
 	user := User{}
-	err := db.Where("nick = ? AND password = ?", data.Nick, data.Password).First(&user).Error
+	err := db.
+		Select([]string{"user_id", "nick", "password"}).
+		Where("nick = ? AND password = ?", data.Nick, data.Password).
+		First(&user).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "用户名或密码错误", Data: err.Error()}
@@ -111,7 +127,12 @@ func (model *User) LoginCheck(data User) helper.ReturnType {
 
 func (model *User) UpdatePassword(user User) helper.ReturnType {
 
-	err := db.Model(&user).Where("mail = ?", user.Mail).Update("password", user.Password).Error
+	err := db.
+		Model(&user).
+		Select([]string{"mail", "password"}).
+		Where("mail = ?", user.Mail).
+		Update("password", user.Password).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "修改密码失败", Data: err.Error()}
@@ -121,7 +142,8 @@ func (model *User) UpdatePassword(user User) helper.ReturnType {
 
 func (model *User) SearchUser(param string) helper.ReturnType {
 	user := User{}
-	err := db.Model(&User{}).
+	err := db.
+		Model(&User{}).
 		Select([]string{"user_id", "nick", "realname", "avatar", "school", "major", "class", "contact", "identity"}).
 		Where("user_id = ?", param).
 		Find(&user).Error
@@ -135,7 +157,11 @@ func (model *User) SearchUser(param string) helper.ReturnType {
 
 func (model *User) AddUserAvatar(UserID int, avatar string) helper.ReturnType {
 	user := User{}
-	err := db.Where("user_id = ?", UserID).First(&user).Error
+	err := db.
+		Select([]string{"user_id", "avatar"}).
+		Where("user_id = ?", UserID).
+		First(&user).
+		Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "获取用户信息失败", Data: err.Error()}
 	}
@@ -148,7 +174,12 @@ func (model *User) AddUserAvatar(UserID int, avatar string) helper.ReturnType {
 	}
 	user.Avatar = avatar
 
-	err = db.Model(&user).Where("user_id = ?", UserID).Update(&user).Error
+	err = db.
+		Select([]string{"user_id", "avatar"}).
+		Model(&user).
+		Where("user_id = ?", UserID).
+		Update(&user).
+		Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "更新用户信息失败", Data: err.Error()}
 	}

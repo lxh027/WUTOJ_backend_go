@@ -23,7 +23,10 @@ func (UserSubmitLog) TableName() string {
 func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnType {
 	var userSubmitLog UserSubmitLog
 	var user User
-	err := db.Where("nick = ?", UserNick).Find(&user).Error
+	err := db.
+		Where("nick = ?", UserNick).
+		Find(&user).
+		Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加用户提交数据失败", Data: err.Error()}
 	}
@@ -38,9 +41,13 @@ func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnTyp
 
 func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
 	var UserSubmitLog UserSubmitLog
-	db.Model(&UserSubmitLog).Where("user_id = ?", int(UserID)).First(&UserSubmitLog)
-	/*if err != nil {
-		return helper.ReturnType{Status: common.CodeError, Msg: "查询提交数据失败", Data: err.Error()}
-	}*/
+	err := db.
+		Model(&UserSubmitLog).
+		Where("user_id = ?", int(UserID)).
+		First(&UserSubmitLog).
+		Error
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交数据失败", Data: err.Error()}
+	}
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交数据成功", Data: UserSubmitLog}
 }
