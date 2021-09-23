@@ -23,6 +23,7 @@
 <script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script src="../../js/common.js"></script>
 <script src="../../js/template.js"></script>
+<script src="../../js/format.js"></script>
 <script>
     layui.use(['form', 'table', 'laydate'], function () {
         var $ = layui.jquery,
@@ -84,10 +85,24 @@
             }],
             cols: [[
                 {type: "checkbox", },
-                {field: 'print_id' , title: 'ID', sort: true},
-                {field: 'submit_id', title: '打印ID', sort: true},
-                {field: 'status', title: '打印状态', sort: true, minWidth:150,},
-                {field: 'print_at', title: '打印执行时间', sort: true},
+                {field: 'print_id' , title: '打印ID', sort: true},
+                {field: 'user_nick', title: '用户昵称', sort: true},
+                {field: 'status', title: '打印状态', sort: true, minWidth:150, templet: function (d) {
+                    if (d.status) return "已打印";
+                    else return "未打印";
+                }},
+                // var a = new Date("2021-09-23T00:27:45Z").format("yyyy-MM-dd hh:mm:ss");
+                {field: 'request_at', title: '打印申请时间', sort: true, templet: function (d) {
+                    a = new Date(d.request_at.toString()).format("yyyy-MM-dd hh:mm:ss");
+                    return a.toString();
+                }},
+                {field: 'print_at', title: '打印执行时间', sort: true, templet: function (d) {
+                    if (d.status) {
+                        a = new Date(d.print_at.toString()).format("yyyy-MM-dd hh:mm:ss");
+                        return a.toString();
+                    }
+                    else return "";
+                }},
                 {title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center"},
             ]],
             limits: [10, 15, 20, 25, 50, 100],

@@ -3,15 +3,18 @@ package model
 import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type PrintLog struct {
-	ID       int       `json:"print_id" gorm:"print_id"`
-	SubmitID int       `json:"submit_id" gorm:"submit_id"`
-	Status   int       `json:"status" gorm:"status"`
-	PrintAt  time.Time `json:"print_at" gorm:"print_at"`
+	ID        int       `json:"print_id" gorm:"id"`
+	Status    int       `json:"status" gorm:"status"`
+	PrintAt   time.Time `json:"print_at" gorm:"print_at"`
+	RequestAt time.Time `json:"request_at" gorm:"request_at"`
+	UserNick  string    `json:"user_nick" gorm:"user_nick"`
+	Code      string    `json:"code" gorm:"code"`
 }
 
 func (PrintLog) TableName() string {

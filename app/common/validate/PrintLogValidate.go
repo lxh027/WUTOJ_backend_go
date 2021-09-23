@@ -8,10 +8,11 @@ func init() {
 	rules := map[string]string{
 		"id":        "required",
 		"submit_id": "required",
+		"code":      "required",
 	}
 
 	scenes := map[string][]string{
-		"add": {"submit_id"},
+		"add": {"code"},
 	}
 
 	PrintLogValidate.Rules = rules
