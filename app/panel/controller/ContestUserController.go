@@ -31,8 +31,6 @@ func GetAllContestUsers(c *gin.Context) {
 
 //AddContestUsers 通过csv文件批量添加参赛选手
 func AddContestUsers(c *gin.Context) {
-	//TODO:搞了一些
-
 	contestUserModel := model.ContestUser{}
 	userModel := model.User{}
 
@@ -46,17 +44,11 @@ func AddContestUsers(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", false))
 		return
 	}
-
-	//TODO:delete this later
-	// fmt.Println(contestUserJSON.ContestID)
-	// fmt.Println("c_" + fmt.Sprintf("%d", contestUserJSON.ContestID))
-
 	//这里动文件
 	file, err := c.FormFile("file")
 
 	if err == nil {
 		csvFile, err := file.Open()
-		// csvFile, err := contestUserJSON.file.Open()
 		if err != nil {
 			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "文件打开失败", false))
 			return
@@ -89,21 +81,15 @@ func AddContestUsers(c *gin.Context) {
 				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "文件读取出错", false))
 				return
 			}
-
-			//试图将信息添加到数据库
 			var user model.User
-			//0:teamID,1:realname,2:school,3:major,4:class,5:contact
+			//csv格式:0:teamID,1:realname,2:school,3:major,4:class,5:contact
 			user.Nick = "c_" + fmt.Sprintf("%d", contestUserJSON.ContestID) + "_" + record[0]
-			//TODO:delete this later
-			// fmt.Println(user.Nick)
-			// fmt.Println("c_" + fmt.Sprintf("%d", contestUserJSON.ContestID) + "_" + record[0])
 			user.Realname = record[1]
 			user.School = record[2]
 			user.Major = record[3]
 			user.Class = record[4]
 			user.Contact = record[5]
-			user.Mail = user.Nick
-			res := userModel.AddUser(user)
+			res := userModel.AddUserWithoutCheckEMail(user)
 			if res.Msg != "创建成功" {
 				c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 				return

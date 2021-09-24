@@ -56,11 +56,29 @@ func (model *User) DeleteUser(userID int) helper.ReturnType {
 	}
 }
 
+//AddUser 添加用户
 func (model *User) AddUser(newUser User) helper.ReturnType {
 	user := User{}
 
 	if err := db.Where("nick = ? OR mail = ?", newUser.Nick, newUser.Mail).First(&user).Error; err == nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称或邮箱已存在", Data: false}
+	}
+
+	err := db.Create(&newUser).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
+	} else {
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
+	}
+}
+
+//AddUserWithoutCheckEMail 添加用户，不检测邮箱冲突
+func (model *User) AddUserWithoutCheckEMail(newUser User) helper.ReturnType {
+	user := User{}
+
+	if err := db.Where("nick = ?", newUser.Nick).First(&user).Error; err == nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: false}
 	}
 
 	err := db.Create(&newUser).Error

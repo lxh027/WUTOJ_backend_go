@@ -83,7 +83,7 @@
                         "code": res.status, //解析接口状态
                         "msg": res.msg, //解析提示文本
                         "count": res.data.count, //解析数据长度
-                        "data": res.data.notifications //解析数据列表
+                        "data": res.data.contest_users //解析数据列表
                     };
                 },
                 toolbar: '#toolbar',
@@ -93,6 +93,7 @@
                     icon: 'layui-icon-tips'
                 }],
                 cols: [[
+                    //TODO:需要考虑显示realname和nick
                     { type: "checkbox", },
                     { field: 'id', title: 'ID', sort: true },
                     { field: 'user_id', title: '用户ID', sort: true },
