@@ -3,16 +3,18 @@ package model
 import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Reply struct {
-	ID        int       `json:"id" form:"id"`
-	DiscussID int       `json:"discuss_id" form:"discuss_id"`
-	UserID    int       `json:"user_id" form:"user_id"`
-	Content   string    `json:"content" form:"content"`
-	Time      time.Time `json:"time" form:"time" gorm:"omitempty"`
+	ID        int       `json:"id,omitempty" form:"id"`
+	DiscussID int       `json:"discuss_id,omitempty" form:"discuss_id"`
+	UserID    int       `json:"user_id,omitempty" form:"user_id"`
+	Content   string    `json:"content,omitempty" form:"content"`
+	Identity  uint      `json:"admin,omitempty" gorm:"identity"`
+	Time      time.Time `json:"time,omitempty" form:"time" gorm:"omitempty"`
 }
 
 func (model *Reply) AddReply(data Reply) helper.ReturnType {
@@ -34,13 +36,15 @@ func (model *Reply) GetReplyByDiscussID(DiscussID int, Offset int, Limit int) he
 	var count int
 
 	err := db.
+		Select([]string{"time", "content", "identity"}).
 		Model(&Reply{}).
 		Order("time desc").
 		Where("discuss_id = ?", DiscussID).
 		Count(&count).
 		Offset(Offset).
 		Limit(Limit).
-		Find(&reply).Error
+		Find(&reply).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}

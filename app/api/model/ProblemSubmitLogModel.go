@@ -19,7 +19,11 @@ type ProblemSubmitLog struct {
 func (*ProblemSubmitLog) GetProblemSubmitLog(ProblemID uint) helper.ReturnType {
 	problemSubmitLog := ProblemSubmitLog{}
 
-	err := db.Where("problem_id = ?", ProblemID).Find(&problemSubmitLog).Error
+	err := db.
+		Select([]string{"problem_id", "ac", "wa", "tle", "mle", "re", "se", "ce"}).
+		Where("problem_id = ?", ProblemID).
+		Find(&problemSubmitLog).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询题目提交记录失败", Data: err.Error()}

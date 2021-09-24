@@ -10,24 +10,18 @@ import (
 	"OnlineJudge/core/judger"
 	"encoding/json"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	_ "io"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func Submit(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	//TODO: auth participation and contest time
 
 	submitModel := model.Submit{}
@@ -172,13 +166,6 @@ func judge(submit model.Submit) {
 }
 
 func GetSubmitInfo(c *gin.Context) {
-
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	submitModel := model.Submit{}
 
 	submitJson := struct {
@@ -200,19 +187,7 @@ func GetSubmitInfo(c *gin.Context) {
 
 }
 
-// TODO
-func GetAllSubmitInfo(c *gin.Context) {
-	// change to GetSubmitInfo
-}
-
-// TODO
 func GetProblemSubmitInfo(c *gin.Context) {
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	submitModel := model.Submit{}
 	submitJson := model.Submit{}
 
@@ -222,19 +197,12 @@ func GetProblemSubmitInfo(c *gin.Context) {
 	}
 
 	submitJson.UserID = GetUserIdFromSession(c)
-	res = submitModel.GetProblemSubmit(submitJson)
+	res := submitModel.GetProblemSubmit(submitJson)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
 
-// TODO
 func GetUserContestSubmitInfo(c *gin.Context) {
-	res := checkLogin(c)
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-		return
-	}
-
 	submitValidate := validate.SubmitValidate
 	submitModel := model.Submit{}
 
@@ -257,7 +225,7 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 		return
 	}
 
-	res = submitModel.GetContestSubmit(submitJson.UserID, submitJson.ContestID, submitJson.PageNumber)
+	res := submitModel.GetContestSubmit(submitJson.UserID, submitJson.ContestID, submitJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

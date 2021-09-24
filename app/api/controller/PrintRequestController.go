@@ -8,22 +8,20 @@ import (
 	"OnlineJudge/constants"
 	"OnlineJudge/core/database"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func PrintRequest(c *gin.Context) {
 	PrintLog := model.PrintLog{}
 	PrintLogModel := model.PrintLog{}
+	userModel := model.User{}
 	PrintLogValidate := validate.PrintLogValidate
 	userID := GetUserIdFromSession(c)
-	if userID == 0 {
-		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "用户未登录", ""))
-		return
-	}
 
 	now := time.Now().Unix()
 	interval := config.GetWutOjConfig()["print_interval_time"].(int)
@@ -44,6 +42,10 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
+	userInfo := userModel.FindUserByID(userID).Data.(model.User)
+
+	PrintLog.UserNick = userInfo.Nick
+	PrintLog.Status = 0
 	printLogMap := helper.Struct2Map(PrintLog)
 
 	if res, err := PrintLogValidate.ValidateMap(printLogMap, "add"); !res {
@@ -51,22 +53,9 @@ func PrintRequest(c *gin.Context) {
 		return
 	}
 
-	SubmitLogModel := model.Submit{}
-	res := SubmitLogModel.GetSubmitInPrintRequest(uint(PrintLog.SubmitID), userID)
+	PrintLog.RequestAt = time.Now()
 
-	if res.Status == constants.CodeError {
-		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, res.Msg, 0))
-		return
-	}
-
-	submit := res.Data.(model.Submit)
-
-	if submit.UserID != userID {
-		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "同学别打印了，这题你把握不住", 0))
-		return
-	}
-
-	res = PrintLogModel.AddPrintLog(PrintLog)
+	res := PrintLogModel.AddPrintLog(PrintLog)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }

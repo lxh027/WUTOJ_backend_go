@@ -6,10 +6,11 @@ import (
 	"OnlineJudge/constants"
 	"errors"
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func GetUserIdFromSession(c *gin.Context) uint {
@@ -60,7 +61,7 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	beginTime := res.Data.(model.Contest).BeginTime
 	endTime := res.Data.(model.Contest).EndTime
 	frozen := res.Data.(model.Contest).Frozen
-	frozenTime := time.Unix(int64( (float64(endTime.Unix()) - float64(beginTime.Unix())) * (1-frozen) + float64(beginTime.Unix()) ), 0)
+	frozenTime := time.Unix(int64((float64(endTime.Unix())-float64(beginTime.Unix()))*(1-frozen)+float64(beginTime.Unix())), 0)
 	format := "2006-01-02 15:04:05"
 	frozenF, _ := time.Parse(format, frozenTime.Format(format))
 	fmt.Printf("beginTime: %v, endTime: %v, frozenTime: %v, frozenF: %v",

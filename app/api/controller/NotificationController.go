@@ -6,11 +6,12 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
 	"OnlineJudge/core/database"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func GetNotification(c *gin.Context) {

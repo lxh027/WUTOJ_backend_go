@@ -5,21 +5,22 @@ import (
 	_ "OnlineJudge/config"
 	"OnlineJudge/constants"
 	_ "debug/elf"
-	_ "github.com/go-playground/locales/mgh"
 	"time"
+
+	_ "github.com/go-playground/locales/mgh"
 )
 
 type Contest struct {
-	ContestID   int       `json:"contest_id" form:"contest_id" uri:"contest_id"`
-	ContestName string    `json:"contest_name" form:"contest_name"`
-	BeginTime   time.Time `json:"begin_time" form:"begin_time"`
-	EndTime     time.Time `json:"end_time" form:"end_time"`
-	Frozen      float64   `json:"frozen" form:"frozen"`
-	Problems    string    `json:"problems" form:"problems"`
-	Prize       string    `json:"prize" form:"prize"`
-	Colors      string    `json:"colors" form:"colors"`
-	Rule        int       `json:"rule" form:"rule"`
-	Status      int       `json:"status" form:"status"`
+	ContestID   int       `json:"contest_id,omitempty" form:"contest_id" uri:"contest_id"`
+	ContestName string    `json:"contest_name,omitempty" form:"contest_name"`
+	BeginTime   time.Time `json:"begin_time,omitempty" form:"begin_time"`
+	EndTime     time.Time `json:"end_time,omitempty" form:"end_time"`
+	Frozen      float64   `json:"frozen,omitempty" form:"frozen"`
+	Problems    string    `json:"problems,omitempty" form:"problems"`
+	Prize       string    `json:"prize,omitempty" form:"prize"`
+	Colors      string    `json:"colors,omitempty" form:"colors"`
+	Rule        int       `json:"rule,omitempty" form:"rule"`
+	Status      int       `json:"status,omitempty" form:"status"`
 }
 
 func (Contest) TableName() string {
@@ -28,7 +29,11 @@ func (Contest) TableName() string {
 
 func (model *Contest) GetContest(param string) helper.ReturnType {
 	contest := Contest{}
-	err := db.Where("contest_id = ?", param).Find(&contest).Error
+	err := db.
+		Select([]string{"contest_id", "contest_name", "begin_time", "end_time", "problems", "status"}).
+		Where("contest_id = ?", param).
+		Find(&contest).
+		Error
 
 	if err == nil {
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: contest}
@@ -41,6 +46,7 @@ func (model *Contest) GetContest(param string) helper.ReturnType {
 	return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 }
 
+// MARK: 此接口没用
 func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 	contest := Contest{}
 	if contestName != "" {
@@ -56,12 +62,16 @@ func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 
 func (model *Contest) GetContestById(contestID int) helper.ReturnType {
 	contest := Contest{}
-	err := db.Where("contest_id = ?", contestID).First(&contest).Error
+	err := db.
+		Select([]string{"contest_id", "contest_name", "begin_time", "end_time", "problems", "status"}).
+		Where("contest_id = ?", contestID).
+		First(&contest).
+		Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "未找到数据", Data: err.Error()}
 	}
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查找成功", Data: contest}
-	
+
 }
 
 func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
@@ -69,7 +79,12 @@ func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
 	//
 	//database.Model(&Contest{}).Find(&contests).Error
 	//
-	err := db.Offset(Offset).Limit(Limit).Find(&contests).Error
+	err := db.
+		Select([]string{"contest_id", "contest_name", "begin_time", "end_time", "problems", "status"}).
+		Offset(Offset).
+		Limit(Limit).
+		Find(&contests).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查找失败，数据库错误", Data: ""}
@@ -81,6 +96,7 @@ func (model *Contest) GetAllContest(Offset int, Limit int) helper.ReturnType {
 
 }
 
+// MARK: 此接口没用
 func (model *Contest) GetAllContestWithoutLimit() helper.ReturnType {
 	var contests []Contest
 	err := db.Model(&Contest{}).Find(&contests).Error
@@ -95,35 +111,13 @@ func (model *Contest) GetAllContestWithoutLimit() helper.ReturnType {
 
 }
 
-func (model *Contest) AddContest(data Contest) helper.ReturnType {
-	err := db.Create(&data).Error
-	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "新建比赛失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "新建比赛成功", Data: ""}
-	}
-}
-
-func (model *Contest) DeleteContest(contestID int) helper.ReturnType {
-	//contest := Contest{}
-	//err := database.Where("contest_id = ?", contestID).First(&contest).Error
-	//if err != nil {
-	//	return helper.ReturnType{Status: common.CodeError, Msg: "数据库错误||删除比赛失败", Data: err.Error()}
-	//}
-	//err = database.Delete(&contest).Error
-	//contest.Status = 0
-	//err = database.Create(&contest).Error
-	err := db.Model(model).Where("contest_id = ?", contestID).Update("status", 0).Error
-	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "删除比赛失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "删除比赛成功", Data: ""}
-	}
-}
-
 func (model *Contest) GetContestStatus(ContestID int) helper.ReturnType {
 	var contest = Contest{}
-	err := db.Where("contest_id = ?", ContestID).First(&contest).Error
+	err := db.
+		Select([]string{"contest_id", "status"}).
+		Where("contest_id = ?", ContestID).
+		First(&contest).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "获取比赛状态失败", Data: ""}
@@ -134,7 +128,11 @@ func (model *Contest) GetContestStatus(ContestID int) helper.ReturnType {
 
 func (model *Contest) GetContestProblems(ContestID int) helper.ReturnType {
 	var contest = Contest{}
-	err := db.Where("contest_id = ?", ContestID).First(&contest).Error
+	err := db.
+		Select([]string{"contest_id", "problems"}).
+		Where("contest_id = ?", ContestID).
+		First(&contest).
+		Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "获取题目失败，数据库错误", Data: ""}
