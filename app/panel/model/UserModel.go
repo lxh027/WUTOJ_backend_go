@@ -130,7 +130,7 @@ func (model *User) GetAllUser(offset int, limit int, nick string, email string) 
 func (model *User) GetUserByID(userID int) helper.ReturnType {
 	var getUser User
 
-	err := db.Select([]string{"nick", "mail"}).Where("user_id = ?", userID).First(&getUser).Error
+	err := db.Select([]string{"user_id", "nick", "realname", "school", "major", "class", "mail"}).Where("user_id = ?", userID).First(&getUser).Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
 	} else {
@@ -145,7 +145,6 @@ func (model *User) GetUserByNick(userNick string) helper.ReturnType {
 	err := db.Select([]string{"user_id", "mail"}).Where("nick = ?", userNick).First(&getUser).Error
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getUser}
 	}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: getUser}
 }
