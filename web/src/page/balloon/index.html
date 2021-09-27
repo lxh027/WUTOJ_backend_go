@@ -68,6 +68,9 @@
                     if (auths.indexOf("setBalloonStatus") !== -1) {
                         $("#currentTableBar").append(getButton(2, 'send', '送'))
                     }
+                    if (auths.indexOf("getBalloonStatus") !== -1) {
+                        $("#currentTableBar").append(getButton(2, 'flushBalloon', '刷新'))
+                    }
                 }
             })
             let int = self.setInterval(function () {
@@ -144,6 +147,25 @@
                 return false;
             }
 
+            if (obj.event === 'flushBalloon') {
+                $.ajax({
+                    url: getPort() + 'balloon/getContestBalloon',
+                    dataType: "json",
+                    data: {
+                        "contest_id": parseInt($("#contest_id").val()),
+                        "user_id": data.user_id,
+                        "problem_id": data.problem_id
+                    },
+                    success: function (data) {
+                        table.reload('currentTableId', {
+                            where: {
+                                "contest_id": parseInt($("#contest_id").val())
+                            },
+                        }, 'data');
+                    }
+                })
+                return false;
+            }
 
 
         });
