@@ -57,9 +57,9 @@
                             })
                         }
                         if (auths.indexOf("updateContest") !== -1) {
-                            $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
-                            $("#currentTableBar").append(getButton(4, 'status', '状态'))
-                            $("#currentTableBar").append(getButton(3, 'delete', '删除'))
+                            // $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                            // $("#currentTableBar").append(getButton(4, 'status', '状态'))
+                            // $("#currentTableBar").append(getButton(3, 'delete', '删除'))
                         }
 
                     }
@@ -77,13 +77,13 @@
                 },
                 parseData: (res) => {
                     //TODO:delete this later
-                    // console.log(res)
-                    // console.log("wcr")
+                    console.log(res)
+                    console.log("wcr")
                     return {
                         "code": res.status, //解析接口状态
                         "msg": res.msg, //解析提示文本
                         "count": res.data.count, //解析数据长度
-                        "data": res.data.contest_users //解析数据列表
+                        "data": res.data.users //解析数据列表
                     };
                 },
                 toolbar: '#toolbar',
@@ -93,10 +93,13 @@
                     icon: 'layui-icon-tips'
                 }],
                 cols: [[
-                    //TODO:需要考虑显示realname和nick
                     { type: "checkbox", },
-                    { field: 'id', title: 'ID', sort: true },
                     { field: 'user_id', title: '用户ID', sort: true },
+                    { field: 'nick', title: '用户昵称', sort: true },
+                    { field: 'realname', title: '真实姓名', sort: true },
+                    { field: 'school', title: '学校', sort: true },
+                    { field: 'major', title: '专业', sort: true },
+                    { field: 'class', title: '班级', sort: true },
                     { field: 'status', title: '状态', sort: true, templet: (d) => { if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>"; } },
                     { title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center" },
                 ]],

@@ -65,16 +65,29 @@ func (model *ContestUser) GetAllContestUsersByID(contestID int) helper.ReturnTyp
 
 	var contestUsers []ContestUser
 	var count int
+	var users []User
+	var userModel User
 	err := db.Model(&ContestUser{}).Where("contest_id = ?", contestID).Order("id desc").Find(&contestUsers).Count(&count).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
-			Data: map[string]interface{}{
-				"contest_users": contestUsers,
-				"count":         count,
-			},
+	}
+	count = len(contestUsers)
+	for _, contestUser := range contestUsers {
+		res := userModel.GetUserByID(contestUser.UserID)
+		if res.Msg != "查询成功" {
+			return helper.ReturnType{Status: constants.CodeError, Msg: res.Msg, Data: res.Data}
 		}
+		user, ok := (res.Data).(User)
+		if !ok {
+			return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: false}
+		}
+		users = append(users, user)
+	}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
+		Data: map[string]interface{}{
+			"users": users,
+			"count": count,
+		},
 	}
 }
