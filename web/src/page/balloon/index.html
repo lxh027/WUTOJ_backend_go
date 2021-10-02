@@ -69,17 +69,18 @@
                         $("#currentTableBar").append(getButton(2, 'send', '送'))
                     }
                     if (auths.indexOf("getBalloonStatus") !== -1) {
-                        $("#currentTableBar").append(getButton(2, 'flushBalloon', '刷新'))
+                        $(".layui-form-item").append(getButton(2, 'flushBalloon', '刷新气球'))
                     }
                 }
             })
-            let int = self.setInterval(function () {
-                table.reload('currentTableId', {
-                    where: {
-                        "contest_id": parseInt($("#contest_id").val())
-                    },
-                }, 'data');
-            }, 100000)
+            //自动刷新气球
+            // let int = self.setInterval(function () {
+            //     table.reload('currentTableId', {
+            //         where: {
+            //             "contest_id": parseInt($("#contest_id").val())
+            //         },
+            //     }, 'data');
+            // }, 100000)
 
         })
 
