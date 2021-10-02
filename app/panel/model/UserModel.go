@@ -73,21 +73,48 @@ func (model *User) AddUser(newUser User) helper.ReturnType {
 	}
 }
 
-//AddUserWithoutCheckEMail 添加用户，不检测邮箱冲突
-func (model *User) AddUserWithoutCheckEMail(newUser User) helper.ReturnType {
+//AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突
+//此处对contestUser也进行了添加
+func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helper.ReturnType {
 	user := User{}
+	contestUserJSON := struct {
+		ContestID int `json:"contest_id" form:"contest_id"`
+	}{}
+	tx := db.Begin()
+	for _, newUser := range newUsers {
+		if err := tx.Where("nick = ?", newUser.Nick).First(&user).Error; err == nil {
+			tx.Rollback()
+			return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: false}
+		}
+		err := tx.Create(&newUser).Error
+		if err != nil {
+			tx.Rollback()
+			return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
+		}
+		var contestUser ContestUser
 
-	if err := db.Where("nick = ?", newUser.Nick).First(&user).Error; err == nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: false}
+		contestUser.ContestID = contestUserJSON.ContestID
+
+		findUser := user.GetUserByNick(user.Nick)
+		if findUser.Status != constants.CodeSuccess {
+			tx.Rollback()
+			return helper.ReturnType{Status: constants.CodeError, Msg: "数据库错误", Data: false}
+		}
+		user_to_id := (findUser.Data).(User)
+		contestUser.UserID = user_to_id.UserID
+		if err := tx.Where("contest_id = ?", contestUser.ContestID).Where("user_id = ?", contestUser.UserID).Find(&contestUser).Error; err == nil {
+			tx.Rollback()
+			return helper.ReturnType{Status: constants.CodeError, Msg: "已经参加比赛，请勿重复参赛", Data: ""}
+		}
+
+		err = tx.Create(&contestUser).Error
+		if err != nil {
+			tx.Rollback()
+			return helper.ReturnType{Status: constants.CodeError, Msg: "参加比赛失败", Data: ""}
+		}
 	}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 
-	err := db.Create(&newUser).Error
-
-	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "创建失败", Data: err.Error()}
-	} else {
-		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
-	}
 }
 
 func (model *User) CheckLogin(loginUser User) helper.ReturnType {
