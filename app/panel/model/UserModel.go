@@ -73,8 +73,7 @@ func (model *User) AddUser(newUser User) helper.ReturnType {
 	}
 }
 
-//AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突
-//此处对contestUser也进行了添加
+//AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突，此处对contestUser也进行了添加
 func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helper.ReturnType {
 	user := User{}
 	contestUserJSON := struct {
