@@ -225,7 +225,7 @@ func GetUserContestSubmitInfo(c *gin.Context) {
 		return
 	}
 
-	res := submitModel.GetContestSubmit(submitJson.UserID, submitJson.ContestID, submitJson.PageNumber)
+	res := submitModel.GetContestSubmitByUser(submitJson.UserID, submitJson.ContestID, submitJson.PageNumber)
 	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 	return
 }
