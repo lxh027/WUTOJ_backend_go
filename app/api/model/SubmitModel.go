@@ -122,8 +122,19 @@ func (model *Submit) GetAllSubmit(Offset int, Limit int, UserId uint) helper.Ret
 
 }
 
+func (model *Submit) GetContestSubmits(ContestID uint) helper.ReturnType {
+	var submits []Submit
+	fields := []string{"user_id", "problem_id", "status", "submit_time"}
+	err := db.Select(fields).Where("contest_id = ?", ContestID).Find(&submits).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询比赛提交记录失败", Data: nil}
+	}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询比赛提交记录成功", Data: submits}
+}
+
 // TODO
-func (model *Submit) GetContestSubmit(UserID uint, ContestID uint, PageNumber int) helper.ReturnType {
+func (model *Submit) GetContestSubmitByUser(UserID uint, ContestID uint, PageNumber int) helper.ReturnType {
 	var submits []Submit
 	var count int
 
