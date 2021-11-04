@@ -28,6 +28,13 @@ func GetAllProblems(c *gin.Context) {
 }
 
 func GetProblemByID(c *gin.Context) {
+	userJson := checkLogin(c)
+	if userJson.Status != constants.CodeSuccess{
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "未登录", 0))
+		return
+	}
+	userIDRaw := userJson.Data.(uint)
+
 	problemValidate := validate.ProblemValidate
 	problemModel := model.Problem{}
 	contestModel := model.Contest{}
@@ -53,15 +60,48 @@ func GetProblemByID(c *gin.Context) {
 		return
 	}
 
-	// TODO: need remove, temprory workaround
-	contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
-	if contestJson.Status == constants.CodeSuccess {
-		userJson := checkLogin(c)
-		if userJson.Status != constants.CodeSuccess{
-			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "未登录", 0))
+	res := problemModel.GetProblemByID(int(problemJson.ProblemID))
+	if res.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+	if res.Data.(model.Problem).Public == constants.ProblemPublic {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
+	// judge if problem in contests
+	contestsBeginTime := contestModel.GetContestsByProblemID(
+		problemJson.ProblemID,
+		[]string{"contest_id", "begin_time"},
+		)
+
+	if contestsBeginTime.Status != constants.CodeSuccess {
+		c.JSON(http.StatusOK, helper.ApiReturn(contestsBeginTime.Status, contestsBeginTime.Msg, contestsBeginTime.Msg))
+	}
+
+	for _, contest := range contestsBeginTime.Data.([]model.Contest) {
+		userID := int(userIDRaw)
+		if participation := contestUserModel.CheckUserContest(userID, contest.ContestID); participation.Status != constants.CodeSuccess {
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "No participation for contest found", nil))
 			return
 		}
-		userIDRaw := userJson.Data.(uint)
+		format := "2006-01-02 15:04:05"
+		now, _ := time.Parse(format, time.Now().Format(format))
+		if now.Before(contest.BeginTime) {
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	return
+
+	/*
+	//
+	contestJson := contestModel.GetContestByProblemId(problemMap["problem_id"].(int))
+	if contestJson.Status == constants.CodeSuccess {
+
 		contest := contestJson.Data.(model.Contest)
 		userID := int(userIDRaw)
 		contestID := contest.ContestID
@@ -76,14 +116,20 @@ func GetProblemByID(c *gin.Context) {
 			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
 			return
 		}
-	}
+	}*/
 
-	res := problemModel.GetProblemByID(int(problemJson.ProblemID))
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-	return
+
 }
 
 func SearchProblem(c *gin.Context) {
+	userJson := checkLogin(c)
+	if userJson.Status != constants.CodeSuccess{
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "未登录", 0))
+		return
+	}
+	userIDRaw := userJson.Data.(uint)
+
+
 	problemJson := struct {
 		Param string `uri:"param" json:"param"`
 	}{}
@@ -91,22 +137,36 @@ func SearchProblem(c *gin.Context) {
 	problemJson.Param = c.Param("param")
 	problemModel := model.Problem{}
 	contestModel := model.Contest{}
+	contestUserModel := model.ContestUser{}
 
 	if err := c.ShouldBind(&problemJson); err == nil {
 		res := problemModel.SearchProblem(problemJson.Param)
 
 		// TODO: need remove, temprory workaround
-		problem_id, _ := strconv.Atoi(problemJson.Param)
-		contestJson := contestModel.GetContestByProblemId(problem_id)
-		if contestJson.Status == constants.CodeSuccess {
+		problemId, _ := strconv.Atoi(problemJson.Param)
+		contestsBeginTime := contestModel.GetContestsByProblemID(
+			problemId,
+			[]string{"contest_id", "begin_time"},
+		)
+
+		if contestsBeginTime.Status != constants.CodeSuccess {
+			c.JSON(http.StatusOK, helper.ApiReturn(contestsBeginTime.Status, contestsBeginTime.Msg, contestsBeginTime.Msg))
+		}
+
+		for _, contest := range contestsBeginTime.Data.([]model.Contest) {
+			userID := int(userIDRaw)
+			if participation := contestUserModel.CheckUserContest(userID, contest.ContestID); participation.Status != constants.CodeSuccess {
+				c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "No participation for contest found", nil))
+				return
+			}
 			format := "2006-01-02 15:04:05"
 			now, _ := time.Parse(format, time.Now().Format(format))
-			contest := contestJson.Data.(model.Contest)
-			if now.Before(contest.BeginTime) || contest.EndTime.Before(now) {
+			if now.Before(contest.BeginTime) {
 				c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
 				return
 			}
 		}
+
 		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 		return
 	} else {
