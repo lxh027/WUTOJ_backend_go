@@ -22,7 +22,8 @@ func ApiRoutes(router *gin.Engine) {
 		//api.GET("/rotation")
 		//api.GET("/data")
 		//api.GET("/notice")
-
+		api.GET("/outer/submits/:contest_id", apiController.GetContestSubmit)
+		api.GET("/outer/teams/:contest_id", apiController.GetContestUsr)
 		api.Use(middleware.ApiAuth())
 		{
 			api.GET("/notification", apiController.GetNotification)
