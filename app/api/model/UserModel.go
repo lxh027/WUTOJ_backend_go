@@ -187,3 +187,23 @@ func (model *User) AddUserAvatar(UserID int, avatar string) helper.ReturnType {
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "添加头像成功", Data: ""}
 
 }
+
+
+func (model *User) GetContestUser(contestID int, isStar int) helper.ReturnType {
+	var users []User
+
+	fields := []string{"users.user_id", "nick", "realname", "school"}
+
+	err := db.
+		Joins("JOIN contest_users ON users.user_id = contest_users.user_id").
+		Where("contest_users.contest_id = ? AND contest_users.status = ?", contestID, isStar).
+		Select(fields).
+		Find(&users).
+		Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
+	}
+
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: users}
+}
