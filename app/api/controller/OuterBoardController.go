@@ -13,6 +13,7 @@ import (
 )
 
 func GetContestUsr(c *gin.Context)  {
+	type item map[string]string
 	userModel := model.User{}
 	submitJson := struct {
 		ContestID 	int 	`uri:"contest_id"`
@@ -20,6 +21,15 @@ func GetContestUsr(c *gin.Context)  {
 
 	if c.ShouldBindUri(&submitJson) != nil {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "绑定数据模型失败", nil))
+		return
+	}
+
+	// try get from redis
+	if d, err := database.GetFromRedis("outer_teams"); err == nil && d != nil {
+		var reData map[string]item
+		bytes, _ := redis.Bytes(d, err)
+		_ = json.Unmarshal(bytes, &reData)
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get rank success", reData))
 		return
 	}
 
@@ -34,7 +44,7 @@ func GetContestUsr(c *gin.Context)  {
 	formalUsers := res1.Data.([]model.User)
 	starUsers := res2.Data.([]model.User)
 
-	type item map[string]string
+
 	reData := make(map[string]item)
 
 	// formal teams
@@ -58,6 +68,8 @@ func GetContestUsr(c *gin.Context)  {
 		}
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
+	reDataStr, _ := json.Marshal(reData)
+	_ = database.PutToRedis("outer_teams", reDataStr, 3600)
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get teams success", reData))
 }
 
@@ -78,7 +90,7 @@ func GetContestSubmit(c *gin.Context)  {
 		var reData [][]interface{}
 		bytes, _ := redis.Bytes(d, err)
 		_ = json.Unmarshal(bytes, &reData)
-		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get rank(redis) success", reData))
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get rank success", reData))
 		return
 	}
 	// get contest begin time
@@ -130,7 +142,7 @@ func GetContestSubmit(c *gin.Context)  {
 		reData = append(reData, data)
 	}
 	reDataStr, _ := json.Marshal(reData)
-	_ = database.PutToRedis("outer_submits", reDataStr, 3600)
+	_ = database.PutToRedis("outer_submits", reDataStr, 30)
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get rank success", reData))
 }
 
