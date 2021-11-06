@@ -112,6 +112,7 @@ func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helpe
 			return helper.ReturnType{Status: constants.CodeError, Msg: "参加比赛失败", Data: ""}
 		}
 	}
+	tx.Commit()
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 
 }

@@ -7,11 +7,12 @@ import (
 	"OnlineJudge/constants"
 	"OnlineJudge/core/database"
 	"encoding/json"
+	"log"
+	"net/http"
+
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 )
 
 func DoLogin(c *gin.Context) {

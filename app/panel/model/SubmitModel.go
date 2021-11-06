@@ -8,18 +8,18 @@ import (
 )
 
 type Submit struct {
-	ID 		int 	`json:"id" form:"id"`
-	UserID 	uint		`json:"user_id" form:"user_id"`
-	Nick 	string 	`json:"nick" form:"nick"`
-	ProblemID 	uint `json:"problem_id" form:"problem_id"`
-	ContestID 	uint `json:"contest_id" form:"contest_id"`
-	SourceCode 	string `json:"source_code" form:"source_code"`
-	Language 	int 	`json:"language" form:"language"`
-	Status 		string 	`json:"status" form:"status"`
-	Msg 		string 	`json:"msg" form:"msg"`
-	Time 		int 	`json:"time" form:"time"`
-	Memory 		int 	`json:"memory" form:"memory"`
-	SubmitTime 	time.Time	`json:"submit_time" form:"submit_time"`
+	ID         int       `json:"id" form:"id"`
+	UserID     uint      `json:"user_id" form:"user_id"`
+	Nick       string    `json:"nick" form:"nick"`
+	ProblemID  uint      `json:"problem_id" form:"problem_id"`
+	ContestID  uint      `json:"contest_id" form:"contest_id"`
+	SourceCode string    `json:"source_code" form:"source_code"`
+	Language   int       `json:"language" form:"language"`
+	Status     string    `json:"status" form:"status"`
+	Msg        string    `json:"msg" form:"msg"`
+	Time       int       `json:"time" form:"time"`
+	Memory     int       `json:"memory" form:"memory"`
+	SubmitTime time.Time `json:"submit_time" form:"submit_time"`
 }
 
 type SubmitBalloon struct {
@@ -30,7 +30,7 @@ type SubmitBalloon struct {
 func (model *Submit) GetAllSubmit(offset int, limit int, whereData map[string]string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
 	var submits []Submit
 	/*where := "user_id like ? AND problem_id like ? AND contest_id like ? AND language like ? " +
-		"AND status like ? AND submit_time >= ? AND submit_time <= ?"*/
+	"AND status like ? AND submit_time >= ? AND submit_time <= ?"*/
 	where := ""
 	var count int
 	var args []interface{}
@@ -62,12 +62,11 @@ func (model *Submit) GetAllSubmit(offset int, limit int, whereData map[string]st
 		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
 			Data: map[string]interface{}{
 				"submits": submits,
-				"count": count,
+				"count":   count,
 			},
 		}
 	}
 }
-
 
 func (model *Submit) GetSubmitGroup(whereData map[string]string, minSubmitTime, maxSubmitTime time.Time) helper.ReturnType {
 	var submits []Submit

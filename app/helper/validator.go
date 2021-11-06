@@ -2,13 +2,14 @@ package helper
 
 import (
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/validate"
 )
 
 type Validator struct {
-	Rules map[string]string
-	Scenes map[string] []string
+	Rules  map[string]string
+	Scenes map[string][]string
 }
 
 func (validator *Validator) ValidateMap(m map[string]interface{}, scene string) (bool, error) {
@@ -30,7 +31,7 @@ func (validator *Validator) ValidateMap(m map[string]interface{}, scene string) 
 	}
 }
 
-func (validator *Validator)ValidateRequest(c *gin.Context, scene string) (bool, error) {
+func (validator *Validator) ValidateRequest(c *gin.Context, scene string) (bool, error) {
 	// 判断scene是否存在
 	if _, ok := validator.Scenes[scene]; !ok {
 		msg := errors.New("scene is not exists")
@@ -53,4 +54,3 @@ func (validator *Validator)ValidateRequest(c *gin.Context, scene string) (bool, 
 		return false, errors.New(v.Errors.One())
 	}
 }
-
