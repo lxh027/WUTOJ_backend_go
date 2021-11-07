@@ -94,6 +94,7 @@ func BackendRoutes(router *gin.Engine) {
 			contest.POST("/getContestByID", panelController.GetContestByID)
 			contest.POST("/changeContestStatus", panelController.ChangeContestStatus)
 			contest.POST("/flushRank", panelController.ClearContestRedis)
+			contest.POST("/openOuterBoard", panelController.SetOuterBoard)
 			contestUser := contest.Group("/contestUser")
 			{
 				contestUser.POST("/getAllContestUsers", panelController.GetAllContestUsers)
@@ -149,5 +150,6 @@ func BackendRoutes(router *gin.Engine) {
 			problem.POST("/uploadImg", panelController.UploadImg)
 		}
 	}
-	router.StaticFS("/admin/", http.Dir("./web"))
+	router.StaticFS("/admin/", http.Dir("./web/admin"))
+	router.StaticFS("/board/", http.Dir("./web/board"))
 }

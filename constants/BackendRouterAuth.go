@@ -70,6 +70,7 @@ var auths = map[string]string{
 	"/panel/contest/getContestByID":      "getAllContest",
 	"/panel/contest/changeContestStatus": "updateContest",
 	"/panel/contest/flushRank":           "updateContest",
+	"/panel/contest/openOuterBoard":	  "updateContest",
 
 	//contest/contestUser
 	"/panel/contest/contestUser/getAllContestUsers": "getAllContest",
