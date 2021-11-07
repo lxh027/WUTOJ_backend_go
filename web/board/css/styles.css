@@ -1,0 +1,595 @@
+@font-face {
+    font-family: "CourierPrime";
+}
+
+* {
+    --text-dark: #222;
+    --text-normal: #444;
+    --text-light: #666;
+    --text-lightest: #aaa;
+    --text-girl: #ee00ee;
+    --text-theme: #4B82C4;
+    --text-wa: hsl(5, 80%, 63%);
+    --text-ac: hsl(120, 80%, 63%);
+    --text-pd: hsl(43, 80%, 60%);
+    --bg-ac-first: #89d989;
+    --bg-wa: #f28379;
+    --bg-ac: #89d989;
+    --bg-pd: #f2f288;
+    box-sizing: border-box;
+}
+
+body {
+    --x: 0;
+    --y: 0;
+    background: url("../images/background.png") fixed;
+    margin: 0;
+    color: var(--text-normal);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+#container {
+    --sidebar-width: 280px;
+    display: inline-block;
+    min-width: 1024px;
+}
+
+#popup {
+    --background: #f9f9f9;
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+}
+
+#mask {
+    --radius: 24px;
+    --frame: 0px;
+    --bottom: 100%;
+    --right: 100%;
+    --clip-path: polygon(
+            evenodd,
+            0 0, var(--right) 0, var(--right) var(--bottom), 0 var(--bottom), 0 0,
+            204px 128px,
+            250px 75px,
+            calc(var(--right) - var(--frame) - var(--radius)) 75px,
+            calc(var(--right) - var(--frame)) calc(75px + var(--radius)),
+            calc(var(--right) - var(--frame)) calc(var(--bottom) - 78px - var(--radius)),
+            calc(var(--right) - var(--frame) - var(--radius)) calc(var(--bottom) - 78px),
+            calc(var(--right) - 750px) calc(var(--bottom) - 78px),
+            calc(var(--right) - 796px) calc(var(--bottom) - 78px),
+            calc(var(--frame) + var(--radius)) calc(var(--bottom) - 78px),
+            var(--frame) calc(var(--bottom) - 78px - var(--radius)),
+            var(--frame) calc(128px + var(--radius)),
+            calc(var(--frame) + var(--radius)) 128px,
+            204px 128px
+    );
+    position: relative;
+    flex: auto;
+}
+
+@media screen and (min-width: 1024px) {
+    #mask {
+        --frame: 24px;
+        --clip-path: polygon(
+                evenodd,
+                0 0, var(--right) 0, var(--right) var(--bottom), 0 var(--bottom), 0 0,
+                204px 128px,
+                250px 75px,
+                calc(var(--right) - var(--frame) - var(--radius)) 75px,
+                calc(var(--right) - var(--frame)) calc(75px + var(--radius)),
+                calc(var(--right) - var(--frame)) calc(var(--bottom) - 78px - var(--radius)),
+                calc(var(--right) - var(--frame) - var(--radius)) calc(var(--bottom) - 78px),
+                calc(var(--right) - 920px) calc(var(--bottom) - 78px),
+                calc(var(--right) - 960px) calc(var(--bottom) - var(--frame)),
+                calc(var(--frame) + var(--radius)) calc(var(--bottom) - var(--frame)),
+                var(--frame) calc(var(--bottom) - var(--frame) - var(--radius)),
+                var(--frame) calc(128px + var(--radius)),
+                calc(var(--frame) + var(--radius)) 128px,
+                204px 128px
+        );
+    }
+}
+
+#shadow {
+    height: 100%;
+    mix-blend-mode: multiply;
+    filter: drop-shadow(-10px 10px 10px #00000014);
+}
+
+#shadow:before {
+    content: '';
+    display: block;
+    height: 100%;
+    background: white;
+    clip-path: var(--clip-path);
+}
+
+#frame {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: var(--background);
+    clip-path: var(--clip-path);
+}
+
+header {
+}
+
+#host {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+}
+
+#host img {
+    width: 175px;
+    height: 83px;
+    object-fit: contain;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    right: 20px;
+    margin-left: 178px;
+    padding: 18px 28px 14px;
+    background: var(--background);
+    text-align: right;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+nav > * {
+    vertical-align: bottom;
+}
+
+nav a {
+    font-size: 14px;
+    text-decoration: none !important;
+    margin-left: 20px;
+}
+
+nav a:hover {
+    filter: drop-shadow(0 2px 5px #4b82c466);
+}
+
+#keyword {
+    display: inline-block;
+}
+
+#keyword input {
+    border: none;
+    border-bottom: 2px solid var(--text-lightest);
+    font-size: 16px;
+    width: 28ch;
+    line-height: 28px;
+    padding: 6px 8px;
+    --clipping: 8px;
+    color: var(--text-light);
+    background: none;
+}
+
+#keyword input:focus {
+    outline: none;
+    border-color: var(--text-theme);
+    color: var(--text-normal);
+}
+
+footer {
+    display: flex;
+    position: absolute;
+    right: auto;
+    bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    left: auto;
+    width: 100%;
+    box-sizing: content-box;
+    z-index: 1;
+}
+
+@media screen and (min-width: 1024px) {
+    footer {
+        right: 36px;
+        width: auto;
+    }
+}
+
+footer img {
+    height: 32px;
+}
+
+#popup.hidden #sidebar {
+    max-width: 0;
+}
+
+#popup:not(.hidden) ~ #ttop {
+    padding-right: var(--sidebar-width);
+}
+
+#popup:not(.hidden) ~ main #table-container:after {
+    padding-right: var(--sidebar-width);
+}
+
+#sidebar {
+    position: relative;
+    flex: none;
+    padding: 78px 0 24px;
+    background: var(--background);
+    overflow: auto;
+    pointer-events: auto;
+}
+
+#sidebar-content {
+    width: var(--sidebar-width);
+    padding: 0 12px;
+    text-align: center;
+}
+
+.operations {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+#sidebar-content .close {
+    margin: 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-theme);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.trigger input {
+    margin: 0;
+}
+
+.trigger small {
+    font-size: 14px;
+}
+
+.teamname .team {
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 2;
+    color: var(--text-theme);
+}
+
+.teamname .school {
+    font-style: italic;
+    font-size: 16px;
+    color: var(--text-light);
+}
+
+.teamname .members {
+    font-size: 20px;
+}
+
+.poptitle {
+    font-weight: 600;
+    margin: 16px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--text-lightest);
+}
+
+#submissions {
+    display: inline-table;
+}
+
+#submissions .accepted .status {
+    color: var(--text-ac);
+}
+
+#submissions .rejected .status {
+    color: var(--text-wa);
+}
+
+#submissions .pending .status {
+    color: var(--text-pd);
+}
+
+#submissions .time {
+    padding: 3px;
+    font-family: CourierPrime, monospace;
+}
+
+#submissions .sub_prob {
+    font-weight: bold;
+    font-family: CourierPrime, monospace;
+}
+
+#submissions .status {
+    text-transform: capitalize;
+    padding: 5px;
+    font-family: CourierPrime, monospace;
+    font-size: 15px;
+}
+
+@keyframes twinkling {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#submissions .recent {
+    -webkit-animation: twinkling 1s 10 ease-in-out;
+    animation: twinkling 1s 10 ease-in-out;
+    -moz-animation: twinkling 1s 10 ease-in-out;
+    -o-animation: twinkling 1s 10 ease-in-out;
+}
+
+#ttop {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    align-items: center;
+    left: 0;
+    width: calc(100vw - 18px);
+    padding-top: 80px;
+    background: 0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 100%, 0) 0%, hsla(0, 0%, 100%, 0) 6%, hsla(0, 0%, 100%, .1) 7.5%),
+    0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0) 4%, hsla(0, 0%, 0%, .03) 4.5%),
+    0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 100%, 0) 0%, hsla(0, 0%, 100%, 0) 1.2%, hsla(0, 0%, 100%, .15) 2.2%),
+    hsl(0, 0%, 94%);
+}
+
+@media screen and (min-width: 1024px) {
+    #ttop {
+        flex-direction: row;
+    }
+}
+
+#ttop:before {
+    content: '';
+    flex: none;
+    width: 250px;
+}
+
+#contest_title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    flex: auto;
+    margin: 56px 0 0;
+    font-family: CourierPrime, monospace;
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+    text-shadow: hsla(0, 0%, 40%, .5) 0 -1px 0, hsla(0, 0%, 100%, .6) 0 2px 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 3;
+}
+
+@media screen and (min-width: 1024px) {
+    #contest_title {
+        margin: 28px 0;
+    }
+}
+
+#time {
+    box-sizing: content-box;
+    flex: none;
+    align-self: center;
+    width: 250px;
+    padding: 8px 16px 8px 32px;
+    font-size: 14px;
+    text-align: center;
+}
+
+#time_elapsed {
+    font-size: 28px;
+    font-family: CourierPrime, monospace;
+    font-weight: bold;
+    text-shadow: hsla(0, 0%, 40%, .5) 0 -1px 0, hsla(0, 0%, 100%, .6) 0 2px 1px;
+}
+
+#tbottom {
+    display: block;
+    height: 90px;
+}
+
+main {
+}
+
+#table-container {
+    display: flex;
+}
+
+#table-container:before, #table-container:after {
+    content: '';
+    width: 0;
+    flex: none;
+}
+
+@media screen and (min-width: 1024px) {
+    #table-container:before, #table-container:after {
+        width: 24px;
+    }
+}
+
+#board {
+    width: 100%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+#board thead {
+    position: sticky;
+    top: 75px;
+    z-index: 2;
+}
+
+thead {
+    background: 0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 100%, 0) 0%, hsla(0, 0%, 100%, 0) 6%, hsla(0, 0%, 100%, .1) 7.5%),
+    0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0) 4%, hsla(0, 0%, 0%, .03) 4.5%),
+    0 0 / 80px 80px repeating-linear-gradient(to top, hsla(0, 0%, 100%, 0) 0%, hsla(0, 0%, 100%, 0) 1.2%, hsla(0, 0%, 100%, .15) 2.2%),
+    linear-gradient(to bottom, hsl(0, 0%, 94%), hsl(0, 0%, 89%));
+    box-shadow: 0 2px 2px #0001;
+}
+
+thead tr th.prob_h {
+    min-width: 64px;
+}
+
+thead tr:nth-of-type(1) th.prob_h {
+    padding-bottom: 0;
+}
+
+thead tr:nth-of-type(2) th.prob_h {
+    padding-top: 0;
+}
+
+thead tr:nth-of-type(2) th {
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    text-shadow: none;
+}
+
+th {
+    padding: 8px 8px;
+    font-family: CourierPrime, monospace;
+    font-size: 16px;
+    line-height: 1.2;
+    text-shadow: hsla(0, 0%, 40%, .5) 0 -1px 0, hsla(0, 0%, 100%, .6) 0 2px 1px;
+}
+
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover td.prob_d {
+    filter: brightness(1.05);
+}
+
+tr.concerned {
+    font-weight: bold;
+    z-index: 2;
+    background-color: #f9f9f9;
+}
+
+tr.hidden {
+    display: none;
+}
+
+tr.girls td.team {
+    color: var(--text-girl);
+}
+
+tr.unoffical td:not(.prob_d) {
+    font-style: italic;
+}
+
+td {
+    text-align: center;
+    padding: 4px;
+    min-height: 45px;
+}
+
+td.rank {
+    line-height: 36px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+td.school {
+    font-size: 14px;
+}
+
+td.team {
+    cursor: pointer;
+}
+
+td.team:hover {
+    background: #4b82c40a;
+}
+
+td.solved {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+td.penalty {
+}
+
+td.prob_d {
+    --padding: 2px;
+    --clipping: 10px;
+    padding: var(--padding) calc(var(--padding) + 4px);
+    position: relative;
+    font-size: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 1;
+    background: var(--bg-color);
+    border-top-width: 0;
+    border-left-width: 0;
+}
+
+td.prob_d.prob_d.prob_d.prob_d:hover {
+    filter: brightness(1.08);
+}
+
+td.prob_d.firstblood {
+    --bg-color: repeating-linear-gradient(-45deg, var(--bg-ac), var(--bg-ac) 6px, transparent 6px, transparent 9px);
+    font-weight: 600;
+    clip-path: polygon(var(--clipping) var(--padding), calc(100% - var(--padding)) var(--padding), calc(100% - var(--padding)) calc(100% - var(--clipping)), calc(100% - var(--clipping)) calc(100% - var(--padding)), var(--padding) calc(100% - var(--padding)), var(--padding) var(--clipping));
+}
+
+td.prob_d.accepted {
+    --bg-color: var(--bg-ac);
+}
+
+td.prob_d.rejected {
+    --bg-color: var(--bg-wa);
+}
+
+td.prob_d.pending {
+    --bg-color: var(--bg-pd);
+}
+
+td.prob_d.untried {
+    color: var(--text-lightest);
+    cursor: default;
+}
+
+#basic-hint {
+    position: fixed;
+    bottom: 0;
+    z-index: 3;
+}
+
+@media screen and (min-width: 1024px) {
+    #basic-hint {
+        display: none;
+    }
+}

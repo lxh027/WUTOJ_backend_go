@@ -211,3 +211,24 @@ func ClearContestRedis(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "刷新排行榜成功", 0))
 	return
 }
+
+func SetOuterBoard(c *gin.Context) {
+	contestJson := struct {
+		ContestID 	int		`json:"contest_id" form:"contest_id"`
+		Time 		int 	`json:"time" form:"time"`
+	}{}
+
+	if err := c.ShouldBind(&contestJson); err != nil {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
+		return
+	}
+	_ = database.DeleteFromRedis("outer_info")
+	_ = database.DeleteFromRedis("outer_submits")
+	_ = database.DeleteFromRedis("outer_teams")
+	_ = database.DeleteFromRedis("outer_id")
+	if err := database.PutToRedis("outer_id", contestJson.ContestID, contestJson.Time); err != nil {
+		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "redis error", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "开放成功", nil))
+}
