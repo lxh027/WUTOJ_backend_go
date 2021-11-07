@@ -142,7 +142,7 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 				problemID = string(rune('A' + index))
 			}
 		}
-		data = append(data, submit.UserID, problemID, submit.SubmitTime.Unix()-beginTime.Unix(), status)
+		data = append(data, submit.UserID, problemID, submit.SubmitTime.UnixMilli()-beginTime.UnixMilli(), status)
 		reData = append(reData, data)
 	}
 	reDataStr, _ := json.Marshal(reData)
