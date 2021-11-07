@@ -2,7 +2,6 @@ package server
 
 import (
 	"OnlineJudge/config"
-	"OnlineJudge/core/grpc"
 	"OnlineJudge/core/judger"
 	"OnlineJudge/core/routes"
 	"io"
@@ -41,9 +40,6 @@ func Run(httpServer *gin.Engine) {
 	// 设置日志格式
 	httpServer.Use(gin.LoggerWithFormatter(config.GetLogFormat))
 	httpServer.Use(gin.Recovery())
-
-	// 初始化grpc连接
-	grpc.InitService()
 
 	// 初始化judge
 	instance := judger.InitInstance()

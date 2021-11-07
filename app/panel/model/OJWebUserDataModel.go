@@ -53,6 +53,7 @@ func (model *OJWebUserData) AddOJWebUserDatas(newOJWebUserDatas []OJWebUserData)
 
 	for _, newOJWebUserData := range newOJWebUserDatas {
 		if err := tx.Where("user_id = ? AND submit_time = ?", newOJWebUserData.UserID, newOJWebUserData.SubmitTime).First(&ojWebUserData).Error; err == nil {
+			/*视为操作成功*/
 			continue
 		}
 		err := tx.Create(&newOJWebUserData).Error

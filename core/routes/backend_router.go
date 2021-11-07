@@ -125,6 +125,20 @@ func BackendRoutes(router *gin.Engine) {
 			balloon.POST("/sendBalloon", panelController.SentBalloon)
 		}
 
+		ojWebUserConfig := panel.Group("/ojWebUserConfig")
+		{
+			ojWebUserConfig.POST("/addOJWebUserConfig", panelController.AddOJWebUserConfig)
+			ojWebUserConfig.POST("/deleteOJWebUserConfig", panelController.DeleteOJWebUserConfig)
+			ojWebUserConfig.POST("/getOJWebUserConfigByID", panelController.GetOJWebUserConfigByID)
+			ojWebUserConfig.POST("/updateOJWebUserConfig", panelController.UpdateOJWebUserConfig)
+		}
+
+		spider := panel.Group("/spider")
+		{
+			spider.POST("/getAll", panelController.GetUserAllSubmit)
+			spider.POST("/getLastWeek", panelController.GetUserLastWeekSubmit)
+		}
+
 		printRequest := panel.Group("/print")
 		{
 			printRequest.POST("/getAllPrintRequest", panelController.GetAllPrintRequest)
