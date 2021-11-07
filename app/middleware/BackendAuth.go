@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/controller"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/backend_auth"
 	"fmt"
 	"net/http"
 
@@ -16,9 +17,9 @@ func BackendAuth() gin.HandlerFunc {
 		fmt.Println(c.FullPath())
 		requestPath := c.FullPath()
 
-		auth := constants.GetBackendRouterAuth(requestPath)
+		auth := backend_auth.GetBackendRouterAuth(requestPath)
 		fmt.Println(auth)
-		if auth != constants.AuthPass {
+		if auth != backend_auth.AuthPass {
 			if res := haveAuth(c, auth); res != constants.Authed {
 				c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "权限不足", res))
 				c.Abort()

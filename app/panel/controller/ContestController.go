@@ -5,10 +5,10 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -203,7 +203,7 @@ func ClearContestRedis(c *gin.Context) {
 		return
 	}
 
-	if err := database.DeleteFromRedis("contest_rank" + strconv.Itoa(int(contestJson.ContestID))); err != nil {
+	if err := database.DeleteFromRedis(redis_key.ContestRank(int(contestJson.ContestID))); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "刷新排行榜失败", err.Error()))
 		return
 	}
@@ -222,11 +222,11 @@ func SetOuterBoard(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "绑定数据模型失败", err.Error()))
 		return
 	}
-	_ = database.DeleteFromRedis("outer_info")
-	_ = database.DeleteFromRedis("outer_submits")
-	_ = database.DeleteFromRedis("outer_teams")
-	_ = database.DeleteFromRedis("outer_id")
-	if err := database.PutToRedis("outer_id", contestJson.ContestID, contestJson.Time); err != nil {
+	_ = database.DeleteFromRedis(redis_key.OuterInfo)
+	_ = database.DeleteFromRedis(redis_key.OuterSubmits)
+	_ = database.DeleteFromRedis(redis_key.OuterTeams)
+	_ = database.DeleteFromRedis(redis_key.OuterID)
+	if err := database.PutToRedis(redis_key.OuterID, contestJson.ContestID, contestJson.Time); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "redis error", err.Error()))
 		return
 	}

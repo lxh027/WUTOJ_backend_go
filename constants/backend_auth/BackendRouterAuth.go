@@ -1,4 +1,4 @@
-package constants
+package backend_auth
 
 func GetBackendRouterAuth(url string) string {
 	return auths[url]

@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"fmt"
@@ -81,7 +82,7 @@ func GetUserRank(c *gin.Context) {
 	}
 
 	// try get from redis
-	if rank, err := database.ZGetAllFromRedis("contest_rank" + strconv.Itoa(int(rankJson.ContestID))); err == nil {
+	if rank, err := database.ZGetAllFromRedis(redis_key.ContestRank(int(rankJson.ContestID))); err == nil {
 		userIDRank, _ := redis.Strings(rank, err)
 		if len(userIDRank) == 0 {
 			getRankFromDB(c, rankJson.ContestID, begin, end, now)
@@ -91,7 +92,7 @@ func GetUserRank(c *gin.Context) {
 		for _, userID := range userIDRank {
 			// get each user_id
 			var item user
-			itemStr, err := redis.String(database.GetFromRedis("contest_rank" + strconv.Itoa(int(rankJson.ContestID)) + "user_id" + userID))
+			itemStr, err := redis.String(database.GetFromRedis(redis_key.ContestRankUser(int(rankJson.ContestID), userID)))
 			if err != nil {
 				getRankFromDB(c, rankJson.ContestID, begin, end, now)
 				return
@@ -156,8 +157,8 @@ func getRankFromDB(c *gin.Context, contestID uint, beginTime, endTime, now time.
 
 	for _, user := range users {
 		itemStr, _ := json.Marshal(user)
-		_ = database.PutToRedis("contest_rank"+strconv.Itoa(int(contestID))+"user_id"+strconv.Itoa(int(user.UserID)), itemStr, 3600)
+		_ = database.PutToRedis(redis_key.ContestRankUser(int(contestID), strconv.Itoa(int(user.UserID))), itemStr, 3600)
 		score := -int64(user.ACNum) * 1000000000 + user.Penalty
-		_ = database.ZAddToRedis("contest_rank"+strconv.Itoa(int(contestID)), score, user.UserID)
+		_ = database.ZAddToRedis(redis_key.ContestRank(int(contestID)), score, user.UserID)
 	}
 }

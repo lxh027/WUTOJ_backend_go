@@ -6,10 +6,10 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -28,7 +28,7 @@ func PrintRequest(c *gin.Context) {
 
 	now := time.Now().Unix()
 	interval := config.GetWutOjConfig()["print_interval_time"].(int)
-	redisStr := "user_last_print_request" + strconv.Itoa(int(userID))
+	redisStr := redis_key.LastPrintRequest(int(userID))
 	if value, err := database.GetFromRedis(redisStr); err == nil {
 		last, _ := redis.Int64(value, err)
 		fmt.Printf("now: %v, last: %v\n", now, last)

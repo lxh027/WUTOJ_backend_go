@@ -3,6 +3,7 @@ package helper
 import (
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"fmt"
 	"gopkg.in/gomail.v2"
@@ -17,7 +18,7 @@ func SendMail(EmailAddress string) (ReturnType, error) {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	VerifyCode := fmt.Sprintf("%06v", rnd.Int31n(1000000))
-	keyValue := "VerifyCode" + EmailAddress
+	keyValue := redis_key.VerifyCode(EmailAddress)
 	// save to redis
 	database.DeleteFromRedis(keyValue)
 	database.PutToRedis(keyValue, VerifyCode, 1000*60*15)
