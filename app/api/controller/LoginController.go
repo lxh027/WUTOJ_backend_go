@@ -5,6 +5,7 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"log"
@@ -124,7 +125,7 @@ func UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	KeyValue := "VerifyCode" + userJson.Mail
+	KeyValue := redis_key.VerifyCode(userJson.Mail)
 
 	VerifyCodeCorrect, err := redis.String(database.GetFromRedis(KeyValue))
 	database.DeleteFromRedis(KeyValue)

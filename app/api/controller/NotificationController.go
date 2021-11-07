@@ -5,13 +5,12 @@ import (
 	"OnlineJudge/app/common/validate"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
-	"log"
-	"net/http"
-	"strconv"
-
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 )
 
 func GetNotification(c *gin.Context) {
@@ -35,7 +34,7 @@ func GetNotification(c *gin.Context) {
 	}
 
 	UserNick := GetUserNickFromSession(c)
-	keyValue := "User:" + UserNick + ":Notification" + strconv.Itoa(notificationJson.ContestID)
+	keyValue := redis_key.UserNotification(UserNick, notificationJson.ContestID)
 	log.Print(keyValue)
 	var LastID int
 

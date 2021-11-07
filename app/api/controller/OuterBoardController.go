@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/api/model"
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"errors"
@@ -15,7 +16,7 @@ import (
 
 func GetContestInfo(c *gin.Context) {
 	var contestID int
-	if d, err := database.GetFromRedis("outer_id"); err == nil && d != nil {
+	if d, err := database.GetFromRedis(redis_key.OuterID); err == nil && d != nil {
 		contestID, _ = redis.Int(d, err)
 	} else {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "no board is opened", nil))
@@ -43,7 +44,7 @@ func getContestUsr(contestID int) (interface{}, error)  {
 	userModel := model.User{}
 
 	// try get from redis
-	if d, err := database.GetFromRedis("outer_teams"); err == nil && d != nil {
+	if d, err := database.GetFromRedis(redis_key.OuterTeams); err == nil && d != nil {
 		var reData map[string]item
 		bytes, _ := redis.Bytes(d, err)
 		_ = json.Unmarshal(bytes, &reData)
@@ -84,7 +85,7 @@ func getContestUsr(contestID int) (interface{}, error)  {
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
 	reDataStr, _ := json.Marshal(reData)
-	_ = database.PutToRedis("outer_teams", reDataStr, 3600)
+	_ = database.PutToRedis(redis_key.OuterTeams, reDataStr, 3600)
 	return reData, nil
 }
 
@@ -93,7 +94,7 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 	contestModel := model.Contest{}
 
 	// try get from redis
-	if d, err := database.GetFromRedis("outer_submits"); err == nil && d != nil {
+	if d, err := database.GetFromRedis(redis_key.OuterSubmits); err == nil && d != nil {
 		var reData [][]interface{}
 		bytes, _ := redis.Bytes(d, err)
 		_ = json.Unmarshal(bytes, &reData)
@@ -145,7 +146,7 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 		reData = append(reData, data)
 	}
 	reDataStr, _ := json.Marshal(reData)
-	_ = database.PutToRedis("outer_submits", reDataStr, 30)
+	_ = database.PutToRedis(redis_key.OuterSubmits, reDataStr, 10)
 	return reData, nil
 }
 
@@ -153,7 +154,7 @@ func getContestBasicInfo(contestID int) (interface{}, error) {
 	contestModel := model.Contest{}
 
 	// try get from redis
-	if d, err := database.GetFromRedis("outer_info"); err == nil && d != nil {
+	if d, err := database.GetFromRedis(redis_key.OuterInfo); err == nil && d != nil {
 		var reData map[string]interface{}
 		bytes, _ := redis.Bytes(d, err)
 		_ = json.Unmarshal(bytes, &reData)
@@ -179,6 +180,6 @@ func getContestBasicInfo(contestID int) (interface{}, error) {
 		"title": contest.ContestName,
 	}
 	reDataStr, _ := json.Marshal(reData)
-	_ = database.PutToRedis("outer_info", reDataStr, 3600)
+	_ = database.PutToRedis(redis_key.OuterInfo, reDataStr, 3600)
 	return reData, nil
 }

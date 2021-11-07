@@ -4,6 +4,7 @@ import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/constants"
+	"OnlineJudge/constants/redis_key"
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"fmt"
@@ -80,7 +81,7 @@ func GetContestBalloon(c *gin.Context) {
 			continue
 		}
 		balloonMap[submitIdentity] = true
-		value, err := database.SIsNumberOfRedisSet("balloon"+strconv.Itoa(int(contestIDJson.ContestID)), submitIdentity)
+		value, err := database.SIsNumberOfRedisSet(redis_key.Balloon(int(contestIDJson.ContestID)), submitIdentity)
 		if err != nil {
 			c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "Redis错误", err.Error()))
 			return
@@ -106,7 +107,7 @@ func SentBalloon(c *gin.Context) {
 
 	submitIdentity := strconv.Itoa(int(IDJson.ContestID)) + strconv.Itoa(IDJson.ProblemID) + " " + strconv.Itoa(int(IDJson.UserID))
 
-	if err := database.SAddToRedisSet("balloon"+strconv.Itoa(int(IDJson.ContestID)), submitIdentity); err != nil {
+	if err := database.SAddToRedisSet(redis_key.Balloon(int(IDJson.ContestID)), submitIdentity); err != nil {
 		c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeError, "设置失败", err.Error()))
 		return
 	}
