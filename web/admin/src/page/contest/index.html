@@ -19,6 +19,21 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
+                            <label class="layui-form-label">开放外榜ID</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="contest_id" autocomplete="off" class="layui-input">
+                            </div>
+                            <label class="layui-form-label">开放时间(秒)</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="time" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="outer-btn">开放外榜</button>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
                             <label class="layui-form-label">标题</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="name" autocomplete="off" class="layui-input">
@@ -140,11 +155,6 @@
 
         // 监听搜索操作
         form.on('submit(data-search-btn)', function (data) {
-            var result = JSON.stringify(data.field);
-            layer.alert(result, {
-                title: '最终的搜索信息'
-            });
-
             //执行搜索重载
             table.reload('currentTableId', {
                 page: {
@@ -154,6 +164,27 @@
                     "where": data.field
                 }
             }, 'data');
+
+            return false;
+        });
+
+        form.on('submit(outer-btn)', function (data) {
+            $.ajax({
+                url: getPort()+'contest/openOuterBoard',
+                type: "post",
+                dataType: "json",
+                data: {
+                    "contest_id": data.field.contest_id,
+                    "time": data.field.time,
+                },
+                success: function (data) {
+                    if (data.status == 0) {
+                        layer.msg("开放成功");
+                    } else {
+                        layer.msg("开放失败");
+                    }
+                }
+            })
 
             return false;
         });
