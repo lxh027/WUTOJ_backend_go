@@ -9,7 +9,7 @@ func init() {
 
 	serverConfig["host"] = "0.0.0.0"
 	serverConfig["port"] = os.Getenv("server_port")
-
+	serverConfig["domain"] = "acmwhut.com"
 	serverConfig["mode"] = "debug"
 }
 
