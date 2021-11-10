@@ -47,7 +47,6 @@ func (model *OJWebUserConfig) DeleteOJWebUserConfig(id int) helper.ReturnType {
 //UpdateOJWebUserConfig 修改用户oj配置
 func (model *OJWebUserConfig) UpdateOJWebUserConfig(id int, updateOJWebUserConfig OJWebUserConfig) helper.ReturnType {
 	err := db.Model(&OJWebUserConfig{}).Where("id = ?", id).Update(updateOJWebUserConfig).Error
-
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
 	}
@@ -82,4 +81,41 @@ func (model *OJWebUserConfig) GetOJWebUserConfigByID(id int) helper.ReturnType {
 
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询用户比赛成功", Data: ojWebUserConfig}
 
+}
+
+//GetAllOJWebUserConfig 获取所有用户OJ配置
+func (model *OJWebUserConfig) GetAllOJWebUserConfig(offset int, limit int, userID int, ojName string) helper.ReturnType {
+	var ojWebUserConfigs []OJWebUserConfig
+	where := "oj_name like ?"
+	var count int
+
+	db.Model(&OJWebUserConfig{}).Where(where, "%"+ojName+"%").Count(&count)
+
+	err := db.Offset(offset).
+		Limit(limit).
+		Where(where, "%"+ojName+"%").
+		Find(&ojWebUserConfigs).
+		Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
+	} else {
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
+			Data: map[string]interface{}{
+				"oj_web_user_configs": ojWebUserConfigs,
+				"count":               count,
+			},
+		}
+	}
+}
+
+//ChangeOJConfigStatus 变更配置状态
+func (model *OJWebUserConfig) ChangeOJConfigStatus(id int, status int) helper.ReturnType {
+	err := db.Model(&OJWebUserConfig{}).Where("id = ?", id).Update("status", status).Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "更新失败", Data: false}
+	} else {
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "更新成功", Data: true}
+	}
 }

@@ -131,6 +131,8 @@ func BackendRoutes(router *gin.Engine) {
 			ojWebUserConfig.POST("/deleteOJWebUserConfig", panelController.DeleteOJWebUserConfig)
 			ojWebUserConfig.POST("/getOJWebUserConfigByID", panelController.GetOJWebUserConfigByID)
 			ojWebUserConfig.POST("/updateOJWebUserConfig", panelController.UpdateOJWebUserConfig)
+			ojWebUserConfig.POST("/getAllOJWebUserConfig", panelController.GetAllOJWebUserConfig)
+			ojWebUserConfig.POST("/changeOJConfigStatus", panelController.ChangeOJConfigStatus)
 		}
 
 		spider := panel.Group("/spider")

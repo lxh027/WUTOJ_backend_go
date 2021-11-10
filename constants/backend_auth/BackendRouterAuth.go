@@ -94,6 +94,19 @@ var auths = map[string]string{
 	"/panel/balloon/getContestBalloon": "getBalloonStatus",
 	"/panel/balloon/sendBalloon":       "setBalloonStatus",
 
+	//ojWebUserConfig
+	"/panel/ojWebUserConfig/addOJWebUserConfig":     "addOJConfig",
+	"/panel/ojWebUserConfig/deleteOJWebUserConfig":  "deleteOJConfig",
+	"/panel/ojWebUserConfig/getOJWebUserConfigByID": "getAllOJConfig",
+	"/panel/ojWebUserConfig/updateOJWebUserConfig":  "updateOJConfig",
+	"/panel/ojWebUserConfig/getAllOJWebUserConfig":  "getAllOJConfig",
+	"/panel/ojWebUserConfig/changeOJConfigStatus":   "updateOJConfig",
+
+	//TODO:添加正确的权限
+	//spider
+	"/panel/spider/getAll":      AuthPass,
+	"/panel/spider/getLastWeek": AuthPass,
+
 	// print
 	"/panel/print/getAllPrintRequest": "getPrintRequest",
 	"/panel/print/handlePrintRequest": "getPrintRequest",

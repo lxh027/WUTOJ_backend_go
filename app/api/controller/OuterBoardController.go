@@ -8,10 +8,11 @@ import (
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"errors"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func GetContestInfo(c *gin.Context) {
@@ -31,15 +32,15 @@ func GetContestInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "get data error", nil))
 		return
 	}
-	reData := map[string]interface{} {
-		"teams": userInfo,
+	reData := map[string]interface{}{
+		"teams":   userInfo,
 		"submits": submitsInfo,
-		"basic": basicInfo,
+		"basic":   basicInfo,
 	}
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get data success", reData))
 }
 
-func getContestUsr(contestID int) (interface{}, error)  {
+func getContestUsr(contestID int) (interface{}, error) {
 	type item map[string]string
 	userModel := model.User{}
 
@@ -67,9 +68,9 @@ func getContestUsr(contestID int) (interface{}, error)  {
 	for _, user := range formalUsers {
 		userItem := item{
 			"members": user.Realname,
-			"school": user.School,
-			"team": user.Nick,
-			"type": "type1",
+			"school":  user.School,
+			"team":    user.Nick,
+			"type":    "type1",
 		}
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
@@ -78,9 +79,9 @@ func getContestUsr(contestID int) (interface{}, error)  {
 	for _, user := range starUsers {
 		userItem := item{
 			"members": user.Realname,
-			"school": user.School,
-			"team": user.Nick,
-			"type": "type2",
+			"school":  user.School,
+			"team":    user.Nick,
+			"type":    "type2",
 		}
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
@@ -89,7 +90,7 @@ func getContestUsr(contestID int) (interface{}, error)  {
 	return reData, nil
 }
 
-func getContestSubmit(contestID int) (interface{}, error)  {
+func getContestSubmit(contestID int) (interface{}, error) {
 	submitModel := model.Submit{}
 	contestModel := model.Contest{}
 
@@ -174,10 +175,10 @@ func getContestBasicInfo(contestID int) (interface{}, error) {
 		return nil, errors.New("parse problems error")
 	}
 
-	reData := map[string]interface{} {
-		"end_time": contest.EndTime,
+	reData := map[string]interface{}{
+		"end_time":    contest.EndTime,
 		"problem_num": len(problems),
-		"title": contest.ContestName,
+		"title":       contest.ContestName,
 	}
 	reDataStr, _ := json.Marshal(reData)
 	_ = database.PutToRedis(redis_key.OuterInfo, reDataStr, 3600)
