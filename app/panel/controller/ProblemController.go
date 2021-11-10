@@ -246,10 +246,12 @@ func UploadImg(c *gin.Context) {
 		})
 		return
 	}
+	serverConfig := config.GetServerConfig()
+	finalUrl := fmt.Sprintf("http://%s:%s%s", serverConfig["domain"], serverConfig["port"], dst)
 	c.JSON(http.StatusOK, gin.H{
 		"code": constants.CodeSuccess,
 		"msg": "upload img success",
-		"url": "/admin"+dst,
+		"url": finalUrl,
 	})
 	return
 }

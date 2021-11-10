@@ -166,4 +166,5 @@ func BackendRoutes(router *gin.Engine) {
 	}
 	router.StaticFS("/admin/", http.Dir("./web/admin"))
 	router.StaticFS("/board/", http.Dir("./web/board"))
+	router.StaticFS("/uploads/", http.Dir("./web/uploads"))
 }
