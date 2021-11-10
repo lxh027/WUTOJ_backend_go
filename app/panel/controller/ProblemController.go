@@ -249,7 +249,7 @@ func UploadImg(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": constants.CodeSuccess,
 		"msg": "upload img success",
-		"url": "/admin"+dst,
+		"url": dst,
 	})
 	return
 }
