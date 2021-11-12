@@ -8,10 +8,11 @@ import (
 	"OnlineJudge/core/database"
 	"encoding/json"
 	"errors"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 )
 
 func GetContestInfo(c *gin.Context) {
