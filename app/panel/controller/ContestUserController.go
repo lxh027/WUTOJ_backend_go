@@ -77,7 +77,7 @@ func AddContestUsers(c *gin.Context) {
 
 			var user model.User
 
-			//csv格式:0:teamID,1:realname,2:school,3:major,4:class,5:contact
+			//csv格式:0:teamID,1:realname,2:school,3:major,4:class,5:contact,6:password
 
 			user.Nick = "c_" + fmt.Sprintf("%d", contestUserJSON.ContestID) + "_" + record[0]
 			user.Realname = record[1]
@@ -85,6 +85,7 @@ func AddContestUsers(c *gin.Context) {
 			user.Major = record[3]
 			user.Class = record[4]
 			user.Contact = record[5]
+			user.Password = helper.GetMd5(record[6])
 			users = append(users, user)
 		}
 		res := userModel.AddUsersAndContestUsers(users, contestUserJSON.ContestID)
