@@ -40,7 +40,7 @@ func (model *Problem) GetAllProblems(offset int, limit int) helper.ReturnType {
 	}
 
 	err = db.
-		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "public", "source", "memory", "type", "tag", "path", "status"}).
+		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "public", "source", "memory", "type", "tag", "status"}).
 		Offset(offset).
 		Limit(limit).
 		Where("public = ?", constants.ProblemPublic).
@@ -88,12 +88,14 @@ func (model *Problem) GetProblemFieldsByIDList(ids []uint, fields []string) help
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功", Data: problems}
 }
 
+// Use
 func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	var problem Problem
 	sampleModel := Sample{}
 	problemSubmitLog := ProblemSubmitLog{}
 
 	err := db.
+		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "source", "memory", "type", "tag"}).
 		Where("problem_id = ?", id).
 		First(&problem).
 		Error
@@ -110,6 +112,7 @@ func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	}
 }
 
+// Unused
 func (model *Problem) GetProblemByTitle(title string) helper.ReturnType {
 	var problem Problem
 
