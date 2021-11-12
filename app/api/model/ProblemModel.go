@@ -7,18 +7,18 @@ import (
 
 type Problem struct {
 	ProblemID    uint    `json:"problem_id,omitempty" form:"problem_id"`
-	Title        string  `json:"title,omitempty" form:"title" `
-	Background   string  `json:"background,omitempty" form:"background"`
-	Describe     string  `json:"describe,omitempty" form:"describe"`
-	InputFormat  string  `json:"input_format,omitempty" form:"input_format"`
-	OutputFormat string  `json:"output_format,omitempty" form:"output_format"`
-	Hint         string  `json:"hint,omitempty" form:"hint"`
+	Title        string  `json:"title" form:"title" `
+	Background   string  `json:"background" form:"background"`
+	Describe     string  `json:"describe" form:"describe"`
+	InputFormat  string  `json:"input_format" form:"input_format"`
+	OutputFormat string  `json:"output_format" form:"output_format"`
+	Hint         string  `json:"hint" form:"hint"`
 	Public       uint    `json:"public,omitempty" form:"public"`
-	Source       string  `json:"source,omitempty" form:"source"`
-	Time         float64 `json:"time,omitempty" form:"time"`
-	Memory       int     `json:"memory,omitempty" form:"memory"`
-	Type         string  `json:"type,omitempty" form:"type"`
-	Tag          string  `json:"tag,omitempty" form:"tag"`
+	Source       string  `json:"source" form:"source"`
+	Time         float64 `json:"time" form:"time"`
+	Memory       int     `json:"memory" form:"memory"`
+	Type         string  `json:"type" form:"type"`
+	Tag          string  `json:"tag" form:"tag"`
 	Path         string  `json:"path,omitempty" form:"path"`
 	Status       int     `json:"status,omitempty" form:"status"`
 }
