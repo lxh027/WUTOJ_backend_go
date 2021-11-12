@@ -105,7 +105,9 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 	if res.Status != constants.CodeSuccess {
 		return nil, errors.New(res.Msg)
 	}
+	
 	beginTime := res.Data.(model.Contest).BeginTime
+	endTime := res.Data.(model.Contest).EndTime
 	problemsStr := res.Data.(model.Contest).Problems
 
 	var problems []uint
@@ -141,6 +143,15 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 			if problem == submit.ProblemID {
 				problemID = string(rune('A' + index))
 			}
+		}
+		_, _, frozenTime, err := getContestTime(submit.ContestID)
+		if err != nil {
+			return nil, errors.New("parse fronzen time error")
+		}
+		format := "2006-01-02 15:04:05"
+		now, _ := time.Parse(format, time.Now().Format(format))
+		if now.Unix() > frozenTime.Unix() && now.Unix() < endTime.Unix() {
+			status = "NEW"
 		}
 		data = append(data, submit.UserID, problemID, submit.SubmitTime.UnixMilli()-beginTime.UnixMilli(), status)
 		reData = append(reData, data)
