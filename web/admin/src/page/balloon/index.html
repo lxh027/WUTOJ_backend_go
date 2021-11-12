@@ -24,6 +24,9 @@
                             <div class="layui-input-inline">
                                 <input type="number" name="contest_id" id="contest_id" autocomplete="off" class="layui-input">
                             </div>
+                            <div class="layui-inline">
+                                <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="balloon-flush-btn">点击刷新</button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -68,9 +71,6 @@
                     if (auths.indexOf("setBalloonStatus") !== -1) {
                         $("#currentTableBar").append(getButton(2, 'send', '送'))
                     }
-                    if (auths.indexOf("getBalloonStatus") !== -1) {
-                        $(".layui-form-item").append(getButton(2, 'flushBalloon', '刷新气球'))
-                    }
                 }
             })
             //自动刷新气球
@@ -84,14 +84,15 @@
 
         })
 
+
         table.render({
             elem: '#currentTableId',
             url: getPort()+'balloon/getContestBalloon',
             contentType: 'application/json',
-            where: {
+            method: 'post',
+            where:{
                 "contest_id": 0
             },
-            method: 'post',
             parseData: (res) => {
                 return {
                     "code": res.status, //解析接口状态
@@ -148,28 +149,19 @@
                 return false;
             }
 
-            if (obj.event === 'flushBalloon') {
-                $.ajax({
-                    url: getPort() + 'balloon/getContestBalloon',
-                    dataType: "json",
-                    data: {
-                        "contest_id": parseInt($("#contest_id").val()),
-                        "user_id": data.user_id,
-                        "problem_id": data.problem_id
-                    },
-                    success: function (data) {
-                        table.reload('currentTableId', {
-                            where: {
-                                "contest_id": parseInt($("#contest_id").val())
-                            },
-                        }, 'data');
-                    }
-                })
-                return false;
-            }
-
 
         });
+        form.on("submit(balloon-flush-btn)",function(data){
+            var contest_id = parseInt($("#contest_id").val())
+
+            table.reload('currentTableId', {
+                where: {
+                    "contest_id": contest_id
+                }
+            }, 'data');
+
+            return false;
+        })
 
     });
 </script>
