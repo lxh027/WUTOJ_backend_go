@@ -40,14 +40,14 @@ func (model *UserSubmitLog) CreatUserSubmitLog(UserNick string) helper.ReturnTyp
 }
 
 func (model *UserSubmitLog) GetUserSubmitLog(UserID uint) helper.ReturnType {
-	var UserSubmitLog UserSubmitLog
+	var userSubmitLog UserSubmitLog
 	err := db.
-		Model(&UserSubmitLog).
+		Model(&userSubmitLog).
 		Where("user_id = ?", int(UserID)).
-		First(&UserSubmitLog).
+		First(&userSubmitLog).
 		Error
 	if err != nil {
-		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交数据失败", Data: err.Error()}
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询提交数据失败", Data: UserSubmitLog{}}
 	}
-	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交数据成功", Data: UserSubmitLog}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询提交数据成功", Data: userSubmitLog}
 }

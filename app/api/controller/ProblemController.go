@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -65,23 +64,20 @@ func GetProblemByID(c *gin.Context) {
 	if contestsBeginTime.Status != constants.CodeSuccess {
 		c.JSON(http.StatusOK, helper.ApiReturn(contestsBeginTime.Status, contestsBeginTime.Msg, contestsBeginTime.Msg))
 	}
-
 	for _, contest := range contestsBeginTime.Data.([]model.Contest) {
 		userID := int(userIDRaw)
-		if participation := contestUserModel.CheckUserContest(userID, contest.ContestID); participation.Status != constants.CodeSuccess {
-			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "No participation for contest found", nil))
-			return
-		}
-		format := "2006-01-02 15:04:05"
-		now, _ := time.Parse(format, time.Now().Format(format))
-		if now.Before(contest.BeginTime) {
-			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "比赛未开始", 0))
-			return
+		if participation := contestUserModel.CheckUserContest(userID, contest.ContestID); participation.Status == constants.CodeSuccess {
+			format := "2006-01-02 15:04:05"
+			now, _ := time.Parse(format, time.Now().Format(format))
+			beginTime, _, _, err := getContestTime(uint(contest.ContestID))
+			if err == nil && now.Unix() >= beginTime.Unix() {
+				res := problemModel.GetProblemByID(int(problemJson.ProblemID))
+				c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+				return
+			}
 		}
 	}
-
-	res := problemModel.GetProblemByID(int(problemJson.ProblemID))
-	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "没有权限", 0))
 	return
 
 	/*

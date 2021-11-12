@@ -3,6 +3,7 @@ package model
 import (
 	"OnlineJudge/app/helper"
 	"OnlineJudge/constants"
+	"log"
 )
 
 type User struct {
@@ -77,11 +78,9 @@ func (model *User) AddUser(newUser User) helper.ReturnType {
 //此处对contestUser也进行了添加
 func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helper.ReturnType {
 	user := User{}
-	contestUserJSON := struct {
-		ContestID int `json:"contest_id" form:"contest_id"`
-	}{}
 	tx := db.Begin()
 	for _, newUser := range newUsers {
+		log.Printf("%v\n", newUser)
 		if err := tx.Where("nick = ?", newUser.Nick).First(&user).Error; err == nil {
 			tx.Rollback()
 			return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: false}
@@ -93,10 +92,11 @@ func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helpe
 		}
 		var contestUser ContestUser
 
-		contestUser.ContestID = contestUserJSON.ContestID
+		contestUser.ContestID = contestID
 
-		findUser := user.GetUserByNick(user.Nick)
+		findUser := user.GetUserByNick(newUser.Nick)
 		if findUser.Status != constants.CodeSuccess {
+			log.Printf("%v", findUser)
 			tx.Rollback()
 			return helper.ReturnType{Status: constants.CodeError, Msg: "数据库错误", Data: false}
 		}
