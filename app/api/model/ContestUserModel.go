@@ -19,7 +19,7 @@ func (ContestUser) TableName() string {
 func (model *ContestUser) AddContestUser(data ContestUser) helper.ReturnType {
 	contestUser := ContestUser{}
 	err := db.
-		Select([]string{"contestUser_id", "user_id"}).
+		Select([]string{"contest_id", "user_id"}).
 		Where("contest_id = ? AND user_id = ?", data.ContestID, data.UserID).
 		Find(&contestUser).
 		Error
@@ -59,7 +59,7 @@ func (model *ContestUser) GetUserContest(UserID int) helper.ReturnType {
 	var contestUser []ContestUser
 
 	err := db.
-		Select([]string{"user_id"}).
+		Select([]string{"user_id", "contest_id"}).
 		Where("user_id = ?", UserID).
 		Find(&contestUser).
 		Error
