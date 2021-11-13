@@ -27,6 +27,19 @@ func (model *ContestUser) AddContestUser(data ContestUser) helper.ReturnType {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "已经参加比赛，请勿重复参赛", Data: ""}
 	}
 
+	contest := Contest{}
+	err = db.Select([]string{"rule"}).
+		Where("contest_id = ?", data.ContestID).
+		Find(&contest).
+		Error
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "比赛不存在", Data: ""}
+	}
+
+	if contest.Rule != constants.CommonContest {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "比赛不可自己报名", Data: ""}
+	}
+
 	err = db.Create(&data).Error
 
 	if err != nil {
