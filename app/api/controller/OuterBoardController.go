@@ -133,9 +133,9 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 		data := make([]interface{}, 0)
 		var status string
 		switch submit.Status {
-		case "ac":
+		case "AC":
 			status = "AC"
-		case "judging":
+		case "Judging":
 			status = "NEW"
 		default:
 			status = "NO"
