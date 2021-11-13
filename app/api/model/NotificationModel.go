@@ -22,7 +22,7 @@ func (model *Notification) GetNotification(ContestID int, LastNotification int) 
 	var notifications []Notification
 
 	err := db.
-		Select([]string{"content", "title"}).
+		Select([]string{"id", "content", "title", "submit_time", "modify_time"}).
 		Where("contest_id = ?", ContestID).
 		Where("status = ?", 1).
 		Where("id > ?", LastNotification).
