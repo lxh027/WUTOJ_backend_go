@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -55,6 +56,13 @@ func GetProblemByID(c *gin.Context) {
 		return
 	}
 
+	res := problemModel.GetProblemByID(int(problemJson.ProblemID))
+	log.Printf("\n\n%v\n\n", res.Data.(map[string]interface{}))
+	if res.Status != constants.CodeSuccess || res.Data.(map[string]interface{})["problem"].(model.Problem).Public == constants.ProblemPublic {
+		c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
+		return
+	}
+
 	// judge if problem in contests
 	contestsBeginTime := contestModel.GetContestsByProblemID(
 		problemJson.ProblemID,
@@ -71,7 +79,7 @@ func GetProblemByID(c *gin.Context) {
 			now, _ := time.Parse(format, time.Now().Format(format))
 			beginTime, _, _, err := getContestTime(uint(contest.ContestID))
 			if err == nil && now.Unix() >= beginTime.Unix() {
-				res := problemModel.GetProblemByID(int(problemJson.ProblemID))
+				//res := problemModel.GetProblemByID(int(problemJson.ProblemID))
 				c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
 				return
 			}

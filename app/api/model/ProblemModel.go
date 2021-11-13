@@ -95,7 +95,7 @@ func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	problemSubmitLog := ProblemSubmitLog{}
 
 	err := db.
-		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "source", "memory", "type", "tag"}).
+		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "source", "memory", "type", "tag", "public"}).
 		Where("problem_id = ?", id).
 		First(&problem).
 		Error
