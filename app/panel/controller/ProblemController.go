@@ -6,19 +6,19 @@ import (
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/config"
 	"OnlineJudge/constants"
+	"encoding/xml"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"math"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
-	"encoding/xml"
-	"io/ioutil"
-	"regexp"
 )
 
 func GetAllProblem(c *gin.Context) {
@@ -236,7 +236,7 @@ func UploadImg(c *gin.Context) {
 
 	FileNameMd5 := helper.GetMd5(file.Filename)
 
-	dst := "/uploads/image/" + FileNameMd5 + path.Ext(file.Filename)
+	dst := "/uploads/image/" + FileNameMd5 + helper.RandString(11) + path.Ext(file.Filename)
 
 	if err := c.SaveUploadedFile(file, "web"+dst); err != nil {
 		c.JSON(http.StatusOK, gin.H{
