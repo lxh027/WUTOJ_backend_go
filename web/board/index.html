@@ -141,6 +141,7 @@
             document.querySelector('head title').innerText = document.querySelector('#contest_title').innerText
             problemNum = basic.problem_num
             let endTime = basic.end_time
+            endTime = endTime.replace("T", " ").replace("Z", "")
             let timestamp_e = new Date(endTime).getTime()
             let timestamp_n = Date.parse(new Date())
             sec = (timestamp_e-timestamp_n)/1000
