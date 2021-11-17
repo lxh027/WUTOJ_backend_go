@@ -132,6 +132,9 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 	for _, submit := range submits {
 		data := make([]interface{}, 0)
 		var status string
+		if submit.Status == "CE" || submit.Status == "UE" {
+			continue
+		}
 		switch submit.Status {
 		case "AC":
 			status = "AC"
