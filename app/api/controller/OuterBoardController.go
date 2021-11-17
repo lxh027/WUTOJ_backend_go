@@ -156,7 +156,7 @@ func getContestSubmit(contestID int) (interface{}, error)  {
 		format := "2006-01-02 15:04:05"
 		now, _ := time.Parse(format, time.Now().Format(format))
 		log.Printf("\n\n%v\n%v\n%v\n", frozenTime.Unix(), now.Unix(), endTime.Unix())
-		if submit.SubmitTime.Unix() > frozenTime.Unix() && submit.SubmitTime.Unix() < endTime.Unix() {
+		if now.Unix() < endTime.Unix() && submit.SubmitTime.Unix() > frozenTime.Unix() && submit.SubmitTime.Unix() < endTime.Unix() {
 			status = "NEW"
 		}
 		data = append(data, submit.UserID, problemID, submit.SubmitTime.UnixMilli()-beginTime.UnixMilli(), status)
