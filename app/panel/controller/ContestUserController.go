@@ -79,7 +79,11 @@ func AddContestUsers(c *gin.Context) {
 
 			//csv格式:0:teamID,1:realname,2:school,3:major,4:class,5:contact,6:password
 
+<<<<<<< HEAD
 			user.Nick = "c_" + fmt.Sprintf("%d", contestUserJSON.ContestID) + "_" + record[0]
+=======
+			user.Nick = fmt.Sprintf("c_%d_%s_%s", contestUserJSON.ContestID, record[0], record[1])
+>>>>>>> pre
 			user.Realname = record[1]
 			user.School = record[2]
 			user.Major = record[3]

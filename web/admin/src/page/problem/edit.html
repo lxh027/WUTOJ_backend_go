@@ -246,8 +246,9 @@
         });
 
         easyeditor.init({
-            elem: '.editor'
-        })
+            elem: '.editor',
+	    uploadUrl: getPort()+'problem/uploadImg'
+	})
 
         form.on('checkbox', function (data) {
             console.log(data.elem)

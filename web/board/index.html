@@ -141,6 +141,10 @@
             document.querySelector('head title').innerText = document.querySelector('#contest_title').innerText
             problemNum = basic.problem_num
             let endTime = basic.end_time
+<<<<<<< HEAD
+=======
+            endTime = endTime.replace("T", " ").replace("Z", "")
+>>>>>>> pre
             let timestamp_e = new Date(endTime).getTime()
             let timestamp_n = Date.parse(new Date())
             sec = (timestamp_e-timestamp_n)/1000
@@ -184,4 +188,8 @@
   </script>
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> pre

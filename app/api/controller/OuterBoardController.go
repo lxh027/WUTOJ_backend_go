@@ -11,7 +11,11 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+<<<<<<< HEAD
 	
+=======
+	"log"
+>>>>>>> pre
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 )
@@ -33,15 +37,26 @@ func GetContestInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "get data error", nil))
 		return
 	}
+<<<<<<< HEAD
 	reData := map[string]interface{}{
 		"teams":   userInfo,
 		"submits": submitsInfo,
 		"basic":   basicInfo,
+=======
+	reData := map[string]interface{} {
+		"teams": userInfo,
+		"submits": submitsInfo,
+		"basic": basicInfo,
+>>>>>>> pre
 	}
 	c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeSuccess, "get data success", reData))
 }
 
+<<<<<<< HEAD
 func getContestUsr(contestID int) (interface{}, error) {
+=======
+func getContestUsr(contestID int) (interface{}, error)  {
+>>>>>>> pre
 	type item map[string]string
 	userModel := model.User{}
 
@@ -69,9 +84,15 @@ func getContestUsr(contestID int) (interface{}, error) {
 	for _, user := range formalUsers {
 		userItem := item{
 			"members": user.Realname,
+<<<<<<< HEAD
 			"school":  user.School,
 			"team":    user.Nick,
 			"type":    "type1",
+=======
+			"school": user.School,
+			"team": user.Nick,
+			"type": "type1",
+>>>>>>> pre
 		}
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
@@ -80,9 +101,15 @@ func getContestUsr(contestID int) (interface{}, error) {
 	for _, user := range starUsers {
 		userItem := item{
 			"members": user.Realname,
+<<<<<<< HEAD
 			"school":  user.School,
 			"team":    user.Nick,
 			"type":    "type2",
+=======
+			"school": user.School,
+			"team": user.Nick,
+			"type": "type2",
+>>>>>>> pre
 		}
 		reData[strconv.Itoa(int(user.UserID))] = userItem
 	}
@@ -91,7 +118,11 @@ func getContestUsr(contestID int) (interface{}, error) {
 	return reData, nil
 }
 
+<<<<<<< HEAD
 func getContestSubmit(contestID int) (interface{}, error) {
+=======
+func getContestSubmit(contestID int) (interface{}, error)  {
+>>>>>>> pre
 	submitModel := model.Submit{}
 	contestModel := model.Contest{}
 
@@ -132,10 +163,20 @@ func getContestSubmit(contestID int) (interface{}, error) {
 	for _, submit := range submits {
 		data := make([]interface{}, 0)
 		var status string
+<<<<<<< HEAD
 		switch submit.Status {
 		case "ac":
 			status = "AC"
 		case "judging":
+=======
+		if submit.Status == "CE" || submit.Status == "UE" {
+			continue
+		}
+		switch submit.Status {
+		case "AC":
+			status = "AC"
+		case "Judging":
+>>>>>>> pre
 			status = "NEW"
 		default:
 			status = "NO"
@@ -146,13 +187,22 @@ func getContestSubmit(contestID int) (interface{}, error) {
 				problemID = string(rune('A' + index))
 			}
 		}
+<<<<<<< HEAD
 		_, _, frozenTime, err := getContestTime(submit.ContestID)
+=======
+		_, _, frozenTime, err := getContestTime(uint(contestID))
+>>>>>>> pre
 		if err != nil {
 			return nil, errors.New("parse fronzen time error")
 		}
 		format := "2006-01-02 15:04:05"
 		now, _ := time.Parse(format, time.Now().Format(format))
+<<<<<<< HEAD
 		if now.Unix() > frozenTime.Unix() && now.Unix() < endTime.Unix() {
+=======
+		log.Printf("\n\n%v\n%v\n%v\n", frozenTime.Unix(), now.Unix(), endTime.Unix())
+		if now.Unix() < endTime.Unix() && submit.SubmitTime.Unix() > frozenTime.Unix() && submit.SubmitTime.Unix() < endTime.Unix() {
+>>>>>>> pre
 			status = "NEW"
 		}
 		data = append(data, submit.UserID, problemID, submit.SubmitTime.UnixMilli()-beginTime.UnixMilli(), status)
@@ -187,10 +237,17 @@ func getContestBasicInfo(contestID int) (interface{}, error) {
 		return nil, errors.New("parse problems error")
 	}
 
+<<<<<<< HEAD
 	reData := map[string]interface{}{
 		"end_time":    contest.EndTime,
 		"problem_num": len(problems),
 		"title":       contest.ContestName,
+=======
+	reData := map[string]interface{} {
+		"end_time": contest.EndTime,
+		"problem_num": len(problems),
+		"title": contest.ContestName,
+>>>>>>> pre
 	}
 	reDataStr, _ := json.Marshal(reData)
 	_ = database.PutToRedis(redis_key.OuterInfo, reDataStr, 3600)

@@ -24,6 +24,10 @@ import (
 
 func Submit(c *gin.Context) {
 	//TODO: auth participation and contest time
+	
+	problemModel := model.Problem{}
+	contestModel := model.Contest{}
+	contestUserModel := model.ContestUser{}
 
 	submitModel := model.Submit{}
 	submitValidate := validate.SubmitValidate
@@ -75,6 +79,38 @@ func Submit(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "不支持的语言类型", nil))
 		return
 	}
+
+	// judge if problem is private and in contests
+	ok := false
+	res := problemModel.GetProblemByID(int(submitJson.ProblemID))
+	if res.Status != constants.CodeSuccess || res.Data.(map[string]interface{})["problem"].(model.Problem).Public == constants.ProblemPublic {
+		ok = true
+	} else {
+		contestsBeginTime := contestModel.GetContestsByProblemID(
+			int(submitJson.ProblemID),
+			[]string{"contest.contest_id", "begin_time"},
+		)
+		if contestsBeginTime.Status == constants.CodeSuccess {
+			for _, contest := range contestsBeginTime.Data.([]model.Contest) {
+				if participation := contestUserModel.CheckUserContest(int(userID.(uint)), contest.ContestID); participation.Status == constants.CodeSuccess {
+					format := "2006-01-02 15:04:05"
+					now, _ := time.Parse(format, time.Now().Format(format))
+					beginTime, _, _, err := getContestTime(uint(contest.ContestID))
+					if err == nil && now.Unix() >= beginTime.Unix() {
+						ok = true
+						break
+					}
+				}
+			}
+		}
+	}
+	if !ok {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "暂时无法提交", nil))
+		return
+	}
+	
+
+
 
 	newSubmit := model.Submit{
 		UserID:     userID.(uint),

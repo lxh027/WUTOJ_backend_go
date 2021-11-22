@@ -62,10 +62,11 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 	endTime := res.Data.(model.Contest).EndTime
 	frozen := res.Data.(model.Contest).Frozen
 	frozenTime := time.Unix(int64((float64(endTime.Unix())-float64(beginTime.Unix()))*(1-frozen)+float64(beginTime.Unix())), 0)
-	format := "2006-01-02 15:04:05"
-	frozenF, _ := time.Parse(format, frozenTime.Format(format))
+	frozenTime = frozenTime.UTC()
+	//format := "2006-01-02 15:04:05"
+	//frozenF, _ := time.Parse(format, frozenTime.Format(format))
 	fmt.Printf("beginTime: %v, endTime: %v, frozenTime: %v, frozenF: %v",
-		beginTime, endTime, frozenTime, frozenF)
+		beginTime, endTime, frozenTime)
 	return beginTime, endTime, frozenTime, nil
 }
 

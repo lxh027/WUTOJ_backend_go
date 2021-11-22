@@ -20,3 +20,6 @@ const UnJoined = false
 
 const Login = true
 const UnLogin = false
+
+const CommonContest = 1
+const UploadOnly = 2

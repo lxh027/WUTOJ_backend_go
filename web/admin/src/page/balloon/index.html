@@ -24,6 +24,9 @@
                             <div class="layui-input-inline">
                                 <input type="number" name="contest_id" id="contest_id" autocomplete="off" class="layui-input">
                             </div>
+                            <div class="layui-inline">
+                                <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="balloon-flush-btn">点击刷新</button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -84,14 +87,15 @@
 
         })
 
+
         table.render({
             elem: '#currentTableId',
             url: getPort()+'balloon/getContestBalloon',
             contentType: 'application/json',
-            where: {
+            method: 'post',
+            where:{
                 "contest_id": 0
             },
-            method: 'post',
             parseData: (res) => {
                 return {
                     "code": res.status, //解析接口状态
@@ -168,8 +172,18 @@
                 return false;
             }
 
-
         });
+        form.on("submit(balloon-flush-btn)",function(data){
+            var contest_id = parseInt($("#contest_id").val())
+
+            table.reload('currentTableId', {
+                where: {
+                    "contest_id": contest_id
+                }
+            }, 'data');
+
+            return false;
+        })
 
     });
 </script>

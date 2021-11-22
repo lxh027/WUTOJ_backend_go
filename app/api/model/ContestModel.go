@@ -63,7 +63,7 @@ func (model *Contest) GetContestByName(contestName string) helper.ReturnType {
 func (model *Contest) GetContestById(contestID int) helper.ReturnType {
 	contest := Contest{}
 	err := db.
-		Select([]string{"contest_id", "contest_name", "begin_time", "end_time", "problems", "status"}).
+		Select([]string{"contest_id", "contest_name", "begin_time", "end_time", "problems", "status", "frozen"}).
 		Where("contest_id = ?", contestID).
 		First(&contest).
 		Error
@@ -145,6 +145,7 @@ func (model *Contest) GetContestsByProblemID(problemID int, fields []string) hel
 
 	err := db.
 		Joins("JOIN contest_problem ON contest.contest_id = contest_problem.contest_id").
+		Where("contest_problem.problem_id = ?", problemID).
 		Select(fields).
 		Find(&contests).
 		Error
