@@ -7,13 +7,12 @@ import (
 	"time"
 )
 
-
 var RedisClient *redis.Pool
 
-func init()  {
+func init() {
 	redisConf := config.GetRedisConfig()
 	RedisClient = &redis.Pool{
-		MaxIdle: redisConf["maxIdle"].(int),
+		MaxIdle:     redisConf["maxIdle"].(int),
 		MaxActive:   redisConf["maxActive"].(int),
 		IdleTimeout: redisConf["timeout"].(time.Duration),
 		Dial: func() (redis.Conn, error) {
@@ -32,7 +31,7 @@ func init()  {
 	}
 }
 
-func ZAddToRedis(key string, score int64, member interface{}) error  {
+func ZAddToRedis(key string, score int64, member interface{}) error {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
@@ -40,14 +39,14 @@ func ZAddToRedis(key string, score int64, member interface{}) error  {
 	return err
 }
 
-func ZGetAllFromRedis(key string) (interface{}, error)  {
+func ZGetAllFromRedis(key string) (interface{}, error) {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
 	return rc.Do("ZRANGE", key, 0, -1)
 }
 
-func SAddToRedisSet(key string, member interface{}) error  {
+func SAddToRedisSet(key string, member interface{}) error {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
@@ -55,7 +54,7 @@ func SAddToRedisSet(key string, member interface{}) error  {
 	return err
 }
 
-func SIsNumberOfRedisSet(key string, member interface{}) (bool, error)  {
+func SIsNumberOfRedisSet(key string, member interface{}) (bool, error) {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
@@ -63,7 +62,7 @@ func SIsNumberOfRedisSet(key string, member interface{}) (bool, error)  {
 	return value, err
 }
 
-func GetFromRedis(key string) (interface{}, error)  {
+func GetFromRedis(key string) (interface{}, error) {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
@@ -71,7 +70,7 @@ func GetFromRedis(key string) (interface{}, error)  {
 	return value, err
 }
 
-func PutToRedis(key string, value interface{}, timeout int)  error {
+func PutToRedis(key string, value interface{}, timeout int) error {
 	key = appendPrefix(key)
 	rc := RedisClient.Get()
 	defer rc.Close()
@@ -89,7 +88,5 @@ func DeleteFromRedis(key string) error {
 
 func appendPrefix(key string) string {
 	prefix := config.GetRedisConfig()["env"].(string)
-	return prefix+"."+key
+	return prefix + "." + key
 }
-
-

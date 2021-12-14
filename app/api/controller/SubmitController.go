@@ -22,9 +22,118 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func SubmitToConsumer(c *gin.Context) {
+	//TODO: auth participation and contest time
+
+	problemModel := model.Problem{}
+	contestModel := model.Contest{}
+	contestUserModel := model.ContestUser{}
+
+	submitModel := model.Submit{}
+	submitValidate := validate.SubmitValidate
+	session := sessions.Default(c)
+	userID := session.Get("user_id")
+
+	if userID == nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "用户未登录", ""))
+		return
+	}
+
+	format := "2006-01-02 15:04:05"
+	now, _ := time.Parse(format, time.Now().Format(format))
+	interval := config.GetWutOjConfig()["interval_time"].(int)
+	redisStr := redis_key.UserLastSubmit(int(userID.(uint)))
+	if value, err := database.GetFromRedis(redisStr); err == nil {
+		defaultFormat := "2006-01-02 15:04:05 +0000 UTC"
+		lastStr, _ := redis.String(value, err)
+		last, _ := time.Parse(defaultFormat, lastStr)
+		fmt.Printf("now: %v, last: %v\n", now, last)
+
+		if now.Unix()-last.Unix() <= int64(interval) {
+			c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "交题间隔过快，请五秒后再试", ""))
+			return
+		}
+	}
+	_ = database.PutToRedis(redisStr, now, 3600)
+
+	var submitJson struct {
+		Language   string `json:"language"`
+		SourceCode string `json:"source_code"`
+		ProblemID  uint   `json:"problem_id"`
+		ContestID  uint   `json:"contest_id"`
+	}
+
+	if err := c.ShouldBindJSON(&submitJson); err != nil {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "数据绑定模型错误", err.Error()))
+		return
+	}
+
+	submitMap := helper.Struct2Map(submitJson)
+
+	if res, err := submitValidate.ValidateMap(submitMap, "add"); !res {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, err.Error(), ""))
+		return
+	}
+
+	if helper.LanguageID(submitJson.Language) == -1 {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "不支持的语言类型", nil))
+		return
+	}
+
+	// judge if problem is private and in contests
+	ok := false
+	res := problemModel.GetProblemByID(int(submitJson.ProblemID))
+	if res.Status != constants.CodeSuccess || res.Data.(map[string]interface{})["problem"].(model.Problem).Public == constants.ProblemPublic {
+		ok = true
+	} else {
+		contestsBeginTime := contestModel.GetContestsByProblemID(
+			int(submitJson.ProblemID),
+			[]string{"contest.contest_id", "begin_time"},
+		)
+		if contestsBeginTime.Status == constants.CodeSuccess {
+			for _, contest := range contestsBeginTime.Data.([]model.Contest) {
+				if participation := contestUserModel.CheckUserContest(int(userID.(uint)), contest.ContestID); participation.Status == constants.CodeSuccess {
+					format := "2006-01-02 15:04:05"
+					now, _ := time.Parse(format, time.Now().Format(format))
+					beginTime, _, _, err := getContestTime(uint(contest.ContestID))
+					if err == nil && now.Unix() >= beginTime.Unix() {
+						ok = true
+						break
+					}
+				}
+			}
+		}
+	}
+
+	if !ok {
+		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "暂时无法提交", nil))
+		return
+	}
+	newSubmit := model.Submit{
+		UserID:     userID.(uint),
+		Nick:       GetUserNickFromSession(c),
+		Language:   helper.LanguageID(submitJson.Language),
+		SourceCode: submitJson.SourceCode,
+		ProblemID:  submitJson.ProblemID,
+		ContestID:  submitJson.ContestID,
+		Status:     "Judging",
+		SubmitTime: now,
+	}
+
+	resp := submitModel.AddSubmit(&newSubmit)
+
+	go func(submit model.Submit) {
+		judge(submit)
+	}(newSubmit)
+
+	c.JSON(http.StatusOK, helper.ApiReturn(resp.Status, resp.Msg, resp.Data))
+	return
+
+}
+
 func Submit(c *gin.Context) {
 	//TODO: auth participation and contest time
-	
+
 	problemModel := model.Problem{}
 	contestModel := model.Contest{}
 	contestUserModel := model.ContestUser{}
@@ -108,9 +217,6 @@ func Submit(c *gin.Context) {
 		c.JSON(http.StatusOK, helper.ApiReturn(constants.CodeError, "暂时无法提交", nil))
 		return
 	}
-	
-
-
 
 	newSubmit := model.Submit{
 		UserID:     userID.(uint),

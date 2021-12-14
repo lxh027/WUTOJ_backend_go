@@ -69,22 +69,3 @@ func getContestTime(contestID uint) (time.Time, time.Time, time.Time, error) {
 		beginTime, endTime, frozenTime)
 	return beginTime, endTime, frozenTime, nil
 }
-
-//func Upload(FileDst string, file *multipart.FileHeader) helper.ReturnType {
-//
-//	FileNameMd5 := helper.GetMd5(file.Filename)
-//
-//	dst := "../uploads/image/" + FileNameMd5 + path.Ext(file.Filename)
-//
-//	UserID := middleware.GetUserIdFromSession(c)
-//	userModel := model.User{}
-//
-//	if err := c.SaveUploadedFile(file, dst); err != nil {
-//		c.JSON(http.StatusOK, helper.ApiReturn(common.CodeError, "上传文件失败", err.Error()))
-//		return
-//	}
-//
-//	res = userModel.AddUserAvatar(int(UserID), dst)
-//	c.JSON(http.StatusOK, helper.ApiReturn(res.Status, res.Msg, res.Data))
-//	return
-//}
