@@ -2,6 +2,7 @@ package main
 
 import (
 	"OnlineJudge/core/database"
+	"OnlineJudge/core/grpc/rpcconn"
 	"OnlineJudge/core/judger"
 	"OnlineJudge/core/server"
 
@@ -14,6 +15,7 @@ func main() {
 	defer func() {
 		database.MySqlDb.Close()
 		judger.CloseInstance()
+		rpcconn.RPCConn.Close()
 	}()
 
 	server.Run(httpServer)
