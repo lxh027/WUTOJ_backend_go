@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>OJ配置列表</title>
-    <!-- TODO:完全没搞 -->
+    <!-- TODO:应该搞了 -->
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -83,7 +83,10 @@
                             })
                         }
                         if (auths.indexOf("updateOJConfig") !== -1) {
-                            $("#currentTableBar").append(getButton(2, 'edit', '编辑'))
+                            $("#currentTableBar").append(getButton(2, 'crawler', '爬取'))
+                        }
+                        if (auths.indexOf("updateOJConfig") !== -1) {
+                            $("#currentTableBar").append(getButton(4, 'edit', '编辑'))
                         }
                         if (auths.indexOf("deleteOJConfig") !== -1) {
                             $("#currentTableBar").append(getButton(3, 'delete', '删除'))
@@ -130,7 +133,7 @@
                     { field: 'status', title: '状态', sort: true, templet: (d) => { if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>"; } },
                     { title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center" },
                 ]],
-                limits: [10, 15, 20, 25, 50, 100],
+                limits: [10, 15, 20, 25, 50, 200],
                 limit: 25,
                 page: true,
                 skin: 'line'
@@ -197,7 +200,24 @@
                         layer.full(index);
                     });
                     return false;
-                } else if (obj.event === 'delete') {
+                } 
+                else if (obj.event === 'crawler') { //TODO:爬取
+
+                    var index = layer.open({
+                        title: '爬取做题记录',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: './crawler.html?id=' + data.id,
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                    return false;
+                } 
+                else if (obj.event === 'delete') {
                     layer.confirm('确认删除', function (index) {
                         $.ajax({
                             url: getPort() + 'ojWebUserConfig/deleteOJWebUserConfig',
@@ -219,7 +239,7 @@
                         })
                         layer.close(index);
                     });
-                } else if (obj.event === 'status') {//TODO:
+                } else if (obj.event === 'status') {
                     layer.confirm('确认更改', function (index) {
                         $.ajax({
                             url: getPort() + 'ojWebUserConfig/changeOJConfigStatus',

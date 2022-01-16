@@ -21,5 +21,7 @@ func init() {
 	RPCConn, err = grpc.Dial(RPCAddress+RPCPORT, grpc.WithInsecure())
 	if err != nil {
 		log.Panic("network error", err)
+	} else {
+		log.Println("crawler connect.")
 	}
 }

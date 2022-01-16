@@ -6,10 +6,11 @@ import (
 	"OnlineJudge/app/panel/model"
 	"OnlineJudge/constants"
 	"encoding/json"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 func UpdateUser(c *gin.Context) {

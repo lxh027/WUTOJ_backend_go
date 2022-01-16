@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>爬取用户做题信息</title>
+    <!-- //TODO:完全没搞 -->
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layui-form layuimini-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户ID</label>
+            <div class="layui-input-block">
+                <input type="text" name="user_id" id="user_id" lay-verify="required" lay-reqtext="用户ID不能为空"
+                    placeholder="请输入用户ID" value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">OJ名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="oj_name" id="oj_name" lay-verify="required" lay-reqtext="OJ名称不能为空"
+                    placeholder="请输入OJ名称" value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">爬取方式</label>
+            <div class="layui-input-block">
+                <select name="type" id="type" lay-filter="typeSelect">
+                    <option value=0>爬取全部</option>
+                    <option value=1>爬取本周</option>
+                    <option value=2>爬取上周</option>
+                    <option value=3>爬取指定时间范围内</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="begin-time-div" hidden>
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="begin_time" id="begin_time" placeholder="请输入" lay-verify="none" autocomplete="off"
+                    class="layui-input">
+                <!-- <input type="text" name="begin_time" id="begin_time" placeholder="请输入" lay-verify="required" autocomplete="off"
+                    class="layui-input"> -->
+        
+            </div>
+        </div>
+        <div class="layui-form-item" id="end-time-div" hidden>
+            <label class="layui-form-label">结束时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="end_time" id="end_time" placeholder="请输入" lay-verify="none" autocomplete="off"
+                    class="layui-input">
+                <!-- <input type="text" name="end_time" id="end_time" placeholder="请输入" lay-verify="required" autocomplete="off"
+                    class="layui-input"> -->
+        
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认添加</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../../js/common.js"></script>
+    <script>
+        layui.use(['form', 'laydate'], function () {
+            var form = layui.form,
+                layer = layui.layer,
+                laydate = layui.laydate,
+                $ = layui.$;
+            let auths = [];
+            $(document).ready(() => {
+                $.ajax({
+                    url: getPort() + 'user/getUserInfo',
+                    type: "post",
+                    dataType: "json",
+                    data: {},
+                    success: function (return_data) {
+                        const data = return_data.data
+                        auths = data.auths
+                        if (auths.indexOf("addContest") === -1) { //TODO:
+                            layer.msg("权限不足", () => {
+                                window.location.href = "../404.html"
+                            })
+                        }
+                    }
+                })
+            })
+
+
+
+
+
+
+            laydate.render({
+                elem: '#begin_time'
+                , type: 'datetime'
+                , format: 'yyyy-MM-ddTHH:mm:ssZ'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , type: 'datetime'
+                , format: 'yyyy-MM-ddTHH:mm:ssZ'
+            });
+            form.render();
+
+
+            form.on('select(typeSelect)', function (data) {
+                if (data.value != 3) {
+                    $("#begin-time-div").hide()
+                    $("#end-time-div").hide()
+                    $("#begin_time").val("")
+                    $("#end_time").val("")
+                } else {
+                    $("#begin-time-div").show()
+                    $('#end-time-div').show()
+                }
+            })
+
+
+
+
+
+
+            //监听提交
+            form.on('submit(saveBtn)', function (data) {
+                var index = layer.alert(JSON.stringify(data.field), {
+                    title: '最终的提交信息'
+                }, function () {
+                    var url = "crawler/getAll"
+                    form.on('select(typeSelect)', function (data) {
+                        if (data.value == 0) {
+                            url='crawler/getAll'
+                        }
+                        else if(data.value == 1){
+                            url='crawler/getWeek'
+                        }
+                        else if(data.value == 2){
+                            url='crawler/getLastWeek'
+                        }
+                        else if(data.value == 3){
+                            url='crawler/getBetween'
+                        }
+                    })
+                    //console.log(url)
+                    $.ajax({
+                        url: getPort() + url.toString(),
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "user_id": $("#user_id").val(),
+                            "oj_name": $("#oj_name").val(),
+                            "start_time": $("#begin_time").val(),
+                            "end_time": $("#end_time").val(),
+                        },
+                        success: function (data) {
+                            layer.msg(data.msg)
+                            console.log(data)
+                            if (data.status == 0) {
+                                // 关闭弹出层
+                                layer.close(index);
+
+                                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                                parent.layui.table.reload('currentTableId', {
+                                    page: {
+                                        curr: 1
+                                    }
+                                    , where: {
+                                        "where": data.field
+                                    }
+                                }, 'data');
+                                parent.layer.close(iframeIndex);
+                            }
+                        }
+                    })
+                });
+
+                return false;
+            });
+
+        });
+    </script>
+</body>
+
+</html>

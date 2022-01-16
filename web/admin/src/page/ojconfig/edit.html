@@ -24,15 +24,17 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">OJ名称</label>
+        <label class="layui-form-label required">OJ名称</label>
         <div class="layui-input-block">
-            <input type="text" name="oj_name" id="oj_name" placeholder="请输入OJ名称" value="" class="layui-input">
+            <input type="text" name="oj_name" id="oj_name" lay-verify="required" lay-reqtext="OJ名称不能为空"
+                placeholder="请输入OJ名称" value="" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">OJ用户昵称</label>
+        <label class="layui-form-label required">OJ用户昵称</label>
         <div class="layui-input-block">
-            <input type="text" name="oj_user_name" id="oj_user_name" placeholder="请输入OJ用户昵称" value="" class="layui-input">
+            <input type="text" name="oj_user_name" id="oj_user_name" lay-verify="required" lay-reqtext="OJ用户昵称不能为空"
+                placeholder="请输入OJ用户昵称" value="" class="layui-input">
         </div>
     </div>
     

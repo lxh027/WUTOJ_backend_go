@@ -135,10 +135,12 @@ func BackendRoutes(router *gin.Engine) {
 			ojWebUserConfig.POST("/changeOJConfigStatus", panelController.ChangeOJConfigStatus)
 		}
 
-		spider := panel.Group("/spider")
+		crawler := panel.Group("/crawler")
 		{
-			spider.POST("/getAll", panelController.GetUserAllSubmit)
-			spider.POST("/getLastWeek", panelController.GetUserLastWeekSubmit)
+			crawler.POST("/getAll", panelController.GetUserAllSubmit)
+			crawler.POST("/getWeek", panelController.GetUserWeekSubmit)
+			crawler.POST("/getLastWeek", panelController.GetUserLastWeekSubmit)
+			crawler.POST("/getBetween", panelController.GetUserBetweenSubmit)
 		}
 
 		printRequest := panel.Group("/print")
