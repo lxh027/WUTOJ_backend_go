@@ -36,9 +36,9 @@ func (model *OJWebUserData) AddOJWebUserData(newOJWebUserData OJWebUserData) hel
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 }
 
-//DeleteOJWebUserData 删除某用户在特定OJ的所有数据
-func (model *OJWebUserData) DeleteOJWebUserData(userID int, ojID string) helper.ReturnType {
-	err := db.Where("user_id = ? AND oj_name = ?", userID, ojID).Delete(OJWebUserData{}).Error
+//DeleteOJWebUserData 删除用户在特定OJ的某条数据
+func (model *OJWebUserData) DeleteOJWebUserData(userID int, ojID string, submitTime time.Time) helper.ReturnType {
+	err := db.Where("user_id = ? AND oj_name = ? AND submit_time = ?", userID, ojID, submitTime).Delete(OJWebUserData{}).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "删除失败", Data: false}
@@ -65,4 +65,30 @@ func (model *OJWebUserData) AddOJWebUserDatas(newOJWebUserDatas []OJWebUserData)
 	tx.Commit()
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 
+}
+
+//GetAllOJWebUserData 获取所有用户OJ做题信息
+func (model *OJWebUserData) GetAllOJWebUserData(offset int, limit int, userID int, ojName string) helper.ReturnType {
+	var ojWebUserDatas []OJWebUserData
+	where := "oj_name like ?"
+	var count int
+
+	db.Model(&OJWebUserData{}).Where(where, "%"+ojName+"%").Count(&count)
+
+	err := db.Offset(offset).
+		Limit(limit).
+		Where(where, "%"+ojName+"%").
+		Find(&ojWebUserDatas).
+		Error
+
+	if err != nil {
+		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: err.Error()}
+	} else {
+		return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询成功",
+			Data: map[string]interface{}{
+				"oj_web_user_configs": ojWebUserDatas,
+				"count":               count,
+			},
+		}
+	}
 }

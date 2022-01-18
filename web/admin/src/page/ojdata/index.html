@@ -76,30 +76,23 @@
                         const data = return_data.data
                         auths = data.auths
                         // console.log(auths)
-                        if (auths.indexOf("getAllOJConfig") === -1) {
+                        if (auths.indexOf("crawler") === -1) {
                             layer.msg("权限不足", () => {
                                 window.location.href = "../404.html"
                             })
                         }
+
                         if (auths.indexOf("crawler") !== -1) {
-                            $("#currentTableBar").append(getButton(2, 'crawler', '爬取'))
-                        }
-                        if (auths.indexOf("updateOJConfig") !== -1) {
-                            $("#currentTableBar").append(getButton(4, 'edit', '编辑'))
-                        }
-                        if (auths.indexOf("deleteOJConfig") !== -1) {
                             $("#currentTableBar").append(getButton(3, 'delete', '删除'))
                         }
-                        if (auths.indexOf("updateOJConfig") !== -1) {
-                            $("#currentTableBar").append(getButton(4, 'status', '状态'))
-                        }
+
                     }
                 })
             })
 
             table.render({
                 elem: '#currentTableId',
-                url: getPort() + 'ojWebUserConfig/getAllOJWebUserConfig',
+                url: getPort() + 'ojWebData/getAllOJWebData',
                 contentType: 'application/json',
                 method: 'post',
                 request: {
@@ -128,8 +121,9 @@
                     // { field: 'nick', title: '昵称', sort: true },
                     // { field: 'realname', title: '姓名', sort: true },
                     { field: 'oj_name', title: 'OJ', sort: true },
-                    { field: 'oj_user_name', title: 'OJ用户名', sort: true },
-                    { field: 'status', title: '状态', sort: true, templet: (d) => { if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>"; } },
+                    { field: 'problem_id', title: 'OJ用户名', sort: true },
+                    { field: 'submit_time', title: '提交时间', sort: true },
+                    { field: 'status', title: '提交结果', sort: true},
                     { title: '操作', minWidth: 220, toolbar: '#currentTableBar', align: "center" },
                 ]],
                 limits: [10, 15, 20, 25, 50, 200],
@@ -184,71 +178,18 @@
 
             table.on('tool(currentTableFilter)', function (obj) {
                 var data = obj.data;
-                if (obj.event === 'edit') {
-
-                    var index = layer.open({
-                        title: '编辑配置信息',
-                        type: 2,
-                        shade: 0.2,
-                        maxmin: true,
-                        shadeClose: true,
-                        area: ['100%', '100%'],
-                        content: './edit.html?id=' + data.id,
-                    });
-                    $(window).on("resize", function () {
-                        layer.full(index);
-                    });
-                    return false;
-                } 
-                else if (obj.event === 'crawler') {
-
-                    var index = layer.open({
-                        title: '爬取做题记录',
-                        type: 2,
-                        shade: 0.2,
-                        maxmin: true,
-                        shadeClose: true,
-                        area: ['100%', '100%'],
-                        content: './crawler.html?id=' + data.id,
-                    });
-                    $(window).on("resize", function () {
-                        layer.full(index);
-                    });
-                    return false;
-                } 
-                else if (obj.event === 'delete') {
+                if (obj.event === 'delete') {
                     layer.confirm('确认删除', function (index) {
+                        console.log(data)
                         $.ajax({
-                            url: getPort() + 'ojWebUserConfig/deleteOJWebUserConfig',
+                            url: getPort() + 'ojWebData/deleteOJWebData',
                             type: "post",
                             dataType: "json",
                             data: {
                                 "id": data.id,
                             },
                             success: function (data) {
-                                table.reload('currentTableId', {
-                                    page: {
-                                        curr: 1
-                                    }
-                                    , where: {
-                                        "where": data.field
-                                    }
-                                }, 'data');
-                            }
-                        })
-                        layer.close(index);
-                    });
-                } else if (obj.event === 'status') {
-                    layer.confirm('确认更改', function (index) {
-                        $.ajax({
-                            url: getPort() + 'ojWebUserConfig/changeOJConfigStatus',
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                "id": data.id,
-                                "status": 1 - data.status
-                            },
-                            success: function (data) {
+                                console.log(data)
                                 table.reload('currentTableId', {
                                     page: {
                                         curr: 1

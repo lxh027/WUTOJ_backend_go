@@ -16,8 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO:搞了一些
-
 //GetUserAllSubmit 获取用户全部提交记录
 func GetUserAllSubmit(c *gin.Context) {
 

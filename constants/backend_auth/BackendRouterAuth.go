@@ -102,12 +102,15 @@ var auths = map[string]string{
 	"/panel/ojWebUserConfig/getAllOJWebUserConfig":  "getAllOJConfig",
 	"/panel/ojWebUserConfig/changeOJConfigStatus":   "updateOJConfig",
 
-	//TODO:添加正确的权限
+	//ojWebData
+	"/panel/ojWebData/deleteOJWebData": "crawler",
+	"/panel/ojWebData/getAllOJWebData": "crawler",
+
 	//crawler
-	"/panel/crawler/getAll":      AuthPass,
-	"/panel/crawler/getWeek":     AuthPass,
-	"/panel/crawler/getLastWeek": AuthPass,
-	"/panel/crawler/getBetween":  AuthPass,
+	"/panel/crawler/getAll":      "crawler",
+	"/panel/crawler/getWeek":     "crawler",
+	"/panel/crawler/getLastWeek": "crawler",
+	"/panel/crawler/getBetween":  "crawler",
 
 	// print
 	"/panel/print/getAllPrintRequest": "getPrintRequest",

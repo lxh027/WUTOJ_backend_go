@@ -66,7 +66,7 @@
                 success: function (return_data) {
                     const data = return_data.data
                     auths = data.auths
-                    if (auths.indexOf("addContest") === -1) { //TODO:
+                    if (auths.indexOf("addOJConfig") === -1) {
                         layer.msg("权限不足", () => {
                             window.location.href = "../404.html"
                         })

@@ -93,6 +93,7 @@ func GetContestBalloon(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.BackendApiReturn(constants.CodeSuccess, "获取成功", balloons))
 }
 
+//SentBalloon 发送气球
 func SentBalloon(c *gin.Context) {
 	IDJson := struct {
 		ContestID uint `json:"contest_id" form:"contest_id"`

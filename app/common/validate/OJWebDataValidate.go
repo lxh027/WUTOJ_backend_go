@@ -11,7 +11,7 @@ func init() {
 
 	scenes := map[string][]string{
 		"findByID":    {"id"},
-		"delete":      {"user_id", "oj_name"},
+		"delete":      {"user_id", "oj_name", "submit_time"},
 		"getAll":      {"user_id", "oj_name"},
 		"getLastWeek": {"user_id", "oj_name"},
 		"getWeek":     {"user_id", "oj_name"},

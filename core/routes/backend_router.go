@@ -135,6 +135,12 @@ func BackendRoutes(router *gin.Engine) {
 			ojWebUserConfig.POST("/changeOJConfigStatus", panelController.ChangeOJConfigStatus)
 		}
 
+		ojWebUserData := panel.Group("/ojWebData")
+		{
+			ojWebUserData.POST("/getAllOJWebData", panelController.GetAllOJWebUserData)
+			ojWebUserData.POST("/deleteOJWebData", panelController.DeleteOJWebUserData)
+		}
+
 		crawler := panel.Group("/crawler")
 		{
 			crawler.POST("/getAll", panelController.GetUserAllSubmit)

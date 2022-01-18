@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>爬取用户做题信息</title>
-    <!-- //TODO:完全没搞 -->
+    <!-- //TODO:应该搞完了 -->
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -89,7 +89,7 @@
                     success: function (return_data) {
                         const data = return_data.data
                         auths = data.auths
-                        if (auths.indexOf("addContest") === -1) { //TODO:
+                        if (auths.indexOf("crawler") === -1) {
                             layer.msg("权限不足", () => {
                                 window.location.href = "../404.html"
                             })
