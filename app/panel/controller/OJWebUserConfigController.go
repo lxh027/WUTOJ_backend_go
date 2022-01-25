@@ -123,7 +123,7 @@ func GetAllOJWebUserConfig(c *gin.Context) {
 
 	if c.ShouldBind(&configJson) == nil {
 		configJson.Offset = (configJson.Offset - 1) * configJson.Limit
-		res := configModel.GetAllOJWebUserConfig(configJson.Offset, configJson.Limit, configJson.Where.UserID, configJson.Where.OJName)
+		res := configModel.GetAllOJWebUserConfig(configJson.Offset, configJson.Limit, configJson.Where.OJName)
 		c.JSON(http.StatusOK, helper.BackendApiReturn(res.Status, res.Msg, res.Data))
 		return
 	}

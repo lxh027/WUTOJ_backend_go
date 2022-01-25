@@ -49,9 +49,7 @@
                     success: function (return_data) {
                         const data = return_data.data
                         auths = data.auths
-                        // console.log("试试")
                         if (auths.indexOf("getAllContest") === -1) {
-                            // console.log("没有权限")
                             layer.msg("权限不足", () => {
                                 window.location.href = "../404.html"
                             })
@@ -68,7 +66,6 @@
 
             table.render({
                 elem: '#currentTableId',
-                // url: getPort() + 'contest/notification/getAllNotification',
                 url: getPort() + 'contest/contestUser/getAllContestUsers',
                 contentType: 'application/json',
                 method: 'post',
@@ -76,7 +73,6 @@
                     "contest_id": id,
                 },
                 parseData: (res) => {
-                    //TODO:delete this later
                     console.log(res)
                     console.log("wcr")
                     return {

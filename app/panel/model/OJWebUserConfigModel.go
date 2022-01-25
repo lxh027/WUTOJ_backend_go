@@ -14,6 +14,16 @@ type OJWebUserConfig struct {
 	Status     int    `json:"status" form:"status"`
 }
 
+type OJWebUserConfigWithNick struct {
+	ID         int    `json:"id" form:"id"`
+	OJName     string `json:"oj_name" form:"oj_name"`
+	UserID     int    `json:"user_id" form:"user_id"`
+	OJUserName string `json:"oj_user_name" form:"oj_user_name"`
+	Status     int    `json:"status" form:"status"`
+	Nick       string `json:"nick" form:"nick"`
+	RealName   string `json:"realname" form:"realname"`
+}
+
 //TableName 设定表名
 func (OJWebUserConfig) TableName() string {
 	return "oj_web_user_config"
@@ -64,7 +74,7 @@ func (model *OJWebUserConfig) GetUserOJwebUserConfig(userID int) helper.ReturnTy
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 	}
 
-	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询用户比赛成功", Data: ojWebUserConfig}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询用户OJ配置成功", Data: ojWebUserConfig}
 
 }
 
@@ -79,22 +89,27 @@ func (model *OJWebUserConfig) GetOJWebUserConfigByID(id int) helper.ReturnType {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}
 	}
 
-	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询用户比赛成功", Data: ojWebUserConfig}
+	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "查询用户OJ配置成功", Data: ojWebUserConfig}
 
 }
 
 //GetAllOJWebUserConfig 获取所有用户OJ配置
-func (model *OJWebUserConfig) GetAllOJWebUserConfig(offset int, limit int, userID int, ojName string) helper.ReturnType {
-	var ojWebUserConfigs []OJWebUserConfig
+func (model *OJWebUserConfig) GetAllOJWebUserConfig(offset int, limit int, ojName string) helper.ReturnType {
+	var ojWebUserConfigs []OJWebUserConfigWithNick
 	where := "oj_name like ?"
 	var count int
 
-	db.Model(&OJWebUserConfig{}).Where(where, "%"+ojName+"%").Count(&count)
+	db.Model(&OJWebUserConfig{}).
+		Where(where, "%"+ojName+"%").
+		Count(&count)
 
-	err := db.Offset(offset).
+	err := db.Table("oj_web_user_config").
+		Select("oj_web_user_config.id as id,oj_web_user_config.oj_name as oj_name,oj_web_user_config.user_id as user_id,oj_web_user_config.oj_user_name as oj_user_name,oj_web_user_config.status as status,users.nick as nick,users.realname as realname").
+		Joins("LEFT JOIN users ON users.user_id = oj_web_user_config.user_id").
+		Offset(offset).
 		Limit(limit).
 		Where(where, "%"+ojName+"%").
-		Find(&ojWebUserConfigs).
+		Scan(&ojWebUserConfigs).
 		Error
 
 	if err != nil {

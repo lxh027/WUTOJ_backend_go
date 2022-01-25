@@ -20,12 +20,6 @@
                 <div style="margin: 10px 10px 10px 10px">
                     <form class="layui-form layui-form-pane" action="">
                         <div class="layui-form-item">
-                            <!-- <div class="layui-inline">
-                                <label class="layui-form-label">昵称</label>
-                                <div class="layui-input-inline">
-                                    <input type="text" name="nick" autocomplete="off" class="layui-input">
-                                </div>
-                            </div> -->
                             <div class="layui-inline">
                                 <label class="layui-form-label">OJ名称</label>
                                 <div class="layui-input-inline">
@@ -125,8 +119,8 @@
                     { type: "checkbox", },
                     { field: 'id', title: 'ID', sort: true },
                     { field: 'user_id', title: '用户ID', sort: true },
-                    // { field: 'nick', title: '昵称', sort: true },
-                    // { field: 'realname', title: '姓名', sort: true },
+                    { field: 'nick', title: '昵称', sort: true },
+                    { field: 'realname', title: '姓名', sort: true },
                     { field: 'oj_name', title: 'OJ', sort: true },
                     { field: 'oj_user_name', title: 'OJ用户名', sort: true },
                     { field: 'status', title: '状态', sort: true, templet: (d) => { if (d.status == "0") return "<p style='color: red'>禁用</p>"; else if (d.status == "1") return "<p style='color: green'>正常</p>"; } },
