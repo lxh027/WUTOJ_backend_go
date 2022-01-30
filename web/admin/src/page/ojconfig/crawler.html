@@ -157,8 +157,10 @@
                             "oj_name": $("#oj_name").val(),
                             "start_time": $("#begin_time").val(),
                             "end_time": $("#end_time").val(),
+                            "status":$("#type").val(),
                         },
                         success: function (data) {
+                            // console.log($("#type").val())
                             layer.msg(data.msg)
                             // console.log(data)
                             if (data.status == 0) {
