@@ -1,6 +1,6 @@
 module OnlineJudge
 
-go 1.15
+go 1.16
 
 require (
 	github.com/BurntSushi/toml v1.0.0
@@ -16,6 +16,7 @@ require (
 	github.com/gookit/validate v1.2.11
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/jinzhu/gorm v1.9.16
+	github.com/nsqio/go-nsq v1.1.0 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d // indirect

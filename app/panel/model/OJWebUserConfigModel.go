@@ -64,11 +64,11 @@ func (model *OJWebUserConfig) UpdateOJWebUserConfig(id int, updateOJWebUserConfi
 }
 
 //GetUserOJwebUserConfig 获取用户oj网站配置信息
-func (model *OJWebUserConfig) GetUserOJwebUserConfig(userID int) helper.ReturnType {
+func (model *OJWebUserConfig) GetUserOJwebUserConfig(userID int, ojName string) helper.ReturnType {
 
 	var ojWebUserConfig []OJWebUserConfig
 
-	err := db.Where("user_id = ?", userID).Find(&ojWebUserConfig).Error
+	err := db.Where("user_id = ? AND oj_name = ?", userID, ojName).Find(&ojWebUserConfig).Error
 
 	if err != nil {
 		return helper.ReturnType{Status: constants.CodeError, Msg: "查询失败", Data: ""}

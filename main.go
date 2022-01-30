@@ -2,8 +2,8 @@ package main
 
 import (
 	"OnlineJudge/core/database"
-	"OnlineJudge/core/grpc/rpcconn"
 	"OnlineJudge/core/judger"
+	"OnlineJudge/core/nsqueue"
 	"OnlineJudge/core/server"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +15,9 @@ func main() {
 	defer func() {
 		database.MySqlDb.Close()
 		judger.CloseInstance()
-		rpcconn.RPCConn.Close()
 	}()
+
+	nsqueue.InitNSQ("Responce", "lc")
 
 	server.Run(httpServer)
 }

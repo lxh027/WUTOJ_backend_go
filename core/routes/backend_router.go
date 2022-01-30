@@ -143,10 +143,10 @@ func BackendRoutes(router *gin.Engine) {
 
 		crawler := panel.Group("/crawler")
 		{
-			crawler.POST("/getAll", panelController.GetUserAllSubmit)
-			crawler.POST("/getWeek", panelController.GetUserWeekSubmit)
-			crawler.POST("/getLastWeek", panelController.GetUserLastWeekSubmit)
-			crawler.POST("/getBetween", panelController.GetUserBetweenSubmit)
+			crawler.POST("/getAll", panelController.GetUserSubmit)
+			// crawler.POST("/getWeek", panelController.GetUserWeekSubmit)
+			// crawler.POST("/getLastWeek", panelController.GetUserLastWeekSubmit)
+			// crawler.POST("/getBetween", panelController.GetUserBetweenSubmit)
 		}
 
 		printRequest := panel.Group("/print")
