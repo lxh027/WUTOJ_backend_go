@@ -3,6 +3,7 @@ package server
 import (
 	"OnlineJudge/config"
 	"OnlineJudge/core/judger"
+	"OnlineJudge/core/nsqueue"
 	"OnlineJudge/core/routes"
 	"io"
 	"os"
@@ -55,6 +56,9 @@ func Run(httpServer *gin.Engine) {
 			time.Sleep(10 * time.Minute)
 		}
 	}()
+
+	//初始化nsq
+	nsqueue.InitNSQ("lc")
 
 	// 注册路由
 	routes.ApiRoutes(httpServer)

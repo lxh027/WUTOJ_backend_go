@@ -21,7 +21,7 @@ type OJWebUserConfigWithNick struct {
 	OJUserName string `json:"oj_user_name" form:"oj_user_name"`
 	Status     int    `json:"status" form:"status"`
 	Nick       string `json:"nick" form:"nick"`
-	RealName   string `json:"realname" form:"realname"`
+	Realname   string `json:"realname" form:"realname"`
 }
 
 //TableName 设定表名

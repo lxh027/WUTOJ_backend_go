@@ -8,7 +8,7 @@ type Response struct {
 }
 
 type CrawlerData struct {
-	UserInfo *UserInfo              `json:"user_info"`
+	UserInfo string                 `json:"user_info"`
 	Data     map[string]*SolvedData `json:"data"`
 }
 
@@ -44,7 +44,7 @@ type Error struct {
 }
 
 type TargetInfo struct {
-	UserInfo *UserInfo    `json:"user_info"`
+	UserInfo string       `json:"user_info"`
 	Oj       []*OJAccount `json:"oj"`
 }
 

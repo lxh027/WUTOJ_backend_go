@@ -3,7 +3,6 @@ package main
 import (
 	"OnlineJudge/core/database"
 	"OnlineJudge/core/judger"
-	"OnlineJudge/core/nsqueue"
 	"OnlineJudge/core/server"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +15,6 @@ func main() {
 		database.MySqlDb.Close()
 		judger.CloseInstance()
 	}()
-
-	nsqueue.InitNSQ("Responce", "lc")
 
 	server.Run(httpServer)
 }

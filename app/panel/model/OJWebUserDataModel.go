@@ -16,6 +16,18 @@ type OJWebUserData struct {
 	Status     string    `json:"status" form:"status"`
 }
 
+//OJWebUserData 带有nick与realname的oj爬取的数据的数据表
+type OJWebUserDataWithNick struct {
+	ID         int       `json:"id" form:"id"`
+	OJName     string    `json:"oj_name" form:"oj_name"`
+	UserID     int       `json:"user_id" form:"user_id"`
+	ProblemID  string    `json:"problem_id" form:"problem_id"`
+	SubmitTime time.Time `json:"submit_time" form:"submit_time"`
+	Status     string    `json:"status" form:"status"`
+	Nick       string    `json:"nick" form:"nick"`
+	Realname   string    `json:"realname" form:"realname"`
+}
+
 //TableName 设定表名
 func (OJWebUserData) TableName() string {
 	return "oj_web_data"
@@ -69,13 +81,16 @@ func (model *OJWebUserData) AddOJWebUserDatas(newOJWebUserDatas []OJWebUserData)
 
 //GetAllOJWebUserData 获取所有用户OJ做题信息
 func (model *OJWebUserData) GetAllOJWebUserData(offset int, limit int, userID int, ojName string) helper.ReturnType {
-	var ojWebUserDatas []OJWebUserData
+	var ojWebUserDatas []OJWebUserDataWithNick
 	where := "oj_name like ?"
 	var count int
 
 	db.Model(&OJWebUserData{}).Where(where, "%"+ojName+"%").Count(&count)
 
-	err := db.Offset(offset).
+	err := db.Table("oj_web_data").
+		Select("oj_web_data.id as id,oj_web_data.oj_name as oj_name,oj_web_data.user_id as user_id,oj_web_data.submit_time as submit_time,oj_web_data.problem_id as problem_id,oj_web_data.status as status,users.nick as nick,users.realname as realname").
+		Joins("LEFT JOIN users ON users.user_id = oj_web_data.user_id").
+		Offset(offset).
 		Limit(limit).
 		Where(where, "%"+ojName+"%").
 		Find(&ojWebUserDatas).

@@ -14,14 +14,6 @@ import (
 	"github.com/nsqio/go-nsq"
 )
 
-//TODO:完全没搞
-
-// const (
-// 	NSQHost = "127.0.0.1" //改为nsq服务地址
-// 	NSQPort = "4150"
-// 	TOPIC   = "crawler"
-// )
-
 type ResponceHandler struct {
 	q *nsq.Consumer
 }
@@ -57,7 +49,7 @@ func (h *ResponceHandler) HandleMessage(message *nsq.Message) error {
 	return nil
 }
 
-func InitConsuemr(topic string, channel string) {
+func InitConsumer(topic string, channel string) {
 	var (
 		config *nsq.Config
 		h      *ResponceHandler
@@ -80,8 +72,8 @@ func InitConsuemr(topic string, channel string) {
 }
 
 //InitNSQ 初始化nsq
-func InitNSQ(topic1 string, channel1 string) {
-	InitConsuemr(topic1, channel1)
+func InitNSQ(channel string) {
+	InitConsumer(fmt.Sprintf("%s", cfg.GetNSQConfig()["consumer_topic"]), channel)
 	RequestProducer = &Producer{}
 	// RequestProducer.producer, _ = InitProducer(cfg.nsqConfig["host"] + ":" + cfg.nsqConfig["port"])
 	RequestProducer.producer, _ = InitProducer(fmt.Sprintf("%s:%s", cfg.GetNSQConfig()["host"], cfg.GetNSQConfig()["port"]))
@@ -97,7 +89,7 @@ func (p *Producer) Publish(data Request) (err error) {
 		return err
 	}
 
-	if err = p.producer.Publish(fmt.Sprintf("%s", cfg.GetNSQConfig()["topic"]), buf.Bytes()); err != nil {
+	if err = p.producer.Publish(fmt.Sprintf("%s", cfg.GetNSQConfig()["producer_topic"]), buf.Bytes()); err != nil {
 		log.Println(err)
 		return err
 	}
@@ -120,7 +112,7 @@ func SaveOJUserData(res Response) {
 	ojWebUserModel := model.OJWebUserData{}
 	for _, data := range res.Data {
 		var err error
-		ojWebUserData.UserID, err = strconv.Atoi(data.UserInfo.Name)
+		ojWebUserData.UserID, err = strconv.Atoi(data.UserInfo)
 		if err != nil {
 			log.Println("crawler data error:", err)
 			return
@@ -129,8 +121,9 @@ func SaveOJUserData(res Response) {
 			ojWebUserData.OJName = key
 			solvedData := value.Data
 			for i := range solvedData.Problems {
-				submitTime, err := time.Parse("2006-01-02 15:04:05 Z0700 MST", solvedData.Problems[i].SubmitTime)
+				submitTime, err := time.Parse("2006-01-02 15:04:05 +0000 UTC", solvedData.Problems[i].SubmitTime)
 				if err != nil {
+					log.Println("crawler data error:", err)
 					continue
 				}
 				ojWebUserData.SubmitTime = submitTime
@@ -145,4 +138,5 @@ func SaveOJUserData(res Response) {
 		log.Println("crawler data error:", re.Data)
 		return
 	}
+	log.Println("receive the crawler data successful")
 }

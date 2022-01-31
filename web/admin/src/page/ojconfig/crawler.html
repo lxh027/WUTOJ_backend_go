@@ -160,8 +160,9 @@
                             "status":$("#type").val(),
                         },
                         success: function (data) {
-                            // console.log($("#type").val())
                             layer.msg(data.msg)
+                            //TODO:不能正常输出
+                            // console.log("test")
                             // console.log(data)
                             if (data.status == 0) {
                                 // 关闭弹出层
