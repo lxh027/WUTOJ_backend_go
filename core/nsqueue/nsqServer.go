@@ -58,14 +58,14 @@ func InitConsumer(topic string, channel string) {
 	h = &ResponceHandler{}
 
 	config = nsq.NewConfig()
-
+	nsqConfig := cfg.GetNSQConfig()
 	if h.q, err = nsq.NewConsumer(topic, channel, config); err != nil {
 		log.Println(err)
 		return
 	}
 
 	h.q.AddHandler(h)
-	if err = h.q.ConnectToNSQD(fmt.Sprintf("%s:%s", cfg.GetNSQConfig()["host"], cfg.GetNSQConfig()["port"])); err != nil {
+	if err = h.q.ConnectToNSQD(fmt.Sprintf("%s:%s", nsqConfig["host"], nsqConfig["port"])); err != nil {
 		log.Println(err)
 	}
 
@@ -73,10 +73,11 @@ func InitConsumer(topic string, channel string) {
 
 //InitNSQ 初始化nsq
 func InitNSQ(channel string) {
-	InitConsumer(fmt.Sprintf("%s", cfg.GetNSQConfig()["consumer_topic"]), channel)
+	nsqConfig := cfg.GetNSQConfig()
+	InitConsumer(fmt.Sprintf("%s", nsqConfig["consumer_topic"]), channel)
 	RequestProducer = &Producer{}
 	// RequestProducer.producer, _ = InitProducer(cfg.nsqConfig["host"] + ":" + cfg.nsqConfig["port"])
-	RequestProducer.producer, _ = InitProducer(fmt.Sprintf("%s:%s", cfg.GetNSQConfig()["host"], cfg.GetNSQConfig()["port"]))
+	RequestProducer.producer, _ = InitProducer(fmt.Sprintf("%s:%s", nsqConfig["host"], nsqConfig["port"]))
 }
 
 func (p *Producer) Publish(data Request) (err error) {
