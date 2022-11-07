@@ -22,7 +22,7 @@ type User struct {
 	Status   int    `json:"status" form:"status"`
 }
 
-//TableName 设定表名
+// TableName 设定表名
 func (User) TableName() string {
 	return "users"
 }
@@ -57,7 +57,7 @@ func (model *User) DeleteUser(userID int) helper.ReturnType {
 	}
 }
 
-//AddUser 添加用户
+// AddUser 添加用户
 func (model *User) AddUser(newUser User) helper.ReturnType {
 	user := User{}
 
@@ -74,24 +74,13 @@ func (model *User) AddUser(newUser User) helper.ReturnType {
 	}
 }
 
-<<<<<<< HEAD
-//AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突，此处对contestUser也进行了添加
-func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helper.ReturnType {
-	user := User{}
-	contestUserJSON := struct {
-		ContestID int `json:"contest_id" form:"contest_id"`
-	}{}
-	tx := db.Begin()
-	for _, newUser := range newUsers {
-=======
-//AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突
-//此处对contestUser也进行了添加
+// AddUsersAndContestUsers 添加多个用户和比赛用户，不检测邮箱冲突
+// 此处对contestUser也进行了添加
 func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helper.ReturnType {
 	user := User{}
 	tx := db.Begin()
 	for _, newUser := range newUsers {
 		log.Printf("%v\n", newUser)
->>>>>>> pre
 		if err := tx.Where("nick = ?", newUser.Nick).First(&user).Error; err == nil {
 			tx.Rollback()
 			return helper.ReturnType{Status: constants.CodeError, Msg: "昵称已存在", Data: false}
@@ -103,18 +92,11 @@ func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helpe
 		}
 		var contestUser ContestUser
 
-<<<<<<< HEAD
-		contestUser.ContestID = contestUserJSON.ContestID
-
-		findUser := user.GetUserByNick(user.Nick)
-		if findUser.Status != constants.CodeSuccess {
-=======
 		contestUser.ContestID = contestID
 
 		findUser := user.GetUserByNick(newUser.Nick)
 		if findUser.Status != constants.CodeSuccess {
 			log.Printf("%v", findUser)
->>>>>>> pre
 			tx.Rollback()
 			return helper.ReturnType{Status: constants.CodeError, Msg: "数据库错误", Data: false}
 		}
@@ -131,10 +113,7 @@ func (model *User) AddUsersAndContestUsers(newUsers []User, contestID int) helpe
 			return helper.ReturnType{Status: constants.CodeError, Msg: "参加比赛失败", Data: ""}
 		}
 	}
-<<<<<<< HEAD
 	tx.Commit()
-=======
->>>>>>> pre
 	return helper.ReturnType{Status: constants.CodeSuccess, Msg: "创建成功", Data: true}
 
 }
@@ -187,7 +166,7 @@ func (model *User) GetUserByID(userID int) helper.ReturnType {
 	}
 }
 
-//GetUserByNick 由用户名获取用户
+// GetUserByNick 由用户名获取用户
 func (model *User) GetUserByNick(userNick string) helper.ReturnType {
 	var getUser User
 

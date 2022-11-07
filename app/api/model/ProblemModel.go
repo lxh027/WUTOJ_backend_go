@@ -95,11 +95,7 @@ func (model *Problem) GetProblemByID(id int) helper.ReturnType {
 	problemSubmitLog := ProblemSubmitLog{}
 
 	err := db.
-<<<<<<< HEAD
-		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "source", "memory", "type", "tag"}).
-=======
 		Select([]string{"problem_id", "time", "title", "background", "`describe`", "input_format", "output_format", "hint", "source", "memory", "type", "tag", "public"}).
->>>>>>> pre
 		Where("problem_id = ?", id).
 		First(&problem).
 		Error
